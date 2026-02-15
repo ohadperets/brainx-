@@ -1,0 +1,1824 @@
+// ===== APP.JS — Peret School Application Logic (Full Featured) =====
+
+// ===== STATE =====
+let currentScreen = 'home';
+let currentSubject = null;
+let screenHistory = [];
+let quizState = {};
+let flashcardState = {};
+let hangmanState = {};
+let memoryState = {};
+let raceState = {};
+let dictationState = {};
+let dailyChallengeState = {};
+let ttsEnabled = false;
+let ttsSpeed = 1;
+
+// ===== STORAGE =====
+function getDefaultProgress() {
+  return {
+    stars: 0,
+    streak: 0,
+    lastActiveDate: null,
+    gamesPlayed: 0,
+    dictationsCompleted: 0,
+    unlockedAchievements: [],
+    dailyChallengeDate: null,
+    dailyChallengeScore: null,
+    hebrew: { quizBest: 0, quizAttempts: 0, flashcardsCompleted: 0, lessonsRead: [] },
+    english: { quizBest: 0, quizAttempts: 0, flashcardsCompleted: 0, lessonsRead: [] },
+    math: { quizBest: 0, quizAttempts: 0, flashcardsCompleted: 0, lessonsRead: [] }
+  };
+}
+
+function loadProgress() {
+  try {
+    const data = localStorage.getItem('brainx-progress');
+    if (data) {
+      const p = JSON.parse(data);
+      const def = getDefaultProgress();
+      return { ...def, ...p,
+        hebrew: { ...def.hebrew, ...p.hebrew },
+        english: { ...def.english, ...p.english },
+        math: { ...def.math, ...p.math }
+      };
+    }
+    return getDefaultProgress();
+  } catch {
+    return getDefaultProgress();
+  }
+}
+
+function saveProgress(p) {
+  try { localStorage.setItem('brainx-progress', JSON.stringify(p)); } catch {}
+}
+
+function loadProfile() {
+  try {
+    const data = localStorage.getItem('brainx-profile');
+    return data ? JSON.parse(data) : null;
+  } catch { return null; }
+}
+
+function saveProfileData(prof) {
+  try { localStorage.setItem('brainx-profile', JSON.stringify(prof)); } catch {}
+}
+
+function loadSettings() {
+  try {
+    const data = localStorage.getItem('brainx-settings');
+    return data ? JSON.parse(data) : { theme: 'default', ttsEnabled: false, ttsSpeed: 1 };
+  } catch { return { theme: 'default', ttsEnabled: false, ttsSpeed: 1 }; }
+}
+
+function saveSettings(s) {
+  try { localStorage.setItem('brainx-settings', JSON.stringify(s)); } catch {}
+}
+
+let progress = loadProgress();
+let profile = loadProfile();
+let settings = loadSettings();
+
+// ===== INITIALIZATION =====
+document.addEventListener('DOMContentLoaded', () => {
+  applyTheme(settings.theme);
+  ttsEnabled = settings.ttsEnabled;
+  ttsSpeed = settings.ttsSpeed;
+  updateStreak();
+
+  setTimeout(() => {
+    const splash = document.getElementById('splash-screen');
+    splash.classList.add('fade-out');
+    setTimeout(() => {
+      splash.style.display = 'none';
+      document.getElementById('app').classList.remove('hidden');
+      if (!profile) {
+        showProfileSetup();
+      } else {
+        updateUIWithProfile();
+      }
+    }, 500);
+  }, 2000);
+
+  const tips = APP_DATA.tips;
+  document.getElementById('daily-tip').textContent = tips[Math.floor(Math.random() * tips.length)];
+
+  updateHomeProgress();
+  updateHomeBadges();
+  updateDailyChallengeCard();
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+});
+
+// ===== STREAK TRACKING =====
+function updateStreak() {
+  const today = new Date().toDateString();
+  if (!progress.lastActiveDate) {
+    progress.streak = 1;
+    progress.lastActiveDate = today;
+    saveProgress(progress);
+    return;
+  }
+  if (progress.lastActiveDate === today) return;
+
+  const last = new Date(progress.lastActiveDate);
+  const now = new Date();
+  const diffDays = Math.floor((now - last) / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 1) {
+    progress.streak = (progress.streak || 0) + 1;
+  } else if (diffDays > 1) {
+    progress.streak = 1;
+  }
+  progress.lastActiveDate = today;
+  saveProgress(progress);
+}
+
+// ===== PROFILE SYSTEM =====
+function showProfileSetup() {
+  const modal = document.getElementById('profile-setup');
+  modal.classList.remove('hidden');
+
+  const grid = document.getElementById('avatar-grid');
+  grid.innerHTML = APP_DATA.avatars.map((a, i) =>
+    `<button class="avatar-option ${i === 0 ? 'selected' : ''}" onclick="selectAvatar(this, '${a}')" data-avatar="${a}">${a}</button>`
+  ).join('');
+}
+
+let selectedAvatar = '😎';
+
+function selectAvatar(el, avatar) {
+  document.querySelectorAll('.avatar-option').forEach(a => a.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedAvatar = avatar;
+}
+
+function saveProfile() {
+  const name = document.getElementById('profile-name-input').value.trim() || 'תלמיד';
+  profile = { name, avatar: selectedAvatar };
+  saveProfileData(profile);
+  document.getElementById('profile-setup').classList.add('hidden');
+  updateUIWithProfile();
+}
+
+function editProfile() {
+  document.getElementById('profile-name-input').value = profile ? profile.name : '';
+  if (profile) selectedAvatar = profile.avatar;
+  showProfileSetup();
+  setTimeout(() => {
+    document.querySelectorAll('.avatar-option').forEach(a => {
+      a.classList.toggle('selected', a.dataset.avatar === selectedAvatar);
+    });
+  }, 50);
+}
+
+function updateUIWithProfile() {
+  if (!profile) return;
+  document.getElementById('home-avatar').textContent = profile.avatar;
+  document.getElementById('home-greeting').textContent = `שלום ${profile.name}!`;
+  document.getElementById('streak-count').textContent = progress.streak || 0;
+  const navIcon = document.getElementById('nav-profile-icon');
+  if (navIcon) navIcon.textContent = profile.avatar;
+}
+
+// ===== THEME SYSTEM =====
+function applyTheme(themeId) {
+  document.body.className = document.body.className.replace(/theme-\S+/g, '').trim();
+  const theme = APP_DATA.themes.find(t => t.id === themeId);
+  if (theme && theme.class) {
+    document.body.classList.add(theme.class);
+  }
+  const meta = document.getElementById('meta-theme');
+  if (meta && theme) meta.content = theme.color;
+  settings.theme = themeId;
+  saveSettings(settings);
+}
+
+function renderThemeGrid() {
+  const grid = document.getElementById('theme-grid');
+  if (!grid) return;
+  grid.innerHTML = APP_DATA.themes.map(t => `
+    <button class="theme-option ${settings.theme === t.id ? 'selected' : ''}"
+            onclick="applyTheme('${t.id}'); renderThemeGrid();"
+            style="background: ${t.color}; color: white;">
+      ${t.name}${settings.theme === t.id ? ' ✓' : ''}
+    </button>
+  `).join('');
+}
+
+// ===== TEXT-TO-SPEECH =====
+function speak(text, lang) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = lang || 'he-IL';
+  utter.rate = ttsSpeed;
+  window.speechSynthesis.speak(utter);
+}
+
+function toggleTTS() {
+  ttsEnabled = !ttsEnabled;
+  settings.ttsEnabled = ttsEnabled;
+  saveSettings(settings);
+  const btn = document.getElementById('btn-tts');
+  btn.querySelector('span').textContent = ttsEnabled ? '🔊' : '🔇';
+}
+
+function toggleTTSSetting() {
+  ttsEnabled = document.getElementById('tts-toggle').checked;
+  settings.ttsEnabled = ttsEnabled;
+  saveSettings(settings);
+  const btn = document.getElementById('btn-tts');
+  if (btn) btn.querySelector('span').textContent = ttsEnabled ? '🔊' : '🔇';
+}
+
+function updateTTSSpeed() {
+  ttsSpeed = parseFloat(document.getElementById('tts-speed').value);
+  settings.ttsSpeed = ttsSpeed;
+  saveSettings(settings);
+}
+
+function readLessonAloud() {
+  const content = document.getElementById('lesson-content').textContent;
+  const lang = currentSubject === 'english' ? 'en-US' : 'he-IL';
+  speak(content, lang);
+}
+
+// ===== NAVIGATION =====
+function navigate(screen, subject) {
+  if (currentScreen !== screen || (subject !== undefined && subject !== currentSubject)) {
+    screenHistory.push({ screen: currentScreen, subject: currentSubject });
+  }
+
+  currentScreen = screen;
+  if (subject !== undefined) currentSubject = subject;
+
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+
+  const headerTitle = document.getElementById('header-title');
+  const btnBack = document.getElementById('btn-back');
+
+  if (screen === 'home') {
+    btnBack.classList.add('hidden');
+    screenHistory = [];
+  } else {
+    btnBack.classList.remove('hidden');
+  }
+
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+  switch (screen) {
+    case 'home':
+      document.getElementById('screen-home').classList.add('active');
+      headerTitle.textContent = 'BrainX';
+      document.getElementById('nav-home').classList.add('active');
+      updateHomeProgress();
+      updateHomeBadges();
+      updateDailyChallengeCard();
+      updateUIWithProfile();
+      break;
+
+    case 'subject':
+      document.getElementById('screen-subject').classList.add('active');
+      headerTitle.textContent = APP_DATA[currentSubject].name;
+      { const navEl = document.getElementById(`nav-${currentSubject}`);
+        if (navEl) navEl.classList.add('active'); }
+      updateSubjectFeatures();
+      break;
+
+    case 'lessons':
+      document.getElementById('screen-lessons').classList.add('active');
+      headerTitle.textContent = 'שיעורים — ' + APP_DATA[currentSubject].name;
+      renderLessons();
+      break;
+
+    case 'lesson-detail':
+      document.getElementById('screen-lesson-detail').classList.add('active');
+      headerTitle.textContent = 'שיעור';
+      break;
+
+    case 'quiz':
+      document.getElementById('screen-quiz').classList.add('active');
+      headerTitle.textContent = 'חידון — ' + APP_DATA[currentSubject].name;
+      startQuiz();
+      break;
+
+    case 'flashcards':
+      document.getElementById('screen-flashcards').classList.add('active');
+      headerTitle.textContent = 'כרטיסיות — ' + APP_DATA[currentSubject].name;
+      startFlashcards();
+      break;
+
+    case 'games':
+      document.getElementById('screen-games').classList.add('active');
+      headerTitle.textContent = 'משחקים — ' + APP_DATA[currentSubject].name;
+      break;
+
+    case 'game-hangman':
+      document.getElementById('screen-game-hangman').classList.add('active');
+      headerTitle.textContent = 'תלייה — ' + APP_DATA[currentSubject].name;
+      startHangman();
+      break;
+
+    case 'game-memory':
+      document.getElementById('screen-game-memory').classList.add('active');
+      headerTitle.textContent = 'זיכרון — ' + APP_DATA[currentSubject].name;
+      startMemory();
+      break;
+
+    case 'game-math-race':
+      document.getElementById('screen-game-math-race').classList.add('active');
+      headerTitle.textContent = 'מרוץ חשבון';
+      initMathRace();
+      break;
+
+    case 'daily-challenge':
+      document.getElementById('screen-daily-challenge').classList.add('active');
+      headerTitle.textContent = 'אתגר יומי';
+      startDailyChallenge();
+      break;
+
+    case 'dictation':
+      document.getElementById('screen-dictation').classList.add('active');
+      headerTitle.textContent = 'הכתבה שבועית';
+      showDictationMenu();
+      break;
+
+    case 'dictation-typing':
+      document.getElementById('screen-dictation-typing').classList.add('active');
+      headerTitle.textContent = 'הכתבה';
+      startDictation();
+      break;
+
+    case 'word-match':
+      document.getElementById('screen-word-match').classList.add('active');
+      headerTitle.textContent = 'חבר מילים';
+      startWordMatch();
+      break;
+
+    case 'achievements':
+      document.getElementById('screen-achievements').classList.add('active');
+      headerTitle.textContent = 'הישגים';
+      renderAchievements();
+      break;
+
+    case 'profile':
+      document.getElementById('screen-profile').classList.add('active');
+      headerTitle.textContent = 'הפרופיל שלי';
+      document.getElementById('nav-profile').classList.add('active');
+      renderProfileScreen();
+      break;
+
+    case 'progress':
+      document.getElementById('screen-progress').classList.add('active');
+      headerTitle.textContent = 'ההתקדמות שלי';
+      renderProgress();
+      break;
+
+    case 'settings':
+      document.getElementById('screen-settings').classList.add('active');
+      headerTitle.textContent = 'הגדרות';
+      renderSettings();
+      break;
+
+    case 'admin-login':
+      document.getElementById('screen-admin-login').classList.add('active');
+      headerTitle.textContent = 'כניסת מנהל';
+      break;
+
+    case 'admin-dashboard':
+      document.getElementById('screen-admin-dashboard').classList.add('active');
+      headerTitle.textContent = 'לוח ניהול';
+      break;
+
+    case 'admin-dictation':
+      document.getElementById('screen-admin-dictation').classList.add('active');
+      headerTitle.textContent = 'ניהול הכתבות';
+      loadWeekWords();
+      break;
+
+    case 'admin-lessons':
+      document.getElementById('screen-admin-lessons').classList.add('active');
+      headerTitle.textContent = 'ניהול שיעורים';
+      break;
+
+    case 'admin-quiz':
+      document.getElementById('screen-admin-quiz').classList.add('active');
+      headerTitle.textContent = 'ניהול חידונים';
+      break;
+  }
+
+  document.getElementById('main-content').scrollTop = 0;
+}
+
+function goBack() {
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  if (raceState.timer) { clearInterval(raceState.timer); raceState.timer = null; }
+
+  if (screenHistory.length > 0) {
+    const prev = screenHistory.pop();
+    currentScreen = prev.screen;
+    currentSubject = prev.subject || currentSubject;
+    const tempHistory = [...screenHistory];
+    navigate(prev.screen, prev.subject || currentSubject);
+    screenHistory = tempHistory;
+  } else {
+    navigate('home');
+  }
+}
+
+// ===== SUBJECT FEATURES =====
+function updateSubjectFeatures() {
+  const grid = document.getElementById('subject-features');
+  let html = `
+    <button class="feature-card lessons-card" onclick="navigate('lessons')">
+      <div class="feature-icon">📝</div>
+      <div class="feature-name">שיעורים</div>
+      <div class="feature-desc">חומר לימוד</div>
+    </button>
+    <button class="feature-card quiz-card" onclick="navigate('quiz')">
+      <div class="feature-icon">❓</div>
+      <div class="feature-name">חידון</div>
+      <div class="feature-desc">בחן את עצמך</div>
+    </button>
+    <button class="feature-card flashcards-card" onclick="navigate('flashcards')">
+      <div class="feature-icon">🃏</div>
+      <div class="feature-name">כרטיסיות</div>
+      <div class="feature-desc">למד ותרגל</div>
+    </button>
+    <button class="feature-card games-card" onclick="navigate('games')">
+      <div class="feature-icon">🎮</div>
+      <div class="feature-name">משחקים</div>
+      <div class="feature-desc">למד בכיף!</div>
+    </button>`;
+
+  if (currentSubject === 'english') {
+    html += `
+    <button class="feature-card" style="background:linear-gradient(135deg,#fff3e0,#ffe0b2)" onclick="navigate('dictation')">
+      <div class="feature-icon">📝</div>
+      <div class="feature-name">הכתבה שבועית</div>
+      <div class="feature-desc">הכתבה וחיבור מילים</div>
+    </button>`;
+  }
+
+  grid.innerHTML = html;
+}
+
+// ===== HOME PROGRESS =====
+function updateHomeProgress() {
+  ['hebrew', 'english', 'math'].forEach(subj => {
+    const el = document.getElementById(`progress-${subj}`);
+    if (!el) return;
+    const p = progress[subj];
+    const totalLessons = APP_DATA[subj].lessons.length;
+    const readLessons = p.lessonsRead.length;
+    if (readLessons > 0 || p.quizAttempts > 0) {
+      el.textContent = `⭐ ${p.quizBest}% | 📝 ${readLessons}/${totalLessons}`;
+    } else {
+      el.textContent = '✨ התחל ללמוד!';
+    }
+  });
+}
+
+function updateHomeBadges() {
+  const row = document.getElementById('home-badges');
+  if (!row) return;
+  const unlocked = progress.unlockedAchievements || [];
+  if (unlocked.length === 0) {
+    row.innerHTML = '<span style="color:#999;font-size:14px;">עדיין אין הישגים — המשך ללמוד!</span>';
+    return;
+  }
+  const badges = APP_DATA.achievements.filter(a => unlocked.includes(a.id));
+  row.innerHTML = badges.slice(0, 8).map(a => `<span class="badge-mini" title="${a.name}">${a.icon}</span>`).join('');
+  if (badges.length > 8) row.innerHTML += `<span class="badge-mini">+${badges.length - 8}</span>`;
+}
+
+function updateDailyChallengeCard() {
+  const sub = document.getElementById('dc-subtitle');
+  if (!sub) return;
+  const today = new Date().toDateString();
+  if (progress.dailyChallengeDate === today && progress.dailyChallengeScore !== null) {
+    sub.textContent = `✅ סיימת היום! ציון: ${progress.dailyChallengeScore}%`;
+  } else {
+    sub.textContent = 'לחץ כדי לשחק!';
+  }
+}
+
+// ===== LESSONS =====
+function renderLessons() {
+  const container = document.getElementById('lessons-list');
+  const lessons = APP_DATA[currentSubject].lessons;
+  const readList = progress[currentSubject].lessonsRead;
+
+  container.innerHTML = lessons.map((lesson, i) => {
+    const isRead = readList.includes(lesson.id);
+    return `
+      <button class="lesson-item" onclick="openLesson(${i})">
+        <div class="lesson-num" style="${isRead ? 'background:#48bb78' : ''}">${isRead ? '✓' : i + 1}</div>
+        <div>
+          <div class="lesson-title">${lesson.title}</div>
+          <div class="lesson-preview">${lesson.preview}</div>
+        </div>
+      </button>`;
+  }).join('');
+}
+
+function openLesson(index) {
+  const lesson = APP_DATA[currentSubject].lessons[index];
+  document.getElementById('lesson-content').innerHTML = lesson.content;
+
+  if (!progress[currentSubject].lessonsRead.includes(lesson.id)) {
+    progress[currentSubject].lessonsRead.push(lesson.id);
+    progress.stars += 2;
+    saveProgress(progress);
+    checkAchievements();
+  }
+
+  navigate('lesson-detail');
+  if (ttsEnabled) setTimeout(() => readLessonAloud(), 500);
+}
+
+// ===== QUIZ =====
+function startQuiz() {
+  const questions = [...APP_DATA[currentSubject].quiz];
+  shuffle(questions);
+
+  quizState = { questions, current: 0, score: 0, answered: false };
+
+  document.getElementById('quiz-container').classList.remove('hidden');
+  document.getElementById('quiz-results').classList.add('hidden');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = quizState.questions[quizState.current];
+  const total = quizState.questions.length;
+  const current = quizState.current + 1;
+
+  document.getElementById('quiz-progress-fill').style.width = `${(current / total) * 100}%`;
+  document.getElementById('quiz-counter').textContent = `שאלה ${current} מתוך ${total}`;
+  document.getElementById('quiz-question').textContent = q.question;
+
+  document.getElementById('quiz-options').innerHTML = q.options.map((opt, i) =>
+    `<button class="quiz-option" onclick="selectAnswer(${i})">${opt}</button>`
+  ).join('');
+
+  document.getElementById('quiz-feedback').classList.add('hidden');
+  document.getElementById('quiz-next').classList.add('hidden');
+  quizState.answered = false;
+
+  if (ttsEnabled) {
+    const lang = currentSubject === 'english' ? 'en-US' : 'he-IL';
+    speak(q.question, lang);
+  }
+}
+
+function selectAnswer(index) {
+  if (quizState.answered) return;
+  quizState.answered = true;
+
+  const q = quizState.questions[quizState.current];
+  const options = document.querySelectorAll('.quiz-option');
+  const feedback = document.getElementById('quiz-feedback');
+
+  options.forEach(o => o.classList.add('disabled'));
+  options[q.correct].classList.add('correct');
+
+  if (index === q.correct) {
+    quizState.score++;
+    feedback.textContent = '🎉 נכון! כל הכבוד!';
+    feedback.className = 'quiz-feedback correct';
+  } else {
+    options[index].classList.add('wrong');
+    feedback.textContent = '😕 לא נכון. התשובה הנכונה מסומנת בירוק.';
+    feedback.className = 'quiz-feedback wrong';
+  }
+
+  feedback.classList.remove('hidden');
+  document.getElementById('quiz-next').classList.remove('hidden');
+
+  if (quizState.current === quizState.questions.length - 1) {
+    document.getElementById('quiz-next').textContent = 'סיום ←';
+  } else {
+    document.getElementById('quiz-next').textContent = 'הבא →';
+  }
+}
+
+function nextQuestion() {
+  quizState.current++;
+  if (quizState.current >= quizState.questions.length) {
+    showQuizResults();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showQuizResults() {
+  document.getElementById('quiz-container').classList.add('hidden');
+  document.getElementById('quiz-results').classList.remove('hidden');
+
+  const score = quizState.score;
+  const total = quizState.questions.length;
+  const percent = Math.round((score / total) * 100);
+
+  progress[currentSubject].quizAttempts++;
+  if (percent > progress[currentSubject].quizBest) {
+    progress[currentSubject].quizBest = percent;
+  }
+  progress.stars += score;
+  saveProgress(progress);
+  checkAchievements();
+
+  let emoji, title;
+  if (percent >= 90) { emoji = '🏆'; title = 'מדהים! מצוין!'; }
+  else if (percent >= 70) { emoji = '🌟'; title = 'כל הכבוד! ממש טוב!'; }
+  else if (percent >= 50) { emoji = '👍'; title = 'לא רע! המשך להתאמן!'; }
+  else { emoji = '💪'; title = 'נסה שוב, אתה יכול!'; }
+
+  document.getElementById('results-emoji').textContent = emoji;
+  document.getElementById('results-title').textContent = title;
+  document.getElementById('results-score').textContent = `${percent}%`;
+  document.getElementById('results-details').innerHTML = `ענית נכון על ${score} מתוך ${total} שאלות<br>+${score} ⭐ כוכבים!`;
+
+  if (percent >= 70) launchConfetti();
+}
+
+function restartQuiz() { startQuiz(); }
+
+// ===== FLASHCARDS =====
+function startFlashcards() {
+  const cards = [...APP_DATA[currentSubject].flashcards];
+  shuffle(cards);
+  flashcardState = { cards, current: 0, knew: 0, didnt: 0, flipped: false };
+
+  document.querySelector('.flashcards-container').classList.remove('hidden');
+  document.getElementById('flashcards-done').classList.add('hidden');
+  renderFlashcard();
+}
+
+function renderFlashcard() {
+  const card = flashcardState.cards[flashcardState.current];
+  const total = flashcardState.cards.length;
+  const current = flashcardState.current + 1;
+
+  document.getElementById('flashcard-counter').textContent = `כרטיס ${current} מתוך ${total}`;
+  document.getElementById('flashcard-front').textContent = card.front;
+  document.getElementById('flashcard-back').textContent = card.back;
+  document.getElementById('flashcard-inner').classList.remove('flipped');
+  flashcardState.flipped = false;
+}
+
+function flipCard() {
+  document.getElementById('flashcard-inner').classList.toggle('flipped');
+  flashcardState.flipped = !flashcardState.flipped;
+
+  if (flashcardState.flipped && ttsEnabled) {
+    const card = flashcardState.cards[flashcardState.current];
+    const lang = currentSubject === 'english' ? 'en-US' : 'he-IL';
+    speak(card.back, lang);
+  }
+}
+
+function flashcardAction(action) {
+  if (action === 'knew') flashcardState.knew++;
+  else flashcardState.didnt++;
+
+  flashcardState.current++;
+  if (flashcardState.current >= flashcardState.cards.length) {
+    showFlashcardResults();
+  } else {
+    renderFlashcard();
+  }
+}
+
+function nextFlashcard() {
+  if (flashcardState.current < flashcardState.cards.length - 1) {
+    flashcardState.current++;
+    renderFlashcard();
+  }
+}
+
+function prevFlashcard() {
+  if (flashcardState.current > 0) {
+    flashcardState.current--;
+    renderFlashcard();
+  }
+}
+
+function showFlashcardResults() {
+  document.querySelector('.flashcards-container').classList.add('hidden');
+  document.getElementById('flashcards-done').classList.remove('hidden');
+
+  const knew = flashcardState.knew;
+  const total = flashcardState.cards.length;
+
+  progress[currentSubject].flashcardsCompleted++;
+  progress.stars += knew;
+  saveProgress(progress);
+  checkAchievements();
+
+  document.getElementById('flashcards-summary').innerHTML = `
+    ✅ ידעת: ${knew} כרטיסיות<br>
+    ❌ לא ידעת: ${flashcardState.didnt} כרטיסיות<br>
+    +${knew} ⭐ כוכבים!`;
+
+  if (knew > total / 2) launchConfetti();
+}
+
+function restartFlashcards() { startFlashcards(); }
+
+// ===== HANGMAN GAME =====
+function startHangman() {
+  const words = APP_DATA.hangman[currentSubject];
+  const choice = words[Math.floor(Math.random() * words.length)];
+  const isHebrew = currentSubject !== 'english';
+
+  hangmanState = {
+    word: choice.word,
+    hint: choice.hint,
+    guessed: [],
+    lives: 6,
+    won: false,
+    lost: false,
+    isHebrew
+  };
+
+  document.getElementById('hangman-result').classList.add('hidden');
+  renderHangman();
+}
+
+function renderHangman() {
+  const s = hangmanState;
+
+  // Display word
+  const wordDisplay = s.word.split('').map(letter => {
+    if (letter === ' ') return '  ';
+    return s.guessed.includes(letter.toUpperCase()) || s.guessed.includes(letter) ? letter : '_';
+  }).join(' ');
+
+  document.getElementById('hangman-word').textContent = wordDisplay;
+  document.getElementById('hangman-hint').textContent = '💡 רמז: ' + s.hint;
+  document.getElementById('hangman-lives').innerHTML = '❤️'.repeat(s.lives) + '🖤'.repeat(6 - s.lives);
+
+  // Hangman figure (simple ASCII)
+  const figures = ['', '😵', '😵\n |', '😵\n/|', '😵\n/|\\', '😵\n/|\\\n/', '😵\n/|\\\n/ \\'];
+  const wrongCount = 6 - s.lives;
+  document.getElementById('hangman-display').textContent = wrongCount > 0 ? figures[wrongCount] : '😊';
+
+  // Keyboard
+  let letters;
+  if (s.isHebrew) {
+    letters = 'אבגדהוזחטיכלמנסעפצקרשת'.split('');
+  } else {
+    letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  }
+
+  document.getElementById('hangman-keyboard').innerHTML = letters.map(l => {
+    const used = s.guessed.includes(l);
+    const inWord = s.word.toUpperCase().includes(l) || s.word.includes(l);
+    let cls = 'hangman-key';
+    if (used) cls += inWord ? ' correct' : ' wrong';
+    return `<button class="${cls}" ${used ? 'disabled' : ''} onclick="guessLetter('${l}')">${l}</button>`;
+  }).join('');
+
+  // Check win
+  const revealed = s.word.split('').every(letter =>
+    letter === ' ' || s.guessed.includes(letter.toUpperCase()) || s.guessed.includes(letter)
+  );
+
+  const result = document.getElementById('hangman-result');
+  if (revealed && !s.won) {
+    s.won = true;
+    result.classList.remove('hidden');
+    result.innerHTML = `<div class="results-emoji">🎉</div><h2>כל הכבוד! ניצחת!</h2>
+      <p>המילה: ${s.word}</p>
+      <button class="btn-primary" onclick="startHangman()">שחק שוב 🔄</button>
+      <button class="btn-secondary" onclick="goBack()">חזרה</button>`;
+    progress.stars += 3;
+    progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
+    saveProgress(progress);
+    checkAchievements();
+    launchConfetti();
+  } else if (s.lives <= 0 && !s.lost) {
+    s.lost = true;
+    result.classList.remove('hidden');
+    result.innerHTML = `<div class="results-emoji">😢</div><h2>הפסדת!</h2>
+      <p>המילה הייתה: <strong>${s.word}</strong></p>
+      <button class="btn-primary" onclick="startHangman()">נסה שוב 🔄</button>
+      <button class="btn-secondary" onclick="goBack()">חזרה</button>`;
+    progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
+    saveProgress(progress);
+    checkAchievements();
+  }
+}
+
+function guessLetter(letter) {
+  if (hangmanState.won || hangmanState.lost) return;
+  if (hangmanState.guessed.includes(letter)) return;
+
+  hangmanState.guessed.push(letter);
+  const inWord = hangmanState.word.toUpperCase().includes(letter) || hangmanState.word.includes(letter);
+  if (!inWord) hangmanState.lives--;
+  renderHangman();
+}
+
+// ===== MEMORY GAME =====
+function startMemory() {
+  const pairs = APP_DATA.memory[currentSubject];
+  let cards = [];
+  pairs.forEach(([a, b], i) => {
+    cards.push({ id: i * 2, pairId: i, text: a, flipped: false, matched: false });
+    cards.push({ id: i * 2 + 1, pairId: i, text: b, flipped: false, matched: false });
+  });
+  shuffle(cards);
+
+  memoryState = {
+    cards,
+    flippedCards: [],
+    moves: 0,
+    matchedPairs: 0,
+    totalPairs: pairs.length,
+    locked: false
+  };
+
+  document.getElementById('memory-moves').textContent = '0';
+  document.getElementById('memory-pairs').textContent = '0';
+  document.getElementById('memory-total').textContent = pairs.length;
+  document.getElementById('memory-result').classList.add('hidden');
+  renderMemoryGrid();
+}
+
+function renderMemoryGrid() {
+  const grid = document.getElementById('memory-grid');
+  grid.innerHTML = memoryState.cards.map((card, i) => {
+    let cls = 'memory-card';
+    if (card.flipped || card.matched) cls += ' flipped';
+    if (card.matched) cls += ' matched';
+    return `<button class="${cls}" onclick="flipMemoryCard(${i})" ${card.matched ? 'disabled' : ''}>
+      <span class="memory-card-front">❓</span>
+      <span class="memory-card-back">${card.text}</span>
+    </button>`;
+  }).join('');
+}
+
+function flipMemoryCard(index) {
+  if (memoryState.locked) return;
+  const card = memoryState.cards[index];
+  if (card.flipped || card.matched) return;
+
+  card.flipped = true;
+  memoryState.flippedCards.push(index);
+  renderMemoryGrid();
+
+  if (memoryState.flippedCards.length === 2) {
+    memoryState.locked = true;
+    memoryState.moves++;
+    document.getElementById('memory-moves').textContent = memoryState.moves;
+
+    const [i1, i2] = memoryState.flippedCards;
+    const c1 = memoryState.cards[i1];
+    const c2 = memoryState.cards[i2];
+
+    if (c1.pairId === c2.pairId) {
+      c1.matched = true;
+      c2.matched = true;
+      memoryState.matchedPairs++;
+      document.getElementById('memory-pairs').textContent = memoryState.matchedPairs;
+      memoryState.flippedCards = [];
+      memoryState.locked = false;
+      renderMemoryGrid();
+
+      if (memoryState.matchedPairs === memoryState.totalPairs) {
+        setTimeout(() => {
+          const result = document.getElementById('memory-result');
+          result.classList.remove('hidden');
+          result.innerHTML = `<div class="results-emoji">🎉</div><h2>מצאת את כל הזוגות!</h2>
+            <p>ב-${memoryState.moves} מהלכים</p>
+            <button class="btn-primary" onclick="startMemory()">שחק שוב 🔄</button>
+            <button class="btn-secondary" onclick="goBack()">חזרה</button>`;
+          progress.stars += Math.max(1, 6 - Math.floor(memoryState.moves / 3));
+          progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
+          saveProgress(progress);
+          checkAchievements();
+          launchConfetti();
+        }, 500);
+      }
+    } else {
+      setTimeout(() => {
+        c1.flipped = false;
+        c2.flipped = false;
+        memoryState.flippedCards = [];
+        memoryState.locked = false;
+        renderMemoryGrid();
+      }, 800);
+    }
+  }
+}
+
+// ===== MATH RACE GAME =====
+function initMathRace() {
+  if (raceState.timer) { clearInterval(raceState.timer); raceState.timer = null; }
+  raceState = { score: 0, timeLeft: 30, timer: null, active: false };
+  document.getElementById('race-score').textContent = '0';
+  document.getElementById('race-timer').textContent = '30';
+  document.getElementById('race-question').textContent = 'לחץ "התחל" כדי להתחיל!';
+  document.getElementById('race-options').innerHTML = '';
+  document.getElementById('race-result').classList.add('hidden');
+  document.getElementById('race-start').classList.remove('hidden');
+}
+
+function startMathRace() {
+  if (raceState.timer) clearInterval(raceState.timer);
+  raceState = { score: 0, timeLeft: 30, timer: null, active: true };
+  document.getElementById('race-start').classList.add('hidden');
+  document.getElementById('race-result').classList.add('hidden');
+  document.getElementById('race-score').textContent = '0';
+
+  generateRaceQuestion();
+
+  raceState.timer = setInterval(() => {
+    raceState.timeLeft--;
+    document.getElementById('race-timer').textContent = raceState.timeLeft;
+    if (raceState.timeLeft <= 0) {
+      clearInterval(raceState.timer);
+      raceState.timer = null;
+      raceState.active = false;
+      endMathRace();
+    }
+  }, 1000);
+}
+
+function generateRaceQuestion() {
+  const ops = ['+', '-', '×'];
+  const op = ops[Math.floor(Math.random() * ops.length)];
+  let a, b, answer;
+
+  switch (op) {
+    case '+':
+      a = Math.floor(Math.random() * 100) + 10;
+      b = Math.floor(Math.random() * 100) + 10;
+      answer = a + b;
+      break;
+    case '-':
+      a = Math.floor(Math.random() * 100) + 50;
+      b = Math.floor(Math.random() * 50) + 1;
+      answer = a - b;
+      break;
+    case '×':
+      a = Math.floor(Math.random() * 12) + 2;
+      b = Math.floor(Math.random() * 12) + 2;
+      answer = a * b;
+      break;
+  }
+
+  document.getElementById('race-question').textContent = `${a} ${op} ${b} = ?`;
+
+  let options = [answer];
+  while (options.length < 4) {
+    const wrong = answer + (Math.floor(Math.random() * 21) - 10);
+    if (wrong !== answer && !options.includes(wrong) && wrong >= 0) {
+      options.push(wrong);
+    }
+  }
+  shuffle(options);
+
+  document.getElementById('race-options').innerHTML = options.map(opt =>
+    `<button class="quiz-option" onclick="raceAnswer(${opt}, ${answer})">${opt}</button>`
+  ).join('');
+}
+
+function raceAnswer(selected, correct) {
+  if (!raceState.active) return;
+
+  if (selected === correct) {
+    raceState.score++;
+    document.getElementById('race-score').textContent = raceState.score;
+    document.getElementById('race-question').style.color = '#48bb78';
+    setTimeout(() => {
+      document.getElementById('race-question').style.color = '';
+      generateRaceQuestion();
+    }, 200);
+  } else {
+    document.getElementById('race-question').style.color = '#fc8181';
+    setTimeout(() => { document.getElementById('race-question').style.color = ''; }, 300);
+  }
+}
+
+function endMathRace() {
+  const result = document.getElementById('race-result');
+  result.classList.remove('hidden');
+  document.getElementById('race-options').innerHTML = '';
+
+  const stars = Math.min(raceState.score, 10);
+  result.innerHTML = `<div class="results-emoji">${raceState.score >= 10 ? '🏆' : raceState.score >= 5 ? '🌟' : '💪'}</div>
+    <h2>סיימת! ${raceState.score} תשובות נכונות!</h2>
+    <p>+${stars} ⭐ כוכבים</p>
+    <button class="btn-primary" onclick="startMathRace()">שחק שוב 🔄</button>
+    <button class="btn-secondary" onclick="goBack()">חזרה</button>`;
+
+  progress.stars += stars;
+  progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
+  saveProgress(progress);
+  checkAchievements();
+  if (raceState.score >= 10) launchConfetti();
+}
+
+// ===== DAILY CHALLENGE =====
+function startDailyChallenge() {
+  const container = document.getElementById('daily-challenge-container');
+  const today = new Date().toDateString();
+
+  if (progress.dailyChallengeDate === today && progress.dailyChallengeScore !== null) {
+    container.innerHTML = `
+      <div class="results-emoji">✅</div>
+      <h2>כבר סיימת את האתגר היומי!</h2>
+      <div class="results-score">${progress.dailyChallengeScore}%</div>
+      <p>חזור מחר לאתגר חדש!</p>
+      <button class="btn-secondary" onclick="goBack()">חזרה</button>`;
+    return;
+  }
+
+  const seed = hashCode(today);
+  const allQuestions = [
+    ...APP_DATA.hebrew.quiz.map(q => ({ ...q, subjectName: 'עברית' })),
+    ...APP_DATA.english.quiz.map(q => ({ ...q, subjectName: 'אנגלית' })),
+    ...APP_DATA.math.quiz.map(q => ({ ...q, subjectName: 'מתמטיקה' }))
+  ];
+
+  const selectedQs = [];
+  const tempArr = [...allQuestions];
+  for (let i = 0; i < 5 && tempArr.length > 0; i++) {
+    const idx = Math.abs((seed + i * 7) % tempArr.length);
+    selectedQs.push(tempArr.splice(idx, 1)[0]);
+  }
+
+  dailyChallengeState = { questions: selectedQs, current: 0, score: 0, answered: false };
+  renderDailyChallengeQuestion(container);
+}
+
+function renderDailyChallengeQuestion(container) {
+  if (!container) container = document.getElementById('daily-challenge-container');
+  const s = dailyChallengeState;
+  const q = s.questions[s.current];
+  const total = s.questions.length;
+  const current = s.current + 1;
+
+  container.innerHTML = `
+    <div class="quiz-header">
+      <div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${(current/total)*100}%"></div></div>
+      <div class="quiz-counter">אתגר יומי — שאלה ${current} מתוך ${total} (${q.subjectName})</div>
+    </div>
+    <div class="quiz-question">${q.question}</div>
+    <div class="quiz-options">${q.options.map((opt, i) =>
+      `<button class="quiz-option" onclick="dailyChallengeAnswer(${i})">${opt}</button>`
+    ).join('')}</div>
+    <div id="dc-feedback" class="quiz-feedback hidden"></div>
+    <button id="dc-next" class="btn-primary hidden" onclick="nextDailyChallenge()">הבא →</button>`;
+}
+
+function dailyChallengeAnswer(index) {
+  if (dailyChallengeState.answered) return;
+  dailyChallengeState.answered = true;
+
+  const q = dailyChallengeState.questions[dailyChallengeState.current];
+  const options = document.querySelectorAll('#daily-challenge-container .quiz-option');
+  const feedback = document.getElementById('dc-feedback');
+
+  options.forEach(o => o.classList.add('disabled'));
+  options[q.correct].classList.add('correct');
+
+  if (index === q.correct) {
+    dailyChallengeState.score++;
+    feedback.textContent = '🎉 נכון!';
+    feedback.className = 'quiz-feedback correct';
+  } else {
+    options[index].classList.add('wrong');
+    feedback.textContent = '😕 לא נכון.';
+    feedback.className = 'quiz-feedback wrong';
+  }
+  feedback.classList.remove('hidden');
+
+  const nextBtn = document.getElementById('dc-next');
+  nextBtn.classList.remove('hidden');
+  if (dailyChallengeState.current === dailyChallengeState.questions.length - 1) {
+    nextBtn.textContent = 'סיום ←';
+  }
+}
+
+function nextDailyChallenge() {
+  dailyChallengeState.current++;
+  dailyChallengeState.answered = false;
+
+  if (dailyChallengeState.current >= dailyChallengeState.questions.length) {
+    const score = dailyChallengeState.score;
+    const total = dailyChallengeState.questions.length;
+    const percent = Math.round((score / total) * 100);
+
+    progress.dailyChallengeDate = new Date().toDateString();
+    progress.dailyChallengeScore = percent;
+    progress.stars += score * 2;
+    saveProgress(progress);
+    checkAchievements();
+
+    const container = document.getElementById('daily-challenge-container');
+    container.innerHTML = `
+      <div class="results-emoji">${percent >= 80 ? '🏆' : percent >= 60 ? '🌟' : '💪'}</div>
+      <h2>${percent >= 80 ? 'מצוין!' : percent >= 60 ? 'כל הכבוד!' : 'נסה שוב מחר!'}</h2>
+      <div class="results-score">${percent}%</div>
+      <p>${score} מתוך ${total} נכונות | +${score * 2} ⭐</p>
+      <button class="btn-secondary" onclick="goBack()">חזרה</button>`;
+
+    if (percent >= 60) launchConfetti();
+  } else {
+    renderDailyChallengeQuestion();
+  }
+}
+
+// ===== DICTATION (English) =====
+let selectedDictationWeek = 0;
+
+function showDictationMenu() {
+  const data = getMergedDictation();
+  const selectEl = document.getElementById('dictation-week-select');
+  
+  // Populate week options
+  selectEl.innerHTML = data.map((week, i) => {
+    const dateRange = getWeekDateRange(i);
+    return `<option value="${i}">שבוע ${i + 1} (${dateRange})</option>`;
+  }).join('');
+  
+  selectedDictationWeek = 0;
+  updateDictationWeekPreview();
+}
+
+function updateDictationWeekPreview() {
+  const selectEl = document.getElementById('dictation-week-select');
+  selectedDictationWeek = parseInt(selectEl.value);
+  const data = getMergedDictation();
+  const weekData = data[selectedDictationWeek];
+  
+  const weekTitle = document.getElementById('dictation-menu-week');
+  if (weekTitle) {
+    weekTitle.textContent = `${weekData.words.length} מילים`;
+  }
+}
+
+function startDictation() {
+  const data = getMergedDictation();
+  const weekData = data[selectedDictationWeek];
+  const words = [...weekData.words];
+  shuffle(words);
+
+  const weekDateRange = getWeekDateRange(selectedDictationWeek);
+  dictationState = { words, current: 0, score: 0, weekTitle: weekDateRange, answered: false, tries: 0 };
+
+  document.getElementById('dictation-week').textContent = `שבוע ${selectedDictationWeek + 1} (${weekDateRange})`;
+  document.getElementById('dictation-results').classList.add('hidden');
+  document.getElementById('dictation-feedback').classList.add('hidden');
+
+  // Show word area, hide results
+  const wordArea = document.querySelector('.dictation-word-area');
+  if (wordArea) wordArea.style.display = '';
+  const counter = document.querySelector('.dictation-progress');
+  if (counter) counter.style.display = '';
+
+  renderDictationWord();
+}
+
+function renderDictationWord() {
+  const s = dictationState;
+  const w = s.words[s.current];
+  const total = s.words.length;
+  const current = s.current + 1;
+
+  document.getElementById('dictation-counter').textContent = `מילה ${current} מתוך ${total}`;
+  document.getElementById('dictation-progress-fill').style.width = `${(current / total) * 100}%`;
+  document.getElementById('dictation-prompt').textContent = w.hebrewHint;
+  document.getElementById('dictation-input').value = '';
+  document.getElementById('dictation-feedback').classList.add('hidden');
+  dictationState.answered = false;
+  dictationState.tries = 0;
+
+  // Update button text
+  const btn = document.querySelector('#screen-dictation-typing .btn-primary');
+  if (btn) btn.textContent = 'בדוק ✓';
+
+  setTimeout(() => {
+    speak(w.word, 'en-US');
+    document.getElementById('dictation-input').focus();
+  }, 300);
+}
+
+function speakDictationWord() {
+  const w = dictationState.words[dictationState.current];
+  speak(w.word, 'en-US');
+}
+
+function checkDictation() {
+  if (dictationState.answered) {
+    // Move to next
+    dictationState.current++;
+    if (dictationState.current >= dictationState.words.length) {
+      showDictationResults();
+    } else {
+      renderDictationWord();
+    }
+    return;
+  }
+
+  const w = dictationState.words[dictationState.current];
+  const input = document.getElementById('dictation-input').value.trim().toLowerCase();
+  const feedback = document.getElementById('dictation-feedback');
+
+  if (input === w.word.toLowerCase()) {
+    // Correct!
+    dictationState.score++;
+    dictationState.answered = true;
+    feedback.textContent = `✅ נכון! ${w.word}`;
+    feedback.className = 'quiz-feedback correct';
+    feedback.classList.remove('hidden');
+
+    const btn = document.querySelector('#screen-dictation-typing .btn-primary');
+    if (dictationState.current < dictationState.words.length - 1) {
+      btn.textContent = 'הבא →';
+    } else {
+      btn.textContent = 'סיום ←';
+    }
+  } else {
+    // Wrong
+    dictationState.tries++;
+    
+    if (dictationState.tries < 2) {
+      // First try - give another chance
+      feedback.textContent = '❌ לא נכון, נסה שוב!';
+      feedback.className = 'quiz-feedback wrong';
+      feedback.classList.remove('hidden');
+      document.getElementById('dictation-input').value = '';
+      document.getElementById('dictation-input').focus();
+    } else {
+      // Second try failed - show answer and move on
+      dictationState.answered = true;
+      feedback.textContent = `❌ התשובה הנכונה: ${w.word}`;
+      feedback.className = 'quiz-feedback wrong';
+      feedback.classList.remove('hidden');
+
+      const btn = document.querySelector('#screen-dictation-typing .btn-primary');
+      if (dictationState.current < dictationState.words.length - 1) {
+        btn.textContent = 'הבא →';
+      } else {
+        btn.textContent = 'סיום ←';
+      }
+    }
+  }
+}
+
+function showDictationResults() {
+  const score = dictationState.score;
+  const total = dictationState.words.length;
+  const percent = Math.round((score / total) * 100);
+
+  progress.stars += score * 2;
+  progress.dictationsCompleted = (progress.dictationsCompleted || 0) + 1;
+  saveProgress(progress);
+  checkAchievements();
+
+  // Hide word area
+  const wordArea = document.querySelector('.dictation-word-area');
+  if (wordArea) wordArea.style.display = 'none';
+  const counter = document.querySelector('.dictation-progress');
+  if (counter) counter.style.display = 'none';
+  document.getElementById('dictation-feedback').classList.add('hidden');
+
+  const results = document.getElementById('dictation-results');
+  results.classList.remove('hidden');
+  results.innerHTML = `
+    <div class="results-emoji">${percent >= 80 ? '🏆' : percent >= 50 ? '🌟' : '💪'}</div>
+    <h2>${percent >= 80 ? 'מצוין!' : percent >= 50 ? 'כל הכבוד!' : 'המשך לתרגל!'}</h2>
+    <div class="results-score">${percent}%</div>
+    <p>${score} מתוך ${total} מילים נכונות<br>+${score * 2} ⭐</p>
+    <button class="btn-primary" onclick="startDictation()">נסה שוב 🔄</button>
+    <button class="btn-secondary" onclick="goBack()">חזרה</button>`;
+
+  if (percent >= 70) launchConfetti();
+}
+
+// Handle Enter key in dictation
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && currentScreen === 'dictation') {
+    checkDictation();
+  }
+});
+
+// ===== WORD MATCHING GAME =====
+let matchState = {};
+
+function startWordMatch() {
+  // Use words from selected dictation week
+  const data = getMergedDictation();
+  const weekData = data[selectedDictationWeek];
+  const dictWords = weekData.words.map(w => ({ hebrew: w.hebrewHint, english: w.word }));
+  
+  // Take up to 10 words
+  shuffle(dictWords);
+  const words = dictWords.slice(0, 10);
+  
+  const hebrewWords = words.map(w => ({ text: w.hebrew, pairId: w.english }));
+  const englishWords = words.map(w => ({ text: w.english, pairId: w.english }));
+  shuffle(englishWords);
+
+  matchState = {
+    hebrewWords,
+    englishWords,
+    selected: null,
+    matched: 0,
+    total: words.length
+  };
+
+  document.getElementById('match-score').textContent = '0';
+  document.getElementById('match-total').textContent = words.length;
+  document.getElementById('match-result').classList.add('hidden');
+  document.getElementById('match-lines').innerHTML = '';
+  renderMatchWords();
+}
+
+function renderMatchWords() {
+  const hebrewCol = document.getElementById('match-hebrew');
+  const englishCol = document.getElementById('match-english');
+
+  hebrewCol.innerHTML = matchState.hebrewWords.map((w, i) => {
+    const matched = matchState.hebrewWords[i].matched;
+    return `<div class="match-word hebrew ${matched ? 'matched' : ''}" 
+                 data-type="hebrew" data-index="${i}" data-pair="${w.pairId}"
+                 onclick="selectMatchWord(this)">${w.text}</div>`;
+  }).join('');
+
+  englishCol.innerHTML = matchState.englishWords.map((w, i) => {
+    const matched = matchState.englishWords[i].matched;
+    return `<div class="match-word english ${matched ? 'matched' : ''}" 
+                 data-type="english" data-index="${i}" data-pair="${w.pairId}"
+                 onclick="selectMatchWord(this)">${w.text}</div>`;
+  }).join('');
+}
+
+function selectMatchWord(el) {
+  const type = el.dataset.type;
+  const index = parseInt(el.dataset.index);
+  const pair = el.dataset.pair;
+
+  // If already matched, ignore
+  if (el.classList.contains('matched')) return;
+
+  // If nothing selected or same type selected, select this one
+  if (!matchState.selected || matchState.selected.type === type) {
+    // Deselect previous
+    document.querySelectorAll('.match-word.selected').forEach(w => w.classList.remove('selected'));
+    el.classList.add('selected');
+    matchState.selected = { type, index, pair, element: el };
+    return;
+  }
+
+  // Different type selected - check if match
+  const prev = matchState.selected;
+  
+  if (prev.pair === pair) {
+    // Match!
+    el.classList.add('matched');
+    prev.element.classList.add('matched');
+    prev.element.classList.remove('selected');
+    
+    // Mark as matched in state
+    if (prev.type === 'hebrew') {
+      matchState.hebrewWords[prev.index].matched = true;
+      matchState.englishWords[index].matched = true;
+    } else {
+      matchState.englishWords[prev.index].matched = true;
+      matchState.hebrewWords[index].matched = true;
+    }
+
+    matchState.matched++;
+    document.getElementById('match-score').textContent = matchState.matched;
+    matchState.selected = null;
+
+    // Draw line
+    drawMatchLine(prev.element, el);
+
+    // Check if done
+    if (matchState.matched === matchState.total) {
+      setTimeout(showMatchResults, 500);
+    }
+  } else {
+    // Wrong match
+    el.classList.add('wrong');
+    prev.element.classList.add('wrong');
+    setTimeout(() => {
+      el.classList.remove('wrong');
+      prev.element.classList.remove('wrong', 'selected');
+    }, 400);
+    matchState.selected = null;
+  }
+}
+
+function drawMatchLine(el1, el2) {
+  const svg = document.getElementById('match-lines');
+  const container = document.querySelector('.match-game-area');
+  const rect = container.getBoundingClientRect();
+
+  const r1 = el1.getBoundingClientRect();
+  const r2 = el2.getBoundingClientRect();
+
+  // Calculate positions relative to container
+  const x1 = r1.left + r1.width / 2 - rect.left;
+  const y1 = r1.top + r1.height / 2 - rect.top;
+  const x2 = r2.left + r2.width / 2 - rect.left;
+  const y2 = r2.top + r2.height / 2 - rect.top;
+
+  const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  line.setAttribute('x1', x1);
+  line.setAttribute('y1', y1);
+  line.setAttribute('x2', x2);
+  line.setAttribute('y2', y2);
+  line.classList.add('match-line');
+  svg.appendChild(line);
+}
+
+function showMatchResults() {
+  const result = document.getElementById('match-result');
+  result.classList.remove('hidden');
+  result.innerHTML = `
+    <div class="results-emoji">🎉</div>
+    <h2>כל הכבוד! חיברת את כל המילים!</h2>
+    <p>+10 ⭐ כוכבים</p>
+    <button class="btn-primary" onclick="startWordMatch()">שחק שוב 🔄</button>
+    <button class="btn-secondary" onclick="goBack()">חזרה</button>`;
+
+  progress.stars += 10;
+  progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
+  saveProgress(progress);
+  checkAchievements();
+  launchConfetti();
+}
+
+// ===== ACHIEVEMENTS =====
+function checkAchievements() {
+  const unlocked = progress.unlockedAchievements || [];
+  let newUnlocks = false;
+
+  APP_DATA.achievements.forEach(ach => {
+    if (!unlocked.includes(ach.id) && ach.check(progress)) {
+      unlocked.push(ach.id);
+      newUnlocks = true;
+      showAchievementToast(ach);
+    }
+  });
+
+  if (newUnlocks) {
+    progress.unlockedAchievements = unlocked;
+    saveProgress(progress);
+  }
+}
+
+function showAchievementToast(ach) {
+  const toast = document.createElement('div');
+  toast.className = 'achievement-toast';
+  toast.innerHTML = `<span class="toast-icon">${ach.icon}</span><div><strong>הישג חדש!</strong><br>${ach.name}</div>`;
+  document.body.appendChild(toast);
+
+  setTimeout(() => toast.classList.add('show'), 10);
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 400);
+  }, 3000);
+}
+
+function renderAchievements() {
+  const container = document.getElementById('achievements-container');
+  const unlocked = progress.unlockedAchievements || [];
+
+  container.innerHTML = APP_DATA.achievements.map(ach => {
+    const isUnlocked = unlocked.includes(ach.id);
+    return `<div class="achievement-card ${isUnlocked ? 'unlocked' : 'locked'}">
+      <div class="achievement-icon">${isUnlocked ? ach.icon : '🔒'}</div>
+      <div class="achievement-info">
+        <div class="achievement-name">${ach.name}</div>
+        <div class="achievement-desc">${ach.desc}</div>
+      </div>
+      ${isUnlocked ? '<span class="achievement-check">✅</span>' : ''}
+    </div>`;
+  }).join('');
+}
+
+// ===== PROFILE SCREEN =====
+function renderProfileScreen() {
+  if (profile) {
+    document.getElementById('profile-avatar').textContent = profile.avatar;
+    document.getElementById('profile-name').textContent = profile.name;
+  }
+  document.getElementById('profile-stars').textContent = progress.stars;
+  document.getElementById('profile-streak').textContent = progress.streak || 0;
+
+  const stats = document.getElementById('profile-stats');
+  const subjects = [
+    { key: 'hebrew', name: 'עברית', icon: '📖' },
+    { key: 'english', name: 'אנגלית', icon: '🔤' },
+    { key: 'math', name: 'מתמטיקה', icon: '🔢' }
+  ];
+
+  stats.innerHTML = subjects.map(subj => {
+    const p = progress[subj.key];
+    const totalLessons = APP_DATA[subj.key].lessons.length;
+    const readLessons = p.lessonsRead.length;
+    const pct = totalLessons > 0 ? Math.round((readLessons / totalLessons) * 100) : 0;
+    return `<div class="progress-subject-card">
+      <div class="progress-subject-icon">${subj.icon}</div>
+      <div class="progress-subject-info">
+        <div class="progress-subject-name">${subj.name}</div>
+        <div class="progress-bar-track"><div class="progress-bar-fill ${subj.key}" style="width:${pct}%"></div></div>
+        <div class="progress-stats">📝 ${readLessons}/${totalLessons} | ❓ ${p.quizBest}% | 🃏 ${p.flashcardsCompleted}x</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const badges = document.getElementById('profile-badges');
+  const unlocked = progress.unlockedAchievements || [];
+  badges.innerHTML = APP_DATA.achievements.map(ach => {
+    const has = unlocked.includes(ach.id);
+    return `<div class="badge-item ${has ? '' : 'locked'}" title="${ach.name}: ${ach.desc}">
+      <span>${has ? ach.icon : '🔒'}</span>
+      <small>${ach.name}</small>
+    </div>`;
+  }).join('');
+}
+
+// ===== PROGRESS SCREEN =====
+function renderProgress() {
+  document.getElementById('total-stars').textContent = `⭐ ${progress.stars}`;
+
+  const subjects = [
+    { key: 'hebrew', name: 'עברית', icon: '📖', colorClass: 'hebrew' },
+    { key: 'english', name: 'אנגלית', icon: '🔤', colorClass: 'english' },
+    { key: 'math', name: 'מתמטיקה', icon: '🔢', colorClass: 'math' }
+  ];
+
+  const container = document.getElementById('progress-details');
+  container.innerHTML = subjects.map(subj => {
+    const p = progress[subj.key];
+    const totalLessons = APP_DATA[subj.key].lessons.length;
+    const readLessons = p.lessonsRead.length;
+    const pct = totalLessons > 0 ? Math.round((readLessons / totalLessons) * 100) : 0;
+
+    return `<div class="progress-subject-card">
+      <div class="progress-subject-icon">${subj.icon}</div>
+      <div class="progress-subject-info">
+        <div class="progress-subject-name">${subj.name}</div>
+        <div class="progress-bar-track"><div class="progress-bar-fill ${subj.colorClass}" style="width:${pct}%"></div></div>
+        <div class="progress-stats">
+          📝 שיעורים: ${readLessons}/${totalLessons} |
+          ❓ חידון: ${p.quizBest}% (${p.quizAttempts} ניסיונות) |
+          🃏 כרטיסיות: ${p.flashcardsCompleted} פעמים
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  renderLeaderboard();
+}
+
+function renderLeaderboard() {
+  const lb = document.getElementById('leaderboard');
+  if (!lb) return;
+
+  const playerName = profile ? profile.name : 'תלמיד';
+  const playerAvatar = profile ? profile.avatar : '🌟';
+
+  // Simulated leaderboard (seeded by date so it's consistent within a day)
+  const seed = hashCode(new Date().toDateString());
+  const fakeStudents = [
+    { name: 'דני', avatar: '🦁', stars: Math.abs(seed % 80) + 60 },
+    { name: 'מיכל', avatar: '🦊', stars: Math.abs((seed * 3) % 80) + 50 },
+    { name: 'יוסי', avatar: '🐶', stars: Math.abs((seed * 7) % 80) + 40 },
+    { name: 'נועה', avatar: '🦄', stars: Math.abs((seed * 11) % 80) + 30 },
+    { name: 'אורי', avatar: '🐸', stars: Math.abs((seed * 13) % 60) + 20 }
+  ];
+
+  const allPlayers = [
+    ...fakeStudents,
+    { name: playerName, avatar: playerAvatar, stars: progress.stars, isMe: true }
+  ];
+
+  allPlayers.sort((a, b) => b.stars - a.stars);
+
+  lb.innerHTML = allPlayers.map((p, i) => `
+    <div class="leaderboard-row ${p.isMe ? 'me' : ''}">
+      <span class="lb-rank">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1)}</span>
+      <span class="lb-avatar">${p.avatar}</span>
+      <span class="lb-name">${p.name}${p.isMe ? ' (אני)' : ''}</span>
+      <span class="lb-stars">⭐ ${p.stars}</span>
+    </div>`).join('');
+}
+
+function resetProgress() {
+  if (confirm('האם אתה בטוח שברצונך לאפס את כל ההתקדמות?')) {
+    progress = getDefaultProgress();
+    saveProgress(progress);
+    if (currentScreen === 'progress') renderProgress();
+    if (currentScreen === 'profile') renderProfileScreen();
+    updateHomeProgress();
+    updateHomeBadges();
+  }
+}
+
+// ===== SETTINGS =====
+function renderSettings() {
+  renderThemeGrid();
+  const ttsToggle = document.getElementById('tts-toggle');
+  if (ttsToggle) ttsToggle.checked = ttsEnabled;
+  const ttsSpeedEl = document.getElementById('tts-speed');
+  if (ttsSpeedEl) ttsSpeedEl.value = ttsSpeed;
+}
+
+// ===== UTILITIES =====
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function hashCode(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return hash;
+}
+
+function getWeekNumber() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 1);
+  const diff = (now - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60000);
+  return Math.floor(diff / (7 * 24 * 60 * 60 * 1000));
+}
+
+function getWeekDateRange(weekOffset = 0) {
+  const now = new Date();
+  const startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() + (weekOffset * 7));
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 6);
+  
+  const formatDate = (d) => d.getDate().toString().padStart(2, '0');
+  const formatMonth = (d) => (d.getMonth() + 1).toString().padStart(2, '0');
+  
+  if (startOfWeek.getMonth() === endOfWeek.getMonth()) {
+    return `${formatDate(startOfWeek)}-${formatDate(endOfWeek)}.${formatMonth(endOfWeek)}`;
+  } else {
+    return `${formatDate(startOfWeek)}.${formatMonth(startOfWeek)}-${formatDate(endOfWeek)}.${formatMonth(endOfWeek)}`;
+  }
+}
+
+// ===== CONFETTI =====
+function launchConfetti() {
+  const colors = ['#667eea', '#764ba2', '#f6ad55', '#48bb78', '#fc8181', '#f6e05e', '#9f7aea'];
+  for (let i = 0; i < 60; i++) {
+    const piece = document.createElement('div');
+    piece.classList.add('confetti-piece');
+    piece.style.left = Math.random() * 100 + 'vw';
+    piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.animationDelay = Math.random() * 1 + 's';
+    piece.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's';
+    piece.style.width = (Math.random() * 8 + 6) + 'px';
+    piece.style.height = (Math.random() * 8 + 6) + 'px';
+    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    document.body.appendChild(piece);
+    setTimeout(() => piece.remove(), 3500);
+  }
+}
+
+// ===== ADMIN SYSTEM =====
+const ADMIN_CREDENTIALS = { username: 'ohadp', password: 'Op0544756518' };
+let isAdminLoggedIn = false;
+
+function adminLogin() {
+  const username = document.getElementById('admin-username').value.trim();
+  const password = document.getElementById('admin-password').value;
+  const errorEl = document.getElementById('admin-login-error');
+  
+  if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+    isAdminLoggedIn = true;
+    errorEl.classList.add('hidden');
+    document.getElementById('admin-username').value = '';
+    document.getElementById('admin-password').value = '';
+    navigate('admin-dashboard');
+  } else {
+    errorEl.textContent = '❌ שם משתמש או סיסמה שגויים';
+    errorEl.classList.remove('hidden');
+  }
+}
+
+function adminLogout() {
+  isAdminLoggedIn = false;
+  navigate('home');
+}
+
+// ===== ADMIN DICTATION MANAGEMENT =====
+function getCustomDictation() {
+  const stored = localStorage.getItem('brainx-dictation');
+  return stored ? JSON.parse(stored) : null;
+}
+
+function saveCustomDictation(data) {
+  localStorage.setItem('brainx-dictation', JSON.stringify(data));
+}
+
+function getMergedDictation() {
+  const custom = getCustomDictation();
+  if (!custom) return APP_DATA.dictation;
+  
+  // Merge custom words with original data
+  return APP_DATA.dictation.map((week, index) => {
+    if (custom[index] && custom[index].words) {
+      return { ...week, words: custom[index].words };
+    }
+    return week;
+  });
+}
+
+function loadWeekWords() {
+  const selectEl = document.getElementById('admin-week-select');
+  const merged = getMergedDictation();
+  
+  // Populate select options with dates
+  if (selectEl.options.length !== merged.length) {
+    selectEl.innerHTML = merged.map((week, i) => {
+      const dateRange = getWeekDateRange(i);
+      return `<option value="${i}">שבוע ${i + 1} (${dateRange})</option>`;
+    }).join('');
+  }
+  
+  const weekIndex = parseInt(selectEl.value);
+  const weekData = merged[weekIndex];
+  
+  const listEl = document.getElementById('admin-word-list');
+  if (!weekData || !weekData.words.length) {
+    listEl.innerHTML = '<p style="color:#999;text-align:center">אין מילים בשבוע זה</p>';
+    return;
+  }
+  
+  listEl.innerHTML = weekData.words.map((w, i) => `
+    <div class="admin-word-item">
+      <div class="word-text">
+        <span class="english">${w.word}</span>
+        <span class="hebrew">${w.hebrewHint}</span>
+      </div>
+      <button class="admin-word-delete" onclick="deleteWord(${weekIndex}, ${i})">✕</button>
+    </div>
+  `).join('');
+}
+
+function addDictationWord() {
+  const weekIndex = parseInt(document.getElementById('admin-week-select').value);
+  const english = document.getElementById('admin-word-english').value.trim();
+  const hebrew = document.getElementById('admin-word-hebrew').value.trim();
+  
+  if (!english || !hebrew) {
+    alert('נא למלא את שני השדות');
+    return;
+  }
+  
+  let custom = getCustomDictation();
+  if (!custom) {
+    // Initialize with current data
+    custom = APP_DATA.dictation.map(week => ({
+      week: week.week,
+      words: [...week.words]
+    }));
+  }
+  
+  custom[weekIndex].words.push({ word: english, hebrewHint: hebrew });
+  saveCustomDictation(custom);
+  
+  document.getElementById('admin-word-english').value = '';
+  document.getElementById('admin-word-hebrew').value = '';
+  loadWeekWords();
+}
+
+function deleteWord(weekIndex, wordIndex) {
+  if (!confirm('למחוק מילה זו?')) return;
+  
+  let custom = getCustomDictation();
+  if (!custom) {
+    custom = APP_DATA.dictation.map(week => ({
+      week: week.week,
+      words: [...week.words]
+    }));
+  }
+  
+  custom[weekIndex].words.splice(wordIndex, 1);
+  saveCustomDictation(custom);
+  loadWeekWords();
+}
+

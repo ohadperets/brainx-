@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#667eea" id="meta-theme">
+  <meta name="description" content="אפליקציית לימודים לכיתה ה׳">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon-192.svg">
+  <link rel="apple-touch-icon" href="icons/icon-192.svg">
+  <title>BrainX</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Profile Setup Modal -->
+  <div id="profile-setup" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">👋 ברוכים הבאים!</div>
+      <p>איך קוראים לך?</p>
+      <input type="text" id="profile-name-input" class="text-input" placeholder="השם שלך..." maxlength="20">
+      <p>בחר אווטאר:</p>
+      <div class="avatar-grid" id="avatar-grid"></div>
+      <button class="btn-primary" onclick="saveProfile()">!בואו נתחיל 🚀</button>
+    </div>
+  </div>
+
+  <!-- Splash Screen -->
+  <div id="splash-screen" class="splash">
+    <div class="splash-content">
+      <div class="splash-icon">🧠</div>
+      <h1>BrainX</h1>
+      <p>לימודים לכיתה ה׳</p>
+      <div class="loading-dots">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Container -->
+  <div id="app" class="app hidden">
+    <!-- Header -->
+    <header id="app-header" class="app-header">
+      <button id="btn-back" class="btn-back hidden" onclick="goBack()">
+        <span>→</span>
+      </button>
+      <h1 id="header-title">BrainX</h1>
+      <div class="header-right">
+        <button id="btn-tts" class="btn-header-icon" onclick="toggleTTS()" title="הקראה">
+          <span>🔊</span>
+        </button>
+        <button id="btn-theme" class="btn-header-icon" onclick="navigate('settings')" title="הגדרות">
+          <span>⚙️</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main id="main-content" class="main-content">
+      <!-- Home Screen -->
+      <section id="screen-home" class="screen active">
+        <!-- Profile Banner -->
+        <div class="welcome-banner" onclick="navigate('profile')">
+          <div class="welcome-avatar" id="home-avatar">🌟</div>
+          <h2 id="home-greeting">שלום!</h2>
+          <p>מה נלמד היום?</p>
+          <div class="streak-badge" id="streak-badge">🔥 <span id="streak-count">0</span> ימים ברצף</div>
+        </div>
+
+        <!-- Daily Challenge -->
+        <div class="daily-challenge-card" onclick="navigate('daily-challenge')">
+          <div class="dc-icon">📅</div>
+          <div class="dc-info">
+            <div class="dc-title">אתגר יומי</div>
+            <div class="dc-subtitle" id="dc-subtitle">לחץ כדי לשחק!</div>
+          </div>
+          <div class="dc-arrow">←</div>
+        </div>
+
+        <!-- Subjects -->
+        <div class="subjects-grid">
+          <button class="subject-card hebrew" onclick="navigate('subject', 'hebrew')">
+            <div class="subject-icon">📖</div>
+            <div>
+              <div class="subject-name">עברית</div>
+              <div class="subject-desc">קריאה, כתיבה ולשון</div>
+            </div>
+            <div class="subject-progress" id="progress-hebrew"></div>
+          </button>
+          <button class="subject-card english" onclick="navigate('subject', 'english')">
+            <div class="subject-icon">🔤</div>
+            <div>
+              <div class="subject-name">אנגלית</div>
+              <div class="subject-desc">English is fun!</div>
+            </div>
+            <div class="subject-progress" id="progress-english"></div>
+          </button>
+          <button class="subject-card math" onclick="navigate('subject', 'math')">
+            <div class="subject-icon">🔢</div>
+            <div>
+              <div class="subject-name">מתמטיקה</div>
+              <div class="subject-desc">חשבון, גאומטריה ובעיות</div>
+            </div>
+            <div class="subject-progress" id="progress-math"></div>
+          </button>
+        </div>
+
+        <!-- Badges Preview -->
+        <div class="badges-preview" onclick="navigate('achievements')">
+          <div class="badges-title">🏆 הישגים</div>
+          <div class="badges-row" id="home-badges"></div>
+        </div>
+
+        <div class="daily-tip">
+          <div class="tip-icon">💡</div>
+          <div class="tip-text" id="daily-tip"></div>
+        </div>
+      </section>
+
+      <!-- Subject Screen -->
+      <section id="screen-subject" class="screen">
+        <div class="feature-grid" id="subject-features">
+          <button class="feature-card lessons-card" onclick="navigate('lessons')">
+            <div class="feature-icon">📝</div>
+            <div class="feature-name">שיעורים</div>
+            <div class="feature-desc">חומר לימוד</div>
+          </button>
+          <button class="feature-card quiz-card" onclick="navigate('quiz')">
+            <div class="feature-icon">❓</div>
+            <div class="feature-name">חידון</div>
+            <div class="feature-desc">בחן את עצמך</div>
+          </button>
+          <button class="feature-card flashcards-card" onclick="navigate('flashcards')">
+            <div class="feature-icon">🃏</div>
+            <div class="feature-name">כרטיסיות</div>
+            <div class="feature-desc">למד ותרגל</div>
+          </button>
+          <button class="feature-card games-card" onclick="navigate('games')">
+            <div class="feature-icon">🎮</div>
+            <div class="feature-name">משחקים</div>
+            <div class="feature-desc">למד בכיף!</div>
+          </button>
+        </div>
+      </section>
+
+      <!-- Lessons Screen -->
+      <section id="screen-lessons" class="screen">
+        <div id="lessons-list" class="lessons-list"></div>
+      </section>
+
+      <!-- Lesson Detail Screen -->
+      <section id="screen-lesson-detail" class="screen">
+        <div id="lesson-content" class="lesson-content"></div>
+        <button class="btn-tts-inline" onclick="readLessonAloud()">🔊 הקרא לי את השיעור</button>
+      </section>
+
+      <!-- Quiz Screen -->
+      <section id="screen-quiz" class="screen">
+        <div id="quiz-container" class="quiz-container">
+          <div class="quiz-header">
+            <div class="quiz-progress-bar">
+              <div id="quiz-progress-fill" class="quiz-progress-fill"></div>
+            </div>
+            <div id="quiz-counter" class="quiz-counter"></div>
+          </div>
+          <div id="quiz-question" class="quiz-question"></div>
+          <div id="quiz-options" class="quiz-options"></div>
+          <div id="quiz-feedback" class="quiz-feedback hidden"></div>
+          <button id="quiz-next" class="btn-primary hidden" onclick="nextQuestion()">השאלה הבאה →</button>
+        </div>
+        <div id="quiz-results" class="quiz-results hidden">
+          <div class="results-emoji" id="results-emoji"></div>
+          <h2 id="results-title"></h2>
+          <div class="results-score" id="results-score"></div>
+          <div class="results-details" id="results-details"></div>
+          <button class="btn-primary" onclick="restartQuiz()">נסה שוב 🔄</button>
+          <button class="btn-secondary" onclick="goBack()">חזרה לתפריט</button>
+        </div>
+      </section>
+
+      <!-- Flashcards Screen -->
+      <section id="screen-flashcards" class="screen">
+        <div class="flashcards-container">
+          <div id="flashcard-counter" class="flashcard-counter"></div>
+          <div id="flashcard" class="flashcard" onclick="flipCard()">
+            <div class="flashcard-inner" id="flashcard-inner">
+              <div class="flashcard-front" id="flashcard-front"></div>
+              <div class="flashcard-back" id="flashcard-back"></div>
+            </div>
+          </div>
+          <p class="flashcard-hint">👆 לחץ על הכרטיס כדי להפוך</p>
+          <div class="flashcard-controls">
+            <button class="btn-flash btn-knew" onclick="flashcardAction('knew')">ידעתי ✅</button>
+            <button class="btn-flash btn-didnt" onclick="flashcardAction('didnt')">לא ידעתי ❌</button>
+          </div>
+          <div class="flashcard-nav">
+            <button class="btn-icon" onclick="prevFlashcard()">→</button>
+            <button class="btn-icon" onclick="nextFlashcard()">←</button>
+          </div>
+        </div>
+        <div id="flashcards-done" class="flashcards-done hidden">
+          <div class="results-emoji">🎉</div>
+          <h2>סיימת את כל הכרטיסיות!</h2>
+          <div id="flashcards-summary"></div>
+          <button class="btn-primary" onclick="restartFlashcards()">שוב פעם 🔄</button>
+          <button class="btn-secondary" onclick="goBack()">חזרה לתפריט</button>
+        </div>
+      </section>
+
+      <!-- Games Menu Screen -->
+      <section id="screen-games" class="screen">
+        <div class="feature-grid">
+          <button class="feature-card" style="background:linear-gradient(135deg,#fce4ec,#f8bbd0)" onclick="navigate('game-hangman')">
+            <div class="feature-icon">🎯</div>
+            <div class="feature-name">תלייה</div>
+            <div class="feature-desc">נחש את המילה</div>
+          </button>
+          <button class="feature-card" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9)" onclick="navigate('game-memory')">
+            <div class="feature-icon">🧠</div>
+            <div class="feature-name">זיכרון</div>
+            <div class="feature-desc">מצא זוגות</div>
+          </button>
+          <button class="feature-card" id="game-math-race-btn" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb)" onclick="navigate('game-math-race')">
+            <div class="feature-icon">🏎️</div>
+            <div class="feature-name">מרוץ חשבון</div>
+            <div class="feature-desc">פתור מהר!</div>
+          </button>
+        </div>
+      </section>
+
+      <!-- Hangman Game Screen -->
+      <section id="screen-game-hangman" class="screen">
+        <div class="game-container">
+          <div class="hangman-display" id="hangman-display"></div>
+          <div class="hangman-word" id="hangman-word"></div>
+          <div class="hangman-hint" id="hangman-hint"></div>
+          <div class="hangman-lives">❤️ <span id="hangman-lives">6</span></div>
+          <div class="hangman-keyboard" id="hangman-keyboard"></div>
+          <div id="hangman-result" class="game-result hidden"></div>
+        </div>
+      </section>
+
+      <!-- Memory Game Screen -->
+      <section id="screen-game-memory" class="screen">
+        <div class="game-container">
+          <div class="memory-stats">
+            <span>מהלכים: <strong id="memory-moves">0</strong></span>
+            <span>זוגות: <strong id="memory-pairs">0</strong>/<strong id="memory-total">0</strong></span>
+          </div>
+          <div class="memory-grid" id="memory-grid"></div>
+          <div id="memory-result" class="game-result hidden"></div>
+        </div>
+      </section>
+
+      <!-- Math Race Game Screen -->
+      <section id="screen-game-math-race" class="screen">
+        <div class="game-container">
+          <div class="race-timer">⏱️ <span id="race-timer">30</span></div>
+          <div class="race-score">ניקוד: <strong id="race-score">0</strong></div>
+          <div class="race-question" id="race-question"></div>
+          <div class="race-options" id="race-options"></div>
+          <div id="race-result" class="game-result hidden"></div>
+          <button id="race-start" class="btn-primary" onclick="startMathRace()">התחל! 🏁</button>
+        </div>
+      </section>
+
+      <!-- Daily Challenge Screen -->
+      <section id="screen-daily-challenge" class="screen">
+        <div id="daily-challenge-container" class="quiz-container"></div>
+      </section>
+
+      <!-- Dictation Menu Screen -->
+      <section id="screen-dictation" class="screen">
+        <div class="game-container">
+          <div class="dictation-header">
+            <h2>📝 הכתבה שבועית</h2>
+            <div class="dictation-week-selector">
+              <label>בחר שבוע:</label>
+              <select id="dictation-week-select" class="admin-select" onchange="updateDictationWeekPreview()"></select>
+            </div>
+            <p class="dictation-week" id="dictation-menu-week"></p>
+          </div>
+          <div class="feature-grid">
+            <button class="feature-card" style="background:linear-gradient(135deg,#e0f2fe,#bae6fd)" onclick="navigate('word-match')">
+              <div class="feature-icon">🔗</div>
+              <div class="feature-name">חבר מילים</div>
+              <div class="feature-desc">חבר עברית לאנגלית</div>
+            </button>
+            <button class="feature-card" style="background:linear-gradient(135deg,#fff3e0,#ffe0b2)" onclick="navigate('dictation-typing')">
+              <div class="feature-icon">⌨️</div>
+              <div class="feature-name">הכתבה</div>
+              <div class="feature-desc">כתוב את המילים</div>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Dictation Typing Screen (English) -->
+      <section id="screen-dictation-typing" class="screen">
+        <div class="game-container">
+          <div class="dictation-header">
+            <h2>📝 הכתבה שבועית</h2>
+            <p class="dictation-week" id="dictation-week"></p>
+          </div>
+          <div class="dictation-word-area">
+            <div class="dictation-prompt" id="dictation-prompt"></div>
+            <button class="btn-tts-inline" onclick="speakDictationWord()">🔊 שמע שוב</button>
+            <input type="text" id="dictation-input" class="text-input dictation-input" placeholder="הקלד את המילה באנגלית..." autocomplete="off" dir="ltr">
+            <button class="btn-primary" onclick="checkDictation()">בדוק ✓</button>
+          </div>
+          <div id="dictation-feedback" class="quiz-feedback hidden"></div>
+          <div class="dictation-progress">
+            <span id="dictation-counter"></span>
+            <div class="quiz-progress-bar"><div id="dictation-progress-fill" class="quiz-progress-fill"></div></div>
+          </div>
+          <div id="dictation-results" class="quiz-results hidden"></div>
+        </div>
+      </section>
+
+      <!-- Word Matching Game Screen -->
+      <section id="screen-word-match" class="screen">
+        <div class="game-container">
+          <h2>🔗 חבר מילים</h2>
+          <p class="match-instructions">לחץ על מילה בעברית ואז על המילה המתאימה באנגלית</p>
+          <div class="match-score">התאמות: <strong id="match-score">0</strong>/<span id="match-total">10</span></div>
+          <div class="match-game-area">
+            <div class="match-column" id="match-hebrew"></div>
+            <svg class="match-lines" id="match-lines"></svg>
+            <div class="match-column" id="match-english"></div>
+          </div>
+          <div id="match-result" class="game-result hidden"></div>
+        </div>
+      </section>
+
+      <!-- Achievements Screen -->
+      <section id="screen-achievements" class="screen">
+        <div class="achievements-container" id="achievements-container"></div>
+      </section>
+
+      <!-- Profile Screen -->
+      <section id="screen-profile" class="screen">
+        <div class="profile-container">
+          <div class="profile-card">
+            <div class="profile-avatar" id="profile-avatar">🌟</div>
+            <h2 id="profile-name">תלמיד</h2>
+            <div class="profile-stars">⭐ <span id="profile-stars">0</span> כוכבים</div>
+            <div class="profile-streak">🔥 <span id="profile-streak">0</span> ימים ברצף</div>
+          </div>
+          <button class="btn-secondary" onclick="editProfile()">✏️ ערוך פרופיל</button>
+          <h3 class="section-title">📊 סטטיסטיקות</h3>
+          <div id="profile-stats" class="progress-details"></div>
+          <h3 class="section-title">🏆 הישגים</h3>
+          <div id="profile-badges" class="badges-grid"></div>
+        </div>
+      </section>
+
+      <!-- Progress Screen -->
+      <section id="screen-progress" class="screen">
+        <div class="progress-container">
+          <div class="progress-header-card">
+            <div class="big-star" id="total-stars">⭐ 0</div>
+            <p>כוכבים שצברת</p>
+          </div>
+          <div id="progress-details" class="progress-details"></div>
+          <h3 class="section-title">🏆 לוח תוצאות</h3>
+          <div id="leaderboard" class="leaderboard"></div>
+          <button class="btn-danger" onclick="resetProgress()">אפס התקדמות 🗑️</button>
+        </div>
+      </section>
+
+      <!-- Settings Screen -->
+      <section id="screen-settings" class="screen">
+        <div class="settings-container">
+          <h3 class="section-title">🎨 ערכת נושא</h3>
+          <div class="theme-grid" id="theme-grid"></div>
+          <h3 class="section-title">🔊 הקראה</h3>
+          <div class="setting-row">
+            <span>הפעל הקראה אוטומטית</span>
+            <label class="switch">
+              <input type="checkbox" id="tts-toggle" onchange="toggleTTSSetting()">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="setting-row">
+            <span>מהירות דיבור</span>
+            <input type="range" id="tts-speed" min="0.5" max="2" step="0.1" value="1" oninput="updateTTSSpeed()">
+          </div>
+          <h3 class="section-title">👤 פרופיל</h3>
+          <button class="btn-secondary" onclick="editProfile()">✏️ ערוך פרופיל</button>
+          <button class="btn-danger" onclick="resetProgress()" style="margin-top:16px">🗑️ אפס את כל ההתקדמות</button>
+          <h3 class="section-title" style="margin-top:30px">🔐 ניהול</h3>
+          <button class="btn-secondary" onclick="navigate('admin-login')">🛠️ כניסת מנהל</button>
+        </div>
+      </section>
+
+      <!-- Admin Login Screen -->
+      <section id="screen-admin-login" class="screen">
+        <div class="admin-container">
+          <div class="admin-logo">🔐</div>
+          <h2>כניסת מנהל</h2>
+          <div class="admin-form">
+            <input type="text" id="admin-username" class="text-input" placeholder="שם משתמש" autocomplete="off">
+            <input type="password" id="admin-password" class="text-input" placeholder="סיסמה" autocomplete="off">
+            <button class="btn-primary" onclick="adminLogin()">כניסה</button>
+            <div id="admin-login-error" class="admin-error hidden"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Admin Dashboard Screen -->
+      <section id="screen-admin-dashboard" class="screen">
+        <div class="admin-container">
+          <h2>🛠️ לוח ניהול</h2>
+          <div class="admin-menu">
+            <button class="admin-menu-btn" onclick="navigate('admin-dictation')">
+              <span class="admin-btn-icon">📝</span>
+              <span class="admin-btn-text">ניהול הכתבות</span>
+            </button>
+            <button class="admin-menu-btn" onclick="navigate('admin-lessons')">
+              <span class="admin-btn-icon">📚</span>
+              <span class="admin-btn-text">ניהול שיעורים</span>
+            </button>
+            <button class="admin-menu-btn" onclick="navigate('admin-quiz')">
+              <span class="admin-btn-icon">❓</span>
+              <span class="admin-btn-text">ניהול חידונים</span>
+            </button>
+          </div>
+          <button class="btn-secondary" onclick="adminLogout()" style="margin-top:20px">🚪 יציאה</button>
+        </div>
+      </section>
+
+      <!-- Admin Dictation Screen -->
+      <section id="screen-admin-dictation" class="screen">
+        <div class="admin-container">
+          <h2>📝 ניהול הכתבות</h2>
+          <div class="admin-section">
+            <label>בחר שבוע:</label>
+            <select id="admin-week-select" class="admin-select" onchange="loadWeekWords()">
+              <option value="0">שבוע 1</option>
+              <option value="1">שבוע 2</option>
+              <option value="2">שבוע 3</option>
+              <option value="3">שבוע 4</option>
+              <option value="4">שבוע 5</option>
+              <option value="5">שבוע 6</option>
+              <option value="6">שבוע 7</option>
+              <option value="7">שבוע 8</option>
+            </select>
+          </div>
+          <div class="admin-section">
+            <h3>מילים בשבוע הנבחר:</h3>
+            <div id="admin-word-list" class="admin-word-list"></div>
+          </div>
+          <div class="admin-section">
+            <h3>הוסף מילה חדשה:</h3>
+            <div class="admin-add-word">
+              <input type="text" id="admin-word-english" class="text-input" placeholder="מילה באנגלית" dir="ltr" autocomplete="off">
+              <input type="text" id="admin-word-hebrew" class="text-input" placeholder="רמז בעברית" autocomplete="off">
+              <button class="btn-primary" onclick="addDictationWord()">➕ הוסף</button>
+            </div>
+          </div>
+          <button class="btn-secondary" onclick="navigate('admin-dashboard')" style="margin-top:20px">חזרה</button>
+        </div>
+      </section>
+
+      <!-- Admin Lessons Screen (placeholder) -->
+      <section id="screen-admin-lessons" class="screen">
+        <div class="admin-container">
+          <h2>📚 ניהול שיעורים</h2>
+          <p style="color:#666;text-align:center;margin:40px 0">בקרוב...</p>
+          <button class="btn-secondary" onclick="navigate('admin-dashboard')">חזרה</button>
+        </div>
+      </section>
+
+      <!-- Admin Quiz Screen (placeholder) -->
+      <section id="screen-admin-quiz" class="screen">
+        <div class="admin-container">
+          <h2>❓ ניהול חידונים</h2>
+          <p style="color:#666;text-align:center;margin:40px 0">בקרוב...</p>
+          <button class="btn-secondary" onclick="navigate('admin-dashboard')">חזרה</button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" onclick="navigate('home')" id="nav-home">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">בית</span>
+      </button>
+      <button class="nav-item" onclick="navigate('subject', 'hebrew')" id="nav-hebrew">
+        <span class="nav-icon">📖</span>
+        <span class="nav-label">עברית</span>
+      </button>
+      <button class="nav-item" onclick="navigate('subject', 'english')" id="nav-english">
+        <span class="nav-icon">🔤</span>
+        <span class="nav-label">אנגלית</span>
+      </button>
+      <button class="nav-item" onclick="navigate('subject', 'math')" id="nav-math">
+        <span class="nav-icon">🔢</span>
+        <span class="nav-label">מתמטיקה</span>
+      </button>
+      <button class="nav-item" onclick="navigate('profile')" id="nav-profile">
+        <span class="nav-icon" id="nav-profile-icon">👤</span>
+        <span class="nav-label">פרופיל</span>
+      </button>
+    </nav>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

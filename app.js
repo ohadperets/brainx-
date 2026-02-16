@@ -424,6 +424,10 @@ function readLessonAloud() {
 }
 
 // ===== NAVIGATION =====
+function goHome() {
+  navigate('home');
+}
+
 function navigate(screen, subject) {
   if (currentScreen !== screen || (subject !== undefined && subject !== currentSubject)) {
     screenHistory.push({ screen: currentScreen, subject: currentSubject });

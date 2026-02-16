@@ -54,8 +54,14 @@
       <button id="btn-back" class="btn-back hidden" onclick="goBack()">
         <span>→</span>
       </button>
-      <h1 id="header-title">BrainX</h1>
+      <div class="header-logo" onclick="goHome()">
+        <span class="header-brain">🧠</span>
+        <h1 id="header-title">BrainX</h1>
+      </div>
       <div class="header-right">
+        <button id="btn-user" class="btn-header-icon" onclick="showUserSwitch()" title="החלף משתמש">
+          <span>👤</span>
+        </button>
         <button id="btn-tts" class="btn-header-icon" onclick="toggleTTS()" title="הקראה">
           <span>🔊</span>
         </button>
@@ -70,11 +76,14 @@
       <!-- Home Screen -->
       <section id="screen-home" class="screen active">
         <!-- Profile Banner -->
-        <div class="welcome-banner" onclick="navigate('profile')">
-          <div class="welcome-avatar" id="home-avatar">🌟</div>
-          <h2 id="home-greeting">שלום!</h2>
-          <p>מה נלמד היום?</p>
-          <div class="streak-badge" id="streak-badge">🔥 <span id="streak-count">0</span> ימים ברצף</div>
+        <div class="welcome-banner compact" onclick="navigate('profile')">
+          <div class="welcome-row">
+            <div class="welcome-avatar" id="home-avatar">🌟</div>
+            <div class="welcome-info">
+              <h2 id="home-greeting">שלום!</h2>
+              <div class="streak-badge" id="streak-badge">🔥 <span id="streak-count">0</span> ימים ברצף</div>
+            </div>
+          </div>
         </div>
 
         <!-- Daily Challenge -->

@@ -1110,7 +1110,6 @@ html, body {
 /* ===== WELCOME BANNER UPDATE ===== */
 .welcome-avatar {
   font-size: 50px;
-  animation: bounce 2s ease infinite;
 }
 
 /* ===== BADGES ===== */

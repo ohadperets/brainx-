@@ -590,6 +590,18 @@ function navigate(screen, subject) {
       renderSettings();
       break;
 
+    case 'ai-generator':
+      document.getElementById('screen-ai-generator').classList.add('active');
+      headerTitle.textContent = '🤖 יוצר AI';
+      renderAIGenerator();
+      break;
+
+    case 'ai-play':
+      document.getElementById('screen-ai-play').classList.add('active');
+      headerTitle.textContent = '🤖 ' + (aiCurrentTopic?.name || 'AI');
+      renderAIPlay();
+      break;
+
     case 'admin-login':
       document.getElementById('screen-admin-login').classList.add('active');
       headerTitle.textContent = 'כניסת מנהל';
@@ -866,8 +878,16 @@ const BALLOON_COLORS = [
   'linear-gradient(135deg, #87ceeb, #6bb8d6)'
 ];
 
+function getBalloonFlashcards() {
+  // Check for AI-generated content first
+  if (window._aiTempFlashcards) {
+    return window._aiTempFlashcards;
+  }
+  return getData()[currentSubject]?.flashcards || [];
+}
+
 function startBalloonPop() {
-  const cards = [...getData()[currentSubject].flashcards];
+  const cards = [...getBalloonFlashcards()];
   shuffle(cards);
   const totalQuestions = Math.min(10, cards.length);
   
@@ -877,7 +897,8 @@ function startBalloonPop() {
     score: 0,
     lives: 3,
     isProcessing: false,
-    balloonInterval: null
+    balloonInterval: null,
+    allCards: cards
   };
 
   document.querySelector('.balloon-game').classList.remove('hidden');
@@ -903,7 +924,7 @@ function renderBalloonQuestion() {
   document.getElementById('balloon-lives').textContent = '❤️'.repeat(s.lives) + '🖤'.repeat(3 - s.lives);
   
   // Create answer options (correct + 3 wrong)
-  const allCards = getData()[currentSubject].flashcards;
+  const allCards = s.allCards || getBalloonFlashcards();
   const wrongAnswers = allCards
     .filter(c => c.back !== question.back)
     .sort(() => Math.random() - 0.5)
@@ -1019,14 +1040,24 @@ function endBalloonPop() {
   document.querySelector('.balloon-game').classList.add('hidden');
   document.getElementById('balloon-done').classList.remove('hidden');
   
+  // Clear AI temp flashcards
+  window._aiTempFlashcards = null;
+  
   const s = balloonPopState;
   const correct = Math.floor(s.score / 10);
   const total = s.questions.length;
   
-  progress[currentSubject].flashcardsCompleted++;
-  progress.stars += correct;
-  saveProgress(progress);
-  checkAchievements();
+  // Only update progress for regular subjects
+  if (progress[currentSubject]) {
+    progress[currentSubject].flashcardsCompleted++;
+    progress.stars += correct;
+    saveProgress(progress);
+    checkAchievements();
+  } else {
+    // AI content - just add stars
+    progress.stars += correct;
+    saveProgress(progress);
+  }
   
   const title = s.lives > 0 ? '🎉 כל הכבוד!' : '💪 נסה שוב!';
   document.getElementById('balloon-result-title').textContent = title;
@@ -1950,6 +1981,9 @@ function renderSettings() {
   if (ttsToggle) ttsToggle.checked = ttsEnabled;
   const ttsSpeedEl = document.getElementById('tts-speed');
   if (ttsSpeedEl) ttsSpeedEl.value = ttsSpeed;
+  // Load OpenAI key
+  const keyInput = document.getElementById('openai-key');
+  if (keyInput) keyInput.value = getOpenAIKey();
 }
 
 // ===== UTILITIES =====
@@ -2134,5 +2168,334 @@ function deleteWord(weekIndex, wordIndex) {
   custom[weekIndex].words.splice(wordIndex, 1);
   saveCustomDictation(custom);
   loadWeekWords();
+}
+
+// ===== AI CONTENT GENERATOR =====
+let aiCurrentTopic = null;
+let aiGeneratedTopics = [];
+
+function getOpenAIKey() {
+  return localStorage.getItem('brainx-openai-key') || '';
+}
+
+function saveOpenAIKey() {
+  const key = document.getElementById('openai-key').value;
+  localStorage.setItem('brainx-openai-key', key);
+}
+
+function loadOpenAIKey() {
+  const keyInput = document.getElementById('openai-key');
+  if (keyInput) {
+    keyInput.value = getOpenAIKey();
+  }
+}
+
+function getAITopics() {
+  const saved = localStorage.getItem('brainx-ai-topics-' + currentUserId);
+  return saved ? JSON.parse(saved) : [];
+}
+
+function saveAITopics(topics) {
+  localStorage.setItem('brainx-ai-topics-' + currentUserId, JSON.stringify(topics));
+}
+
+function renderAIGenerator() {
+  loadOpenAIKey();
+  aiGeneratedTopics = getAITopics();
+  renderAITopicsList();
+}
+
+function renderAITopicsList() {
+  const container = document.getElementById('ai-generated-topics');
+  const topics = getAITopics();
+  
+  if (topics.length === 0) {
+    container.innerHTML = '<p style="text-align:center;color:var(--text-light);margin-top:20px">עדיין לא יצרת נושאים. נסה עכשיו!</p>';
+    return;
+  }
+  
+  container.innerHTML = '<h3 style="margin-bottom:12px">📚 הנושאים שלי</h3>' + topics.map((topic, i) => `
+    <div class="ai-topic-item" onclick="playAITopic(${i})">
+      <div class="ai-topic-info">
+        <div class="ai-topic-icon">${topic.icon || '📘'}</div>
+        <div>
+          <div class="ai-topic-name">${topic.name}</div>
+          <div class="ai-topic-meta">${topic.createdAt || ''}</div>
+        </div>
+      </div>
+      <button class="ai-topic-delete" onclick="event.stopPropagation(); deleteAITopic(${i})">🗑️</button>
+    </div>
+  `).join('');
+}
+
+function deleteAITopic(index) {
+  if (!confirm('למחוק נושא זה?')) return;
+  const topics = getAITopics();
+  topics.splice(index, 1);
+  saveAITopics(topics);
+  renderAITopicsList();
+}
+
+function playAITopic(index) {
+  aiCurrentTopic = getAITopics()[index];
+  navigate('ai-play');
+}
+
+function renderAIPlay() {
+  if (!aiCurrentTopic) {
+    navigate('ai-generator');
+    return;
+  }
+  
+  document.getElementById('ai-play-topic').textContent = '📚 ' + aiCurrentTopic.name;
+  
+  const features = document.getElementById('ai-play-features');
+  let html = '';
+  
+  if (aiCurrentTopic.lessons?.length > 0) {
+    html += `<button class="feature-card lessons-card" onclick="playAILesson()">
+      <div class="feature-icon">📚</div>
+      <div class="feature-name">שיעור</div>
+      <div class="feature-desc">חומר לימוד</div>
+    </button>`;
+  }
+  
+  if (aiCurrentTopic.quiz?.length > 0) {
+    html += `<button class="feature-card quiz-card" onclick="playAIQuiz()">
+      <div class="feature-icon">❓</div>
+      <div class="feature-name">חידון</div>
+      <div class="feature-desc">${aiCurrentTopic.quiz.length} שאלות</div>
+    </button>`;
+  }
+  
+  if (aiCurrentTopic.flashcards?.length > 0) {
+    html += `<button class="feature-card balloon-card" onclick="playAIBalloon()">
+      <div class="feature-icon">🎈</div>
+      <div class="feature-name">פיצוץ בלונים</div>
+      <div class="feature-desc">${aiCurrentTopic.flashcards.length} שאלות</div>
+    </button>`;
+  }
+  
+  if (aiCurrentTopic.hangman?.length > 0) {
+    html += `<button class="feature-card" style="background:linear-gradient(135deg,#fce4ec,#f8bbd0)" onclick="playAIHangman()">
+      <div class="feature-icon">🎯</div>
+      <div class="feature-name">תלייה</div>
+      <div class="feature-desc">${aiCurrentTopic.hangman.length} מילים</div>
+    </button>`;
+  }
+  
+  if (aiCurrentTopic.memory?.length > 0) {
+    html += `<button class="feature-card" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9)" onclick="playAIMemory()">
+      <div class="feature-icon">🧠</div>
+      <div class="feature-name">זיכרון</div>
+      <div class="feature-desc">${aiCurrentTopic.memory.length} זוגות</div>
+    </button>`;
+  }
+  
+  features.innerHTML = html;
+}
+
+async function generateAIContent() {
+  const apiKey = getOpenAIKey();
+  if (!apiKey) {
+    showAIError('נא להזין OpenAI API Key בהגדרות');
+    return;
+  }
+  
+  const prompt = document.getElementById('ai-prompt').value.trim();
+  if (!prompt) {
+    showAIError('נא להזין נושא ליצירה');
+    return;
+  }
+  
+  const lang = document.querySelector('input[name="ai-lang"]:checked').value;
+  const genLessons = document.getElementById('ai-gen-lessons').checked;
+  const genQuiz = document.getElementById('ai-gen-quiz').checked;
+  const genBalloon = document.getElementById('ai-gen-balloon').checked;
+  const genHangman = document.getElementById('ai-gen-hangman').checked;
+  const genMemory = document.getElementById('ai-gen-memory').checked;
+  
+  if (!genLessons && !genQuiz && !genBalloon && !genHangman && !genMemory) {
+    showAIError('נא לבחור לפחות סוג תוכן אחד');
+    return;
+  }
+  
+  // Show loading
+  document.getElementById('ai-btn-text').classList.add('hidden');
+  document.getElementById('ai-btn-loading').classList.remove('hidden');
+  document.querySelector('.btn-ai-generate').disabled = true;
+  hideAIMessages();
+  
+  const systemPrompt = `You are an educational content generator for a children's learning app.
+Generate content in ${lang === 'he' ? 'Hebrew' : 'English'} about the topic: "${prompt}"
+The content should be appropriate for grades 2-5 (ages 7-11).
+Return ONLY valid JSON with this exact structure (include only requested sections):
+
+{
+  "name": "Topic name",
+  "icon": "relevant emoji",
+  ${genLessons ? `"lessons": [{"title": "Lesson title", "content": "HTML content with <h2>, <p>, <ul>, etc"}],` : ''}
+  ${genQuiz ? `"quiz": [{"q": "Question?", "options": ["A","B","C","D"], "correct": 0}],` : ''}
+  ${genBalloon ? `"flashcards": [{"front": "Question/Term", "back": "Answer/Definition"}],` : ''}
+  ${genHangman ? `"hangman": [{"word": "WORD", "hint": "Hint text"}],` : ''}
+  ${genMemory ? `"memory": [{"term": "Term1", "match": "Match1"}],` : ''}
+}
+
+Generate:
+${genLessons ? '- 1-2 educational lessons with rich HTML content' : ''}
+${genQuiz ? '- 5-8 multiple choice questions' : ''}
+${genBalloon ? '- 8-12 flashcard pairs (question/answer)' : ''}
+${genHangman ? '- 6-10 words with hints for hangman game' : ''}
+${genMemory ? '- 6-8 matching pairs for memory game' : ''}`;
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: `Create educational content about: ${prompt}` }
+        ],
+        temperature: 0.7,
+        max_tokens: 3000
+      })
+    });
+    
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error?.message || 'API request failed');
+    }
+    
+    const data = await response.json();
+    const content = data.choices[0].message.content;
+    
+    // Parse JSON from response (handle markdown code blocks)
+    let jsonStr = content;
+    const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (jsonMatch) {
+      jsonStr = jsonMatch[1];
+    }
+    
+    const generated = JSON.parse(jsonStr);
+    generated.createdAt = new Date().toLocaleDateString('he-IL');
+    generated.prompt = prompt;
+    
+    // Save to topics
+    const topics = getAITopics();
+    topics.unshift(generated);
+    saveAITopics(topics);
+    
+    showAISuccess(`נוצר בהצלחה: ${generated.name}`);
+    document.getElementById('ai-prompt').value = '';
+    renderAITopicsList();
+    
+  } catch (error) {
+    console.error('AI Error:', error);
+    showAIError('שגיאה: ' + error.message);
+  } finally {
+    document.getElementById('ai-btn-text').classList.remove('hidden');
+    document.getElementById('ai-btn-loading').classList.add('hidden');
+    document.querySelector('.btn-ai-generate').disabled = false;
+  }
+}
+
+function showAIError(msg) {
+  const el = document.getElementById('ai-error');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+}
+
+function showAISuccess(msg) {
+  const el = document.getElementById('ai-success');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+}
+
+function hideAIMessages() {
+  document.getElementById('ai-error').classList.add('hidden');
+  document.getElementById('ai-success').classList.add('hidden');
+}
+
+// AI Game Players - use existing game logic with AI data
+function playAILesson() {
+  if (!aiCurrentTopic?.lessons?.length) return;
+  const lesson = aiCurrentTopic.lessons[0];
+  navigate('lesson-detail');
+  document.getElementById('lesson-title').textContent = lesson.title;
+  document.getElementById('lesson-content').innerHTML = lesson.content;
+}
+
+function playAIQuiz() {
+  if (!aiCurrentTopic?.quiz?.length) return;
+  
+  const questions = aiCurrentTopic.quiz.map(q => ({
+    q: q.q,
+    options: q.options,
+    correct: q.correct
+  }));
+  
+  quizState = { questions, current: 0, score: 0, answered: false };
+  navigate('quiz');
+  renderQuizQuestion();
+}
+
+function playAIBalloon() {
+  if (!aiCurrentTopic?.flashcards?.length) return;
+  
+  // Temporarily override getData for balloon pop
+  const originalFlashcards = getData()[currentSubject]?.flashcards;
+  const tempSubject = currentSubject;
+  
+  // Create temp data
+  window._aiTempFlashcards = aiCurrentTopic.flashcards;
+  currentSubject = 'ai-temp';
+  
+  navigate('balloon-pop');
+  
+  // Restore after a tick
+  setTimeout(() => { currentSubject = tempSubject; }, 100);
+}
+
+function playAIHangman() {
+  if (!aiCurrentTopic?.hangman?.length) return;
+  
+  const words = aiCurrentTopic.hangman;
+  const choice = words[Math.floor(Math.random() * words.length)];
+  const isHebrew = /[\u0590-\u05FF]/.test(choice.word);
+  
+  hangmanState = {
+    word: choice.word.toUpperCase(),
+    hint: choice.hint,
+    guessed: [],
+    lives: 6,
+    won: false,
+    lost: false,
+    isHebrew
+  };
+  
+  navigate('game-hangman');
+  document.getElementById('hangman-result').classList.add('hidden');
+  renderHangman();
+}
+
+function playAIMemory() {
+  if (!aiCurrentTopic?.memory?.length) return;
+  
+  const pairs = aiCurrentTopic.memory.slice(0, 6);
+  const cards = [];
+  pairs.forEach((pair, i) => {
+    cards.push({ id: i * 2, pairId: i, text: pair.term, flipped: false, matched: false });
+    cards.push({ id: i * 2 + 1, pairId: i, text: pair.match, flipped: false, matched: false });
+  });
+  shuffle(cards);
+  
+  memoryState = { cards, flipped: [], matches: 0, moves: 0, totalPairs: pairs.length };
+  navigate('game-memory');
+  renderMemoryGame();
 }
 

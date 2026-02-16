@@ -135,6 +135,16 @@
           </button>
         </div>
 
+        <!-- AI Generator Card -->
+        <div class="ai-generator-card" onclick="navigate('ai-generator')">
+          <div class="ai-icon">🤖</div>
+          <div class="ai-info">
+            <div class="ai-title">יוצר AI</div>
+            <div class="ai-subtitle">צור משחקים ותרגילים על כל נושא!</div>
+          </div>
+          <div class="ai-arrow">←</div>
+        </div>
+
         <!-- Badges Preview -->
         <div class="badges-preview" onclick="navigate('achievements')">
           <div class="badges-title">🏆 הישגים</div>
@@ -413,8 +423,62 @@
           <button class="btn-secondary" onclick="editProfile()">✏️ ערוך פרופיל</button>
           <button class="btn-secondary" onclick="showUserSwitch()" style="margin-top:12px">🔄 החלף משתמש</button>
           <button class="btn-danger" onclick="resetProgress()" style="margin-top:16px">🗑️ אפס את כל ההתקדמות</button>
+          <h3 class="section-title" style="margin-top:30px">🤖 AI - יצירת תוכן</h3>
+          <div class="setting-row">
+            <span>OpenAI API Key</span>
+            <input type="password" id="openai-key" class="text-input" placeholder="sk-..." style="width:160px;font-size:12px" oninput="saveOpenAIKey()">
+          </div>
+          <p style="font-size:12px;color:var(--text-light);margin-top:4px">הכנס מפתח API מ-OpenAI כדי ליצור תוכן מותאם אישית</p>
           <h3 class="section-title" style="margin-top:30px">🔐 ניהול</h3>
           <button class="btn-secondary" onclick="navigate('admin-login')">🛠️ כניסת מנהל</button>
+        </div>
+      </section>
+
+      <!-- AI Generator Screen -->
+      <section id="screen-ai-generator" class="screen">
+        <div class="ai-generator-container">
+          <div class="ai-hero">
+            <div class="ai-hero-icon">🤖✨</div>
+            <h2>יוצר AI</h2>
+            <p>כתוב נושא וה-AI יצור לך משחקים ותרגילים!</p>
+          </div>
+          
+          <div class="ai-input-section">
+            <label class="ai-label">על מה תרצה ללמוד?</label>
+            <input type="text" id="ai-prompt" class="ai-input" placeholder="למשל: דינוזאורים, חלל, בעלי חיים..." dir="rtl">
+            <div class="ai-language-select">
+              <label><input type="radio" name="ai-lang" value="he" checked> עברית</label>
+              <label><input type="radio" name="ai-lang" value="en"> English</label>
+            </div>
+          </div>
+
+          <div class="ai-options">
+            <label class="ai-checkbox"><input type="checkbox" id="ai-gen-lessons" checked> 📚 שיעורים</label>
+            <label class="ai-checkbox"><input type="checkbox" id="ai-gen-quiz" checked> ❓ חידון</label>
+            <label class="ai-checkbox"><input type="checkbox" id="ai-gen-balloon" checked> 🎈 פיצוץ בלונים</label>
+            <label class="ai-checkbox"><input type="checkbox" id="ai-gen-hangman" checked> 🎯 תלייה</label>
+            <label class="ai-checkbox"><input type="checkbox" id="ai-gen-memory" checked> 🧠 זיכרון</label>
+          </div>
+
+          <button class="btn-ai-generate" onclick="generateAIContent()">
+            <span id="ai-btn-text">✨ צור תוכן</span>
+            <span id="ai-btn-loading" class="hidden">⏳ מייצר...</span>
+          </button>
+
+          <div id="ai-error" class="ai-error hidden"></div>
+          <div id="ai-success" class="ai-success hidden"></div>
+
+          <div id="ai-generated-topics" class="ai-topics-list"></div>
+        </div>
+      </section>
+
+      <!-- AI Content Play Screen -->
+      <section id="screen-ai-play" class="screen">
+        <div class="ai-play-container">
+          <div class="ai-play-header">
+            <span id="ai-play-topic"></span>
+          </div>
+          <div class="feature-grid" id="ai-play-features"></div>
         </div>
       </section>
 

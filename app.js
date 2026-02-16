@@ -1548,20 +1548,38 @@ function generateRaceQuestion() {
 function raceAnswer(selected, correct) {
   if (!raceState.active) return;
 
+  const options = document.querySelectorAll('#race-options .quiz-option');
+  
   if (selected === correct) {
     raceState.score++;
     document.getElementById('race-score').textContent = raceState.score;
-    document.getElementById('race-question').style.color = '#48bb78';
+    options.forEach(btn => {
+      btn.disabled = true;
+      if (parseInt(btn.textContent) === correct) {
+        btn.classList.add('correct');
+      }
+    });
     playSound('correct');
     showPointsPopup(10);
     setTimeout(() => {
-      document.getElementById('race-question').style.color = '';
       generateRaceQuestion();
-    }, 200);
+    }, 300);
   } else {
-    document.getElementById('race-question').style.color = '#fc8181';
+    // Disable all buttons and show correct/wrong
+    options.forEach(btn => {
+      btn.disabled = true;
+      const val = parseInt(btn.textContent);
+      if (val === correct) {
+        btn.classList.add('correct');
+      } else if (val === selected) {
+        btn.classList.add('wrong');
+      }
+    });
     playSound('wrong');
-    setTimeout(() => { document.getElementById('race-question').style.color = ''; }, 300);
+    // Wait 1.5 seconds then continue
+    setTimeout(() => {
+      generateRaceQuestion();
+    }, 1500);
   }
 }
 

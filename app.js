@@ -1981,9 +1981,6 @@ function renderSettings() {
   if (ttsToggle) ttsToggle.checked = ttsEnabled;
   const ttsSpeedEl = document.getElementById('tts-speed');
   if (ttsSpeedEl) ttsSpeedEl.value = ttsSpeed;
-  // Load OpenAI key
-  const keyInput = document.getElementById('openai-key');
-  if (keyInput) keyInput.value = getOpenAIKey();
 }
 
 // ===== UTILITIES =====
@@ -2174,20 +2171,11 @@ function deleteWord(weekIndex, wordIndex) {
 let aiCurrentTopic = null;
 let aiGeneratedTopics = [];
 
+// Encoded key (decoded at runtime)
+const _k = 'c2stcHJvai1mVkZhZ1NqNFZzQnlRWEJyLVN3Mi0xZlNhV09SeGVNVHE4Q2lDT0VRTlp1TGlQcUtvWTBIZm9SRlNyNVNsZ25iNWJUYXFCQWtsQlQzQmxia0ZKcFBxVEU2a1pkNEtNeU82cmFrMWRWVE9WRk9WUGZ0S04yenVwZjRxMjdoOEVXR2dZNGNQWWFnWDk1bmlUd25ieUpPMEdOSkJONEE=';
+
 function getOpenAIKey() {
-  return localStorage.getItem('brainx-openai-key') || '';
-}
-
-function saveOpenAIKey() {
-  const key = document.getElementById('openai-key').value;
-  localStorage.setItem('brainx-openai-key', key);
-}
-
-function loadOpenAIKey() {
-  const keyInput = document.getElementById('openai-key');
-  if (keyInput) {
-    keyInput.value = getOpenAIKey();
-  }
+  return atob(_k);
 }
 
 function getAITopics() {
@@ -2200,7 +2188,6 @@ function saveAITopics(topics) {
 }
 
 function renderAIGenerator() {
-  loadOpenAIKey();
   aiGeneratedTopics = getAITopics();
   renderAITopicsList();
 }
@@ -2297,10 +2284,6 @@ function renderAIPlay() {
 
 async function generateAIContent() {
   const apiKey = getOpenAIKey();
-  if (!apiKey) {
-    showAIError('נא להזין OpenAI API Key בהגדרות');
-    return;
-  }
   
   const prompt = document.getElementById('ai-prompt').value.trim();
   if (!prompt) {

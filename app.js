@@ -551,11 +551,23 @@ function editProfile() {
 
 function updateUIWithProfile() {
   if (!profile) return;
+  const gradeName = profile.grade === 2 ? "כיתה ב׳" : "כיתה ה׳";
   document.getElementById('home-avatar').textContent = profile.avatar;
   document.getElementById('home-greeting').textContent = `שלום ${profile.name}!`;
   document.getElementById('streak-count').textContent = progress.streak || 0;
   const navIcon = document.getElementById('nav-profile-icon');
   if (navIcon) navIcon.textContent = profile.avatar;
+  
+  // Show grade indicator
+  let gradeIndicator = document.getElementById('grade-indicator');
+  if (!gradeIndicator) {
+    gradeIndicator = document.createElement('div');
+    gradeIndicator.id = 'grade-indicator';
+    gradeIndicator.className = 'grade-indicator';
+    const greeting = document.getElementById('home-greeting');
+    greeting.parentNode.insertBefore(gradeIndicator, greeting.nextSibling);
+  }
+  gradeIndicator.textContent = gradeName;
 }
 
 // ===== THEME SYSTEM =====

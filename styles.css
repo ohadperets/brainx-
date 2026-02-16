@@ -1077,6 +1077,18 @@ html, body {
   margin-top: 8px;
 }
 
+/* ===== GRADE INDICATOR ===== */
+.grade-indicator {
+  background: rgba(102, 126, 234, 0.15);
+  color: var(--primary);
+  border-radius: 12px;
+  padding: 4px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-block;
+  margin-top: 4px;
+}
+
 /* ===== DAILY CHALLENGE CARD ===== */
 .daily-challenge-card {
   background: linear-gradient(135deg, #f6ad55, #ed8936);

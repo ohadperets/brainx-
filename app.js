@@ -331,6 +331,10 @@ function getDefaultProgress() {
     streak: 0,
     lastActiveDate: null,
     gamesPlayed: 0,
+    balloonGames: 0,
+    memoryGames: 0,
+    hangmanWins: 0,
+    mathRaces: 0,
     dictationsCompleted: 0,
     unlockedAchievements: [],
     dailyChallengeDate: null,
@@ -1260,11 +1264,13 @@ function endBalloonPop() {
   if (progress[currentSubject]) {
     progress[currentSubject].flashcardsCompleted++;
     progress.stars += correct;
+    progress.balloonGames = (progress.balloonGames || 0) + 1;
     saveProgress(progress);
     checkAchievements();
   } else {
     // AI content - just add stars
     progress.stars += correct;
+    progress.balloonGames = (progress.balloonGames || 0) + 1;
     saveProgress(progress);
   }
   
@@ -1369,6 +1375,7 @@ function renderHangman() {
     </div>`;
     progress.stars += stars;
     progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
+    progress.hangmanWins = (progress.hangmanWins || 0) + 1;
     saveProgress(progress);
     playSound('win');
     checkAchievements();
@@ -1492,6 +1499,7 @@ function flipMemoryCard(index) {
           const starsEarned = Math.max(1, 6 - Math.floor(memoryState.moves / 3));
           progress.stars += starsEarned;
           progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
+          progress.memoryGames = (progress.memoryGames || 0) + 1;
           saveProgress(progress);
           saveHighScore('memory-' + currentSubject, 100 - memoryState.moves);
           playSound('win');
@@ -1644,6 +1652,7 @@ function endMathRace() {
 
   progress.stars += stars;
   progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
+  progress.mathRaces = (progress.mathRaces || 0) + 1;
   saveProgress(progress);
   updateStreak();
   checkAchievements();

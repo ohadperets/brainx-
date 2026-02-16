@@ -612,18 +612,43 @@ const APP_DATA = {
 
   // ========== ACHIEVEMENTS ==========
   achievements: [
+    // Lessons
     { id: 'first-lesson', icon: '📖', name: 'קורא מתחיל', desc: 'קרא שיעור אחד', check: p => p.hebrew.lessonsRead.length + p.english.lessonsRead.length + p.math.lessonsRead.length >= 1 },
     { id: 'all-lessons', icon: '📚', name: 'תולעת ספרים', desc: 'קרא את כל השיעורים', check: p => p.hebrew.lessonsRead.length + p.english.lessonsRead.length + p.math.lessonsRead.length >= 9 },
+    // Quizzes
     { id: 'first-quiz', icon: '❓', name: 'סקרן', desc: 'סיים חידון אחד', check: p => p.hebrew.quizAttempts + p.english.quizAttempts + p.math.quizAttempts >= 1 },
+    { id: 'quiz-5', icon: '📝', name: 'חוקר חידונים', desc: 'סיים 5 חידונים', check: p => p.hebrew.quizAttempts + p.english.quizAttempts + p.math.quizAttempts >= 5 },
     { id: 'quiz-master', icon: '🏆', name: 'אלוף החידונים', desc: 'קבל 100% בחידון', check: p => p.hebrew.quizBest === 100 || p.english.quizBest === 100 || p.math.quizBest === 100 },
-    { id: 'flashcard-fan', icon: '🃏', name: 'מלך הכרטיסיות', desc: 'סיים כרטיסיות 5 פעמים', check: p => p.hebrew.flashcardsCompleted + p.english.flashcardsCompleted + p.math.flashcardsCompleted >= 5 },
+    // Stars & Levels
     { id: 'star-10', icon: '⭐', name: '10 כוכבים', desc: 'צבור 10 כוכבים', check: p => p.stars >= 10 },
     { id: 'star-50', icon: '🌟', name: '50 כוכבים', desc: 'צבור 50 כוכבים', check: p => p.stars >= 50 },
-    { id: 'star-100', icon: '💫', name: '100 כוכבים', desc: 'צבור 100 כוכבים', check: p => p.stars >= 100 },
+    { id: 'star-100', icon: '💫', name: 'מאה כוכבים!', desc: 'צבור 100 כוכבים', check: p => p.stars >= 100 },
+    { id: 'star-200', icon: '🌠', name: 'כוכב על', desc: 'צבור 200 כוכבים', check: p => p.stars >= 200 },
+    { id: 'star-500', icon: '🌌', name: 'גלקסיה!', desc: 'צבור 500 כוכבים', check: p => p.stars >= 500 },
+    // Streaks
     { id: 'streak-3', icon: '🔥', name: 'רצף שלושה', desc: '3 ימים ברצף', check: p => (p.streak || 0) >= 3 },
     { id: 'streak-7', icon: '🔥', name: 'שבוע ברצף!', desc: '7 ימים ברצף', check: p => (p.streak || 0) >= 7 },
+    { id: 'streak-14', icon: '🔥', name: 'שבועיים!', desc: '14 ימים ברצף', check: p => (p.streak || 0) >= 14 },
+    { id: 'streak-30', icon: '💥', name: 'מלך הרצף!', desc: '30 ימים ברצף', check: p => (p.streak || 0) >= 30 },
+    // Games
     { id: 'gamer', icon: '🎮', name: 'גיימר', desc: 'שחק 3 משחקים', check: p => (p.gamesPlayed || 0) >= 3 },
-    { id: 'dictation', icon: '📝', name: 'מכתיב מצטיין', desc: 'סיים הכתבה שבועית', check: p => (p.dictationsCompleted || 0) >= 1 }
+    { id: 'gamer-pro', icon: '🏅', name: 'גיימר מקצועי', desc: 'שחק 10 משחקים', check: p => (p.gamesPlayed || 0) >= 10 },
+    { id: 'gamer-master', icon: '👑', name: 'מלך המשחקים', desc: 'שחק 25 משחקים', check: p => (p.gamesPlayed || 0) >= 25 },
+    // Balloon Pop
+    { id: 'balloon-first', icon: '🎈', name: 'פוצץ בלונים', desc: 'סיים משחק בלונים', check: p => (p.balloonGames || 0) >= 1 },
+    { id: 'balloon-10', icon: '🎉', name: 'מומחה לבלונים', desc: 'סיים 10 משחקי בלונים', check: p => (p.balloonGames || 0) >= 10 },
+    // Memory
+    { id: 'memory-first', icon: '🧠', name: 'זיכרון חד', desc: 'סיים משחק זיכרון', check: p => (p.memoryGames || 0) >= 1 },
+    { id: 'memory-5', icon: '🧠', name: 'זכרון מצוין', desc: 'סיים 5 משחקי זיכרון', check: p => (p.memoryGames || 0) >= 5 },
+    // Hangman
+    { id: 'hangman-first', icon: '🎯', name: 'תליין מתחיל', desc: 'נצח במשחק תלייה', check: p => (p.hangmanWins || 0) >= 1 },
+    { id: 'hangman-10', icon: '🎯', name: 'מנחש מילים', desc: 'נצח 10 פעמים בתלייה', check: p => (p.hangmanWins || 0) >= 10 },
+    // Math Race
+    { id: 'racer', icon: '🏗️', name: 'מרוצן', desc: 'סיים מרוץ חשבון', check: p => (p.mathRaces || 0) >= 1 },
+    { id: 'racer-speed', icon: '🏁', name: 'מהיר כמו ברק', desc: 'סיים 5 מרוצי חשבון', check: p => (p.mathRaces || 0) >= 5 },
+    // Dictation
+    { id: 'dictation', icon: '📝', name: 'מכתיב מצטיין', desc: 'סיים הכתבה שבועית', check: p => (p.dictationsCompleted || 0) >= 1 },
+    { id: 'dictation-5', icon: '✍️', name: 'אלוף ההכתבות', desc: 'סיים 5 הכתבות', check: p => (p.dictationsCompleted || 0) >= 5 }
   ],
 
   // ========== HANGMAN WORDS ==========
@@ -1087,18 +1112,43 @@ const APP_DATA_GRADE2 = {
 
   // ========== ACHIEVEMENTS (same as grade 5) ==========
   achievements: [
+    // Lessons
     { id: 'first-lesson', icon: '📖', name: 'קורא מתחיל', desc: 'קרא שיעור אחד', check: p => p.hebrew.lessonsRead.length + p.english.lessonsRead.length + p.math.lessonsRead.length >= 1 },
     { id: 'all-lessons', icon: '📚', name: 'תולעת ספרים', desc: 'קרא את כל השיעורים', check: p => p.hebrew.lessonsRead.length + p.english.lessonsRead.length + p.math.lessonsRead.length >= 9 },
+    // Quizzes
     { id: 'first-quiz', icon: '❓', name: 'סקרן', desc: 'סיים חידון אחד', check: p => p.hebrew.quizAttempts + p.english.quizAttempts + p.math.quizAttempts >= 1 },
+    { id: 'quiz-5', icon: '📝', name: 'חוקר חידונים', desc: 'סיים 5 חידונים', check: p => p.hebrew.quizAttempts + p.english.quizAttempts + p.math.quizAttempts >= 5 },
     { id: 'quiz-master', icon: '🏆', name: 'אלוף החידונים', desc: 'קבל 100% בחידון', check: p => p.hebrew.quizBest === 100 || p.english.quizBest === 100 || p.math.quizBest === 100 },
-    { id: 'flashcard-fan', icon: '🃏', name: 'מלך הכרטיסיות', desc: 'סיים כרטיסיות 5 פעמים', check: p => p.hebrew.flashcardsCompleted + p.english.flashcardsCompleted + p.math.flashcardsCompleted >= 5 },
+    // Stars & Levels
     { id: 'star-10', icon: '⭐', name: '10 כוכבים', desc: 'צבור 10 כוכבים', check: p => p.stars >= 10 },
     { id: 'star-50', icon: '🌟', name: '50 כוכבים', desc: 'צבור 50 כוכבים', check: p => p.stars >= 50 },
-    { id: 'star-100', icon: '💫', name: '100 כוכבים', desc: 'צבור 100 כוכבים', check: p => p.stars >= 100 },
+    { id: 'star-100', icon: '💫', name: 'מאה כוכבים!', desc: 'צבור 100 כוכבים', check: p => p.stars >= 100 },
+    { id: 'star-200', icon: '🌠', name: 'כוכב על', desc: 'צבור 200 כוכבים', check: p => p.stars >= 200 },
+    { id: 'star-500', icon: '🌌', name: 'גלקסיה!', desc: 'צבור 500 כוכבים', check: p => p.stars >= 500 },
+    // Streaks
     { id: 'streak-3', icon: '🔥', name: 'רצף שלושה', desc: '3 ימים ברצף', check: p => (p.streak || 0) >= 3 },
     { id: 'streak-7', icon: '🔥', name: 'שבוע ברצף!', desc: '7 ימים ברצף', check: p => (p.streak || 0) >= 7 },
+    { id: 'streak-14', icon: '🔥', name: 'שבועיים!', desc: '14 ימים ברצף', check: p => (p.streak || 0) >= 14 },
+    { id: 'streak-30', icon: '💥', name: 'מלך הרצף!', desc: '30 ימים ברצף', check: p => (p.streak || 0) >= 30 },
+    // Games
     { id: 'gamer', icon: '🎮', name: 'גיימר', desc: 'שחק 3 משחקים', check: p => (p.gamesPlayed || 0) >= 3 },
-    { id: 'dictation', icon: '📝', name: 'מכתיב מצטיין', desc: 'סיים הכתבה שבועית', check: p => (p.dictationsCompleted || 0) >= 1 }
+    { id: 'gamer-pro', icon: '🏅', name: 'גיימר מקצועי', desc: 'שחק 10 משחקים', check: p => (p.gamesPlayed || 0) >= 10 },
+    { id: 'gamer-master', icon: '👑', name: 'מלך המשחקים', desc: 'שחק 25 משחקים', check: p => (p.gamesPlayed || 0) >= 25 },
+    // Balloon Pop
+    { id: 'balloon-first', icon: '🎈', name: 'פוצץ בלונים', desc: 'סיים משחק בלונים', check: p => (p.balloonGames || 0) >= 1 },
+    { id: 'balloon-10', icon: '🎉', name: 'מומחה לבלונים', desc: 'סיים 10 משחקי בלונים', check: p => (p.balloonGames || 0) >= 10 },
+    // Memory
+    { id: 'memory-first', icon: '🧠', name: 'זיכרון חד', desc: 'סיים משחק זיכרון', check: p => (p.memoryGames || 0) >= 1 },
+    { id: 'memory-5', icon: '🧠', name: 'זכרון מצוין', desc: 'סיים 5 משחקי זיכרון', check: p => (p.memoryGames || 0) >= 5 },
+    // Hangman
+    { id: 'hangman-first', icon: '🎯', name: 'תליין מתחיל', desc: 'נצח במשחק תלייה', check: p => (p.hangmanWins || 0) >= 1 },
+    { id: 'hangman-10', icon: '🎯', name: 'מנחש מילים', desc: 'נצח 10 פעמים בתלייה', check: p => (p.hangmanWins || 0) >= 10 },
+    // Math Race
+    { id: 'racer', icon: '🏗️', name: 'מרוצן', desc: 'סיים מרוץ חשבון', check: p => (p.mathRaces || 0) >= 1 },
+    { id: 'racer-speed', icon: '🏁', name: 'מהיר כמו ברק', desc: 'סיים 5 מרוצי חשבון', check: p => (p.mathRaces || 0) >= 5 },
+    // Dictation
+    { id: 'dictation', icon: '📝', name: 'מכתיב מצטיין', desc: 'סיים הכתבה שבועית', check: p => (p.dictationsCompleted || 0) >= 1 },
+    { id: 'dictation-5', icon: '✍️', name: 'אלוף ההכתבות', desc: 'סיים 5 הכתבות', check: p => (p.dictationsCompleted || 0) >= 5 }
   ],
 
   // ========== HANGMAN WORDS - כיתה ב׳ ==========

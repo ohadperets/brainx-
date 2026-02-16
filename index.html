@@ -17,7 +17,8 @@
   <!-- User Selection Screen -->
   <div id="user-select-screen" class="modal-overlay hidden">
     <div class="modal-card user-select-card">
-      <div class="modal-header">👋 מי משתמש עכשיו?</div>
+      <button class="modal-close-btn" onclick="hideUserSelectScreen()">×</button>
+      <div class="modal-header">👋 מי משחק?</div>
       <div id="user-list" class="user-list"></div>
       <button class="btn-secondary add-user-btn" onclick="showNewUserForm()">➕ הוסף משתמש חדש</button>
     </div>

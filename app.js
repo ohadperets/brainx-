@@ -1280,7 +1280,9 @@ function renderHangman() {
     return s.guessed.includes(letter.toUpperCase()) || s.guessed.includes(letter) ? letter : '_';
   }).join(' ');
 
-  document.getElementById('hangman-word').textContent = wordDisplay;
+  const wordEl = document.getElementById('hangman-word');
+  wordEl.textContent = wordDisplay;
+  wordEl.style.direction = s.isHebrew ? 'rtl' : 'ltr';
   document.getElementById('hangman-hint').textContent = '💡 רמז: ' + s.hint;
   document.getElementById('hangman-lives').innerHTML = '❤️'.repeat(s.lives) + '🖤'.repeat(6 - s.lives);
 

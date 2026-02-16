@@ -864,11 +864,6 @@ function updateSubjectFeatures() {
       <div class="feature-name">חידון</div>
       <div class="feature-desc">בחן את עצמך</div>
     </button>
-    <button class="feature-card balloon-card" onclick="navigate('balloon-pop')">
-      <div class="feature-icon">🎈</div>
-      <div class="feature-name">פיצוץ בלונים</div>
-      <div class="feature-desc">לחץ על הבלון הנכון!</div>
-    </button>
     <button class="feature-card games-card" onclick="navigate('games')">
       <div class="feature-icon">🎮</div>
       <div class="feature-name">משחקים</div>

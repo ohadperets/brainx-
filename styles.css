@@ -147,11 +147,6 @@ html, body {
   animation: bounce 2s ease infinite;
 }
 
-#btn-user span {
-  animation: bounce 2s ease infinite;
-  animation-delay: 0.5s;
-}
-
 .app-header h1 {
   font-size: 20px;
   font-weight: 700;

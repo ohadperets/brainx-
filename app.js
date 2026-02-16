@@ -1706,7 +1706,6 @@ function renderDailyChallengeQuestion(container) {
     <div class="quiz-options">${q.options.map((opt, i) =>
       `<button class="quiz-option" onclick="dailyChallengeAnswer(${i})">${opt}</button>`
     ).join('')}</div>
-    <div id="dc-feedback" class="quiz-feedback hidden"></div>
     <button id="dc-next" class="btn-primary hidden" onclick="nextDailyChallenge()">הבא →</button>`;
 }
 
@@ -1716,21 +1715,17 @@ function dailyChallengeAnswer(index) {
 
   const q = dailyChallengeState.questions[dailyChallengeState.current];
   const options = document.querySelectorAll('#daily-challenge-container .quiz-option');
-  const feedback = document.getElementById('dc-feedback');
 
   options.forEach(o => o.classList.add('disabled'));
   options[q.correct].classList.add('correct');
 
   if (index === q.correct) {
     dailyChallengeState.score++;
-    feedback.textContent = '🎉 נכון!';
-    feedback.className = 'quiz-feedback correct';
+    playSound('correct');
   } else {
     options[index].classList.add('wrong');
-    feedback.textContent = '😕 לא נכון.';
-    feedback.className = 'quiz-feedback wrong';
+    playSound('wrong');
   }
-  feedback.classList.remove('hidden');
 
   const nextBtn = document.getElementById('dc-next');
   nextBtn.classList.remove('hidden');

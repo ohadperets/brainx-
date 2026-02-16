@@ -491,13 +491,13 @@ html, body {
 .quiz-question {
   background: var(--card-bg);
   border-radius: var(--radius);
-  padding: 24px;
+  padding: 16px;
   text-align: center;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   box-shadow: var(--shadow);
-  margin-bottom: 16px;
-  min-height: 80px;
+  margin-bottom: 12px;
+  min-height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -507,16 +507,16 @@ html, body {
 .quiz-options {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 16px;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
 .quiz-option {
   background: var(--card-bg);
   border: 2px solid #e2e8f0;
   border-radius: var(--radius-sm);
-  padding: 16px;
-  font-size: 17px;
+  padding: 12px;
+  font-size: 16px;
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: center;

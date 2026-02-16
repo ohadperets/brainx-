@@ -5,7 +5,7 @@ let currentScreen = 'home';
 let currentSubject = null;
 let screenHistory = [];
 let quizState = {};
-let flashcardState = {};
+let balloonPopState = {};
 let hangmanState = {};
 let memoryState = {};
 let raceState = {};
@@ -512,10 +512,10 @@ function navigate(screen, subject) {
       startQuiz();
       break;
 
-    case 'flashcards':
-      document.getElementById('screen-flashcards').classList.add('active');
-      headerTitle.textContent = '🃏 כרטיסיות';
-      startFlashcards();
+    case 'balloon-pop':
+      document.getElementById('screen-balloon-pop').classList.add('active');
+      headerTitle.textContent = '🎈 פיצוץ בלונים';
+      startBalloonPop();
       break;
 
     case 'games':
@@ -650,10 +650,10 @@ function updateSubjectFeatures() {
       <div class="feature-name">חידון</div>
       <div class="feature-desc">בחן את עצמך</div>
     </button>
-    <button class="feature-card flashcards-card" onclick="navigate('flashcards')">
-      <div class="feature-icon">🃏</div>
-      <div class="feature-name">כרטיסיות</div>
-      <div class="feature-desc">למד ותרגל</div>
+    <button class="feature-card balloon-card" onclick="navigate('balloon-pop')">
+      <div class="feature-icon">🎈</div>
+      <div class="feature-name">פיצוץ בלונים</div>
+      <div class="feature-desc">לחץ על הבלון הנכון!</div>
     </button>
     <button class="feature-card games-card" onclick="navigate('games')">
       <div class="feature-icon">🎮</div>
@@ -854,87 +854,193 @@ function showQuizResults() {
 
 function restartQuiz() { startQuiz(); }
 
-// ===== FLASHCARDS =====
-function startFlashcards() {
+// ===== BALLOON POP GAME =====
+const BALLOON_COLORS = [
+  'linear-gradient(135deg, #ff6b6b, #ee5a5a)',
+  'linear-gradient(135deg, #4ecdc4, #44a8a0)',
+  'linear-gradient(135deg, #ffe66d, #ffd93d)',
+  'linear-gradient(135deg, #95e1d3, #7bc8bb)',
+  'linear-gradient(135deg, #ff8fab, #ff6b8a)',
+  'linear-gradient(135deg, #a8e6cf, #8dd8b8)',
+  'linear-gradient(135deg, #dda0dd, #cc8fcc)',
+  'linear-gradient(135deg, #87ceeb, #6bb8d6)'
+];
+
+function startBalloonPop() {
   const cards = [...getData()[currentSubject].flashcards];
   shuffle(cards);
-  flashcardState = { cards, current: 0, knew: 0, didnt: 0, flipped: false };
+  const totalQuestions = Math.min(10, cards.length);
+  
+  balloonPopState = {
+    questions: cards.slice(0, totalQuestions),
+    current: 0,
+    score: 0,
+    lives: 3,
+    isProcessing: false,
+    balloonInterval: null
+  };
 
-  document.querySelector('.flashcards-container').classList.remove('hidden');
-  document.getElementById('flashcards-done').classList.add('hidden');
-  renderFlashcard();
+  document.querySelector('.balloon-game').classList.remove('hidden');
+  document.getElementById('balloon-done').classList.add('hidden');
+  document.getElementById('balloon-total').textContent = totalQuestions;
+  
+  renderBalloonQuestion();
 }
 
-function renderFlashcard() {
-  const card = flashcardState.cards[flashcardState.current];
-  const total = flashcardState.cards.length;
-  const current = flashcardState.current + 1;
-
-  document.getElementById('flashcard-counter').textContent = `כרטיס ${current} מתוך ${total}`;
-  document.getElementById('flashcard-front').textContent = card.front;
-  document.getElementById('flashcard-back').textContent = card.back;
-  document.getElementById('flashcard-inner').classList.remove('flipped');
-  flashcardState.flipped = false;
-}
-
-function flipCard() {
-  document.getElementById('flashcard-inner').classList.toggle('flipped');
-  flashcardState.flipped = !flashcardState.flipped;
-
-  if (flashcardState.flipped && ttsEnabled) {
-    const card = flashcardState.cards[flashcardState.current];
-    const lang = currentSubject === 'english' ? 'en-US' : 'he-IL';
-    speak(card.back, lang);
+function renderBalloonQuestion() {
+  const s = balloonPopState;
+  const arena = document.getElementById('balloon-arena');
+  arena.innerHTML = '';
+  
+  if (s.balloonInterval) {
+    clearInterval(s.balloonInterval);
   }
+  
+  const question = s.questions[s.current];
+  document.getElementById('balloon-question').textContent = question.front;
+  document.getElementById('balloon-current').textContent = s.current + 1;
+  document.getElementById('balloon-score').textContent = s.score;
+  document.getElementById('balloon-lives').textContent = '❤️'.repeat(s.lives) + '🖤'.repeat(3 - s.lives);
+  
+  // Create answer options (correct + 3 wrong)
+  const allCards = getData()[currentSubject].flashcards;
+  const wrongAnswers = allCards
+    .filter(c => c.back !== question.back)
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 3)
+    .map(c => c.back);
+  
+  const answers = [question.back, ...wrongAnswers];
+  shuffle(answers);
+  
+  s.isProcessing = false;
+  
+  // Spawn balloons with delay
+  let delay = 0;
+  answers.forEach((answer, index) => {
+    setTimeout(() => {
+      if (balloonPopState.current === s.current) {
+        spawnBalloon(answer, answer === question.back, index);
+      }
+    }, delay);
+    delay += 500;
+  });
 }
 
-function flashcardAction(action) {
-  if (action === 'knew') flashcardState.knew++;
-  else flashcardState.didnt++;
+function spawnBalloon(text, isCorrect, index) {
+  const arena = document.getElementById('balloon-arena');
+  const balloon = document.createElement('div');
+  balloon.className = 'balloon';
+  balloon.dataset.correct = isCorrect;
+  
+  // Random horizontal position
+  const leftPos = 10 + (index * 22);
+  balloon.style.left = leftPos + '%';
+  
+  // Random animation duration (4-7 seconds)
+  const duration = 4 + Math.random() * 3;
+  balloon.style.animationDuration = duration + 's';
+  
+  const color = BALLOON_COLORS[Math.floor(Math.random() * BALLOON_COLORS.length)];
+  
+  balloon.innerHTML = `
+    <div class="balloon-body" style="background: ${color}">${text}</div>
+    <div class="balloon-string"></div>
+  `;
+  
+  balloon.onclick = () => popBalloon(balloon, isCorrect);
+  
+  arena.appendChild(balloon);
+  
+  // Remove balloon when animation ends (missed)
+  balloon.addEventListener('animationend', () => {
+    if (balloon.parentNode && isCorrect && !balloonPopState.isProcessing) {
+      // Missed the correct balloon!
+      balloonPopState.lives--;
+      updateLives();
+      if (balloonPopState.lives <= 0) {
+        endBalloonPop();
+      } else {
+        nextBalloonQuestion();
+      }
+    }
+  });
+}
 
-  flashcardState.current++;
-  if (flashcardState.current >= flashcardState.cards.length) {
-    showFlashcardResults();
+function popBalloon(balloon, isCorrect) {
+  if (balloonPopState.isProcessing) return;
+  balloonPopState.isProcessing = true;
+  
+  balloon.classList.add('popped');
+  balloon.classList.add(isCorrect ? 'correct' : 'wrong');
+  
+  if (isCorrect) {
+    balloonPopState.score += 10;
+    document.getElementById('balloon-score').textContent = balloonPopState.score;
+    
+    // Pop all remaining balloons
+    document.querySelectorAll('.balloon:not(.popped)').forEach(b => {
+      b.classList.add('popped');
+    });
+    
+    setTimeout(() => {
+      nextBalloonQuestion();
+    }, 500);
   } else {
-    renderFlashcard();
+    balloonPopState.lives--;
+    updateLives();
+    
+    setTimeout(() => {
+      if (balloonPopState.lives <= 0) {
+        endBalloonPop();
+      } else {
+        balloonPopState.isProcessing = false;
+      }
+    }, 300);
   }
 }
 
-function nextFlashcard() {
-  if (flashcardState.current < flashcardState.cards.length - 1) {
-    flashcardState.current++;
-    renderFlashcard();
+function updateLives() {
+  const lives = balloonPopState.lives;
+  document.getElementById('balloon-lives').textContent = '❤️'.repeat(Math.max(0, lives)) + '🖤'.repeat(3 - Math.max(0, lives));
+}
+
+function nextBalloonQuestion() {
+  balloonPopState.current++;
+  
+  if (balloonPopState.current >= balloonPopState.questions.length) {
+    endBalloonPop();
+  } else {
+    renderBalloonQuestion();
   }
 }
 
-function prevFlashcard() {
-  if (flashcardState.current > 0) {
-    flashcardState.current--;
-    renderFlashcard();
-  }
-}
-
-function showFlashcardResults() {
-  document.querySelector('.flashcards-container').classList.add('hidden');
-  document.getElementById('flashcards-done').classList.remove('hidden');
-
-  const knew = flashcardState.knew;
-  const total = flashcardState.cards.length;
-
+function endBalloonPop() {
+  document.querySelector('.balloon-game').classList.add('hidden');
+  document.getElementById('balloon-done').classList.remove('hidden');
+  
+  const s = balloonPopState;
+  const correct = Math.floor(s.score / 10);
+  const total = s.questions.length;
+  
   progress[currentSubject].flashcardsCompleted++;
-  progress.stars += knew;
+  progress.stars += correct;
   saveProgress(progress);
   checkAchievements();
-
-  document.getElementById('flashcards-summary').innerHTML = `
-    ✅ ידעת: ${knew} כרטיסיות<br>
-    ❌ לא ידעת: ${flashcardState.didnt} כרטיסיות<br>
-    +${knew} ⭐ כוכבים!`;
-
-  if (knew > total / 2) launchConfetti();
+  
+  const title = s.lives > 0 ? '🎉 כל הכבוד!' : '💪 נסה שוב!';
+  document.getElementById('balloon-result-title').textContent = title;
+  
+  document.getElementById('balloon-summary').innerHTML = `
+    🎯 ניקוד: ${s.score} נקודות<br>
+    ✅ תשובות נכונות: ${correct} מתוך ${total}<br>
+    +${correct} ⭐ כוכבים!
+  `;
+  
+  if (correct > total / 2) launchConfetti();
 }
 
-function restartFlashcards() { startFlashcards(); }
+function restartBalloonPop() { startBalloonPop(); }
 
 // ===== HANGMAN GAME =====
 function startHangman() {

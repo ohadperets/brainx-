@@ -208,31 +208,24 @@
         </div>
       </section>
 
-      <!-- Flashcards Screen -->
-      <section id="screen-flashcards" class="screen">
-        <div class="flashcards-container">
-          <div id="flashcard-counter" class="flashcard-counter"></div>
-          <div id="flashcard" class="flashcard" onclick="flipCard()">
-            <div class="flashcard-inner" id="flashcard-inner">
-              <div class="flashcard-front" id="flashcard-front"></div>
-              <div class="flashcard-back" id="flashcard-back"></div>
-            </div>
+      <!-- Balloon Pop Screen -->
+      <section id="screen-balloon-pop" class="screen">
+        <div class="balloon-game">
+          <div class="balloon-header">
+            <div class="balloon-score">🎈 <span id="balloon-score">0</span></div>
+            <div class="balloon-lives" id="balloon-lives">❤️❤️❤️</div>
           </div>
-          <p class="flashcard-hint">👆 לחץ על הכרטיס כדי להפוך</p>
-          <div class="flashcard-controls">
-            <button class="btn-flash btn-knew" onclick="flashcardAction('knew')">ידעתי ✅</button>
-            <button class="btn-flash btn-didnt" onclick="flashcardAction('didnt')">לא ידעתי ❌</button>
-          </div>
-          <div class="flashcard-nav">
-            <button class="btn-icon" onclick="prevFlashcard()">→</button>
-            <button class="btn-icon" onclick="nextFlashcard()">←</button>
+          <div class="balloon-question" id="balloon-question"></div>
+          <div class="balloon-arena" id="balloon-arena"></div>
+          <div class="balloon-progress">
+            <span id="balloon-current">1</span> / <span id="balloon-total">10</span>
           </div>
         </div>
-        <div id="flashcards-done" class="flashcards-done hidden">
+        <div id="balloon-done" class="balloon-done hidden">
           <div class="results-emoji">🎉</div>
-          <h2>סיימת את כל הכרטיסיות!</h2>
-          <div id="flashcards-summary"></div>
-          <button class="btn-primary" onclick="restartFlashcards()">שוב פעם 🔄</button>
+          <h2 id="balloon-result-title">כל הכבוד!</h2>
+          <div id="balloon-summary"></div>
+          <button class="btn-primary" onclick="restartBalloonPop()">שחק שוב 🔄</button>
           <button class="btn-secondary" onclick="goBack()">חזרה לתפריט</button>
         </div>
       </section>

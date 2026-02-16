@@ -1001,24 +1001,19 @@ function selectAnswer(index) {
 
   const q = quizState.questions[quizState.current];
   const options = document.querySelectorAll('.quiz-option');
-  const feedback = document.getElementById('quiz-feedback');
 
   options.forEach(o => o.classList.add('disabled'));
+  options[q.correct].classList.add('correct');
 
   if (index === q.correct) {
     quizState.score++;
-    feedback.textContent = '🎉 נכון! כל הכבוד!';
-    feedback.className = 'quiz-feedback correct';
     playSound('correct');
     showPointsPopup(10);
   } else {
     options[index].classList.add('wrong');
-    feedback.textContent = '😕 לא נכון';
-    feedback.className = 'quiz-feedback wrong';
     playSound('wrong');
   }
 
-  feedback.classList.remove('hidden');
   document.getElementById('quiz-next').classList.remove('hidden');
 
   if (quizState.current === quizState.questions.length - 1) {

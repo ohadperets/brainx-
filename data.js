@@ -124,56 +124,31 @@ const APP_DATA = {
       }
     ],
     quiz: [
-      {
-        question: "מהו שם עצם?",
-        options: ["מילה שמתארת פעולה", "מילה שמציינת דבר, אדם או מקום", "מילה שמחברת משפטים", "מילה שמתארת שם עצם"],
-        correct: 1
-      },
-      {
-        question: "איזו מילה היא שם עצם פרטי?",
-        options: ["ילד", "עיר", "ירושלים", "ספר"],
-        correct: 2
-      },
-      {
-        question: "מהו הרבים של 'ילדה'?",
-        options: ["ילדים", "ילדות", "ילדה", "ילדן"],
-        correct: 1
-      },
-      {
-        question: "מהו השורש של המילה 'כותב'?",
-        options: ["כ.ו.ת", "כ.ת.ב", "כ.ו.ב", "ת.כ.ב"],
-        correct: 1
-      },
-      {
-        question: "איזה זמן הוא 'אלמד'?",
-        options: ["עבר", "הווה", "עתיד", "ציווי"],
-        correct: 2
-      },
-      {
-        question: "מהו שם תואר?",
-        options: ["מילה שמציינת מקום", "מילה שמתארת פעולה", "מילה שמתארת שם עצם", "מילה שמחברת משפטים"],
-        correct: 2
-      },
-      {
-        question: "'אהבה' היא דוגמה ל...",
-        options: ["שם עצם פרטי", "שם עצם כללי", "שם עצם מופשט", "שם תואר"],
-        correct: 2
-      },
-      {
-        question: "מה צריך שם תואר להתאים ל?",
-        options: ["רק למין", "רק למספר", "למין ולמספר", "לזמן הפועל"],
-        correct: 2
-      },
-      {
-        question: "מהו הגוף הנכון: 'אנחנו ___'?",
-        options: ["למדתי", "למדת", "למדנו", "למדו"],
-        correct: 2
-      },
-      {
-        question: "איזו מילה היא שם עצם מופשט?",
-        options: ["כיסא", "ירושלים", "חופש", "חתול"],
-        correct: 2
-      }
+      { question: "מהו שם עצם?", options: ["מילה שמתארת פעולה", "מילה שמציינת דבר, אדם או מקום", "מילה שמחברת משפטים", "מילה שמתארת שם עצם"], correct: 1 },
+      { question: "איזו מילה היא שם עצם פרטי?", options: ["ילד", "עיר", "ירושלים", "ספר"], correct: 2 },
+      { question: "מהו הרבים של 'ילדה'?", options: ["ילדים", "ילדות", "ילדה", "ילדן"], correct: 1 },
+      { question: "מהו השורש של המילה 'כותב'?", options: ["כ.ו.ת", "כ.ת.ב", "כ.ו.ב", "ת.כ.ב"], correct: 1 },
+      { question: "איזה זמן הוא 'אלמד'?", options: ["עבר", "הווה", "עתיד", "ציווי"], correct: 2 },
+      { question: "מהו שם תואר?", options: ["מילה שמציינת מקום", "מילה שמתארת פעולה", "מילה שמתארת שם עצם", "מילה שמחברת משפטים"], correct: 2 },
+      { question: "'אהבה' היא דוגמה ל...", options: ["שם עצם פרטי", "שם עצם כללי", "שם עצם מופשט", "שם תואר"], correct: 2 },
+      { question: "מה צריך שם תואר להתאים ל?", options: ["רק למין", "רק למספר", "למין ולמספר", "לזמן הפועל"], correct: 2 },
+      { question: "מהו הגוף הנכון: 'אנחנו ___'?", options: ["למדתי", "למדת", "למדנו", "למדו"], correct: 2 },
+      { question: "איזו מילה היא שם עצם מופשט?", options: ["כיסא", "ירושלים", "חופש", "חתול"], correct: 2 },
+      { question: "מהו הרבים של 'ספר'?", options: ["ספרות", "ספרים", "ספריה", "ספרן"], correct: 1 },
+      { question: "איזה זמן הוא 'רצתי'?", options: ["עבר", "הווה", "עתיד", "ציווי"], correct: 0 },
+      { question: "מהו השורש של 'לומד'?", options: ["ל.ו.מ", "ל.מ.ד", "מ.ל.ד", "ד.מ.ל"], correct: 1 },
+      { question: "'הילד הגבוה' - 'גבוה' הוא:", options: ["שם עצם", "שם תואר", "פועל", "מילת קישור"], correct: 1 },
+      { question: "מהו הרבים של 'מחברת'?", options: ["מחברים", "מחברות", "מחברתות", "מחברן"], correct: 1 },
+      { question: "מהו הנקבה של 'גדול'?", options: ["גדולה", "גדולים", "גדולות", "גדלה"], correct: 0 },
+      { question: "'הם ___' - מה הגוף הנכון?", options: ["אכלתי", "אכלת", "אכל", "אכלו"], correct: 3 },
+      { question: "איזו מילה היא פועל?", options: ["ירושלים", "יפה", "רץ", "שולחן"], correct: 2 },
+      { question: "מילת חיבור היא:", options: ["ו", "ילד", "יפה", "רץ"], correct: 0 },
+      { question: "מהו השורש של 'שומר'?", options: ["ש.מ.ר", "ש.ו.מ", "מ.ר.ש", "ר.מ.ש"], correct: 0 },
+      { question: "הזמן ההווה של 'אכלתי':", options: ["אוכל", "יאכל", "אכול", "אכלתי"], correct: 0 },
+      { question: "מהו הרבים של 'עיפרון'?", options: ["עיפרונות", "עיפרונים", "עיפרנים", "עפרונים"], correct: 1 },
+      { question: "'חכמה' - שם עצם מסוג:", options: ["פרטי", "כללי", "מופשט", "קונקרטי"], correct: 2 },
+      { question: "הפועל 'יכתוב' הוא בזמן:", options: ["עבר", "הווה", "עתיד", "ציווי"], correct: 2 },
+      { question: "נקבה של 'מורה':", options: ["מורה", "מורית", "מורָה", "מורות"], correct: 0 }
     ],
     flashcards: [
       { front: "מהו שם עצם?", back: "מילה שמציינת דבר, אדם, מקום, חיה או רעיון" },
@@ -327,56 +302,36 @@ const APP_DATA = {
       }
     ],
     quiz: [
-      {
-        question: "She ___ to school every day.",
-        options: ["go", "goes", "going", "went"],
-        correct: 1
-      },
-      {
-        question: "They ___ play soccer yesterday.",
-        options: ["don't", "doesn't", "didn't", "aren't"],
-        correct: 2
-      },
-      {
-        question: "___ you like pizza?",
-        options: ["Does", "Do", "Did", "Are"],
-        correct: 1
-      },
-      {
-        question: "What is 'מחברת' in English?",
-        options: ["pencil", "eraser", "notebook", "ruler"],
-        correct: 2
-      },
-      {
-        question: "The past of 'go' is:",
-        options: ["goed", "gone", "went", "goes"],
-        correct: 2
-      },
-      {
-        question: "He ___ his homework last night.",
-        options: ["do", "does", "did", "doing"],
-        correct: 2
-      },
-      {
-        question: "What is 'ספרייה' in English?",
-        options: ["classroom", "library", "cafeteria", "playground"],
-        correct: 1
-      },
-      {
-        question: "I ___ eat breakfast every morning.",
-        options: ["always", "yesterday", "last week", "tomorrow"],
-        correct: 0
-      },
-      {
-        question: "She doesn't ___ English.",
-        options: ["speaks", "speaking", "speak", "spoke"],
-        correct: 2
-      },
-      {
-        question: "The past of 'eat' is:",
-        options: ["eated", "ate", "eaten", "eating"],
-        correct: 1
-      }
+      { question: "She ___ to school every day.", options: ["go", "goes", "going", "went"], correct: 1 },
+      { question: "They ___ play soccer yesterday.", options: ["don't", "doesn't", "didn't", "aren't"], correct: 2 },
+      { question: "___ you like pizza?", options: ["Does", "Do", "Did", "Are"], correct: 1 },
+      { question: "What is 'מחברת' in English?", options: ["pencil", "eraser", "notebook", "ruler"], correct: 2 },
+      { question: "The past of 'go' is:", options: ["goed", "gone", "went", "goes"], correct: 2 },
+      { question: "He ___ his homework last night.", options: ["do", "does", "did", "doing"], correct: 2 },
+      { question: "What is 'ספרייה' in English?", options: ["classroom", "library", "cafeteria", "playground"], correct: 1 },
+      { question: "I ___ eat breakfast every morning.", options: ["always", "yesterday", "last week", "tomorrow"], correct: 0 },
+      { question: "She doesn't ___ English.", options: ["speaks", "speaking", "speak", "spoke"], correct: 2 },
+      { question: "The past of 'eat' is:", options: ["eated", "ate", "eaten", "eating"], correct: 1 },
+      { question: "They ___ basketball now.", options: ["play", "plays", "playing", "are playing"], correct: 3 },
+      { question: "What is 'מורה' in English?", options: ["student", "teacher", "principal", "parent"], correct: 1 },
+      { question: "The past of 'see' is:", options: ["seed", "seen", "saw", "sees"], correct: 2 },
+      { question: "___ she like music?", options: ["Do", "Does", "Did", "Is"], correct: 1 },
+      { question: "We ___ to the park yesterday.", options: ["go", "goes", "went", "going"], correct: 2 },
+      { question: "What is 'תלמיד' in English?", options: ["teacher", "student", "friend", "brother"], correct: 1 },
+      { question: "He ___ a book now.", options: ["read", "reads", "reading", "is reading"], correct: 3 },
+      { question: "The past of 'have' is:", options: ["haved", "has", "had", "having"], correct: 2 },
+      { question: "I ___ like spiders.", options: ["doesn't", "don't", "didn't", "isn't"], correct: 1 },
+      { question: "What is 'חבר' in English?", options: ["brother", "sister", "friend", "family"], correct: 2 },
+      { question: "She ___ her room every day.", options: ["clean", "cleans", "cleaning", "cleaned"], correct: 1 },
+      { question: "The past of 'make' is:", options: ["maked", "makes", "made", "making"], correct: 2 },
+      { question: "What is 'בית' in English?", options: ["school", "house", "room", "door"], correct: 1 },
+      { question: "___ they finish the test?", options: ["Do", "Does", "Did", "Are"], correct: 2 },
+      { question: "I ___ TV every evening.", options: ["watch", "watches", "watching", "watched"], correct: 0 },
+      { question: "The past of 'come' is:", options: ["comed", "comes", "came", "coming"], correct: 2 },
+      { question: "What is 'כלב' in English?", options: ["cat", "dog", "bird", "fish"], correct: 1 },
+      { question: "She ___ speak French.", options: ["don't", "doesn't", "didn't", "isn't"], correct: 1 },
+      { question: "The past of 'write' is:", options: ["writed", "writes", "wrote", "writing"], correct: 2 },
+      { question: "What is 'משפחה' in English?", options: ["friend", "family", "school", "home"], correct: 1 }
     ],
     flashcards: [
       { front: "classroom", back: "כיתה" },
@@ -393,7 +348,17 @@ const APP_DATA = {
       { front: "eat → ?", back: "ate (עבר)" },
       { front: "see → ?", back: "saw (עבר)" },
       { front: "have → ?", back: "had (עבר)" },
-      { front: "make → ?", back: "made (עבר)" }
+      { front: "make → ?", back: "made (עבר)" },
+      { front: "come → ?", back: "came (עבר)" },
+      { front: "write → ?", back: "wrote (עבר)" },
+      { front: "take → ?", back: "took (עבר)" },
+      { front: "teacher", back: "מורה" },
+      { front: "student", back: "תלמיד" },
+      { front: "friend", back: "חבר" },
+      { front: "family", back: "משפחה" },
+      { front: "house", back: "בית" },
+      { front: "dog", back: "כלב" },
+      { front: "cat", back: "חתול" }
     ]
   },
 
@@ -530,56 +495,36 @@ const APP_DATA = {
       }
     ],
     quiz: [
-      {
-        question: "בשבר ¾, מהו המונה?",
-        options: ["4", "3", "7", "1"],
-        correct: 1
-      },
-      {
-        question: "²⁄₅ + ¹⁄₅ = ?",
-        options: ["³⁄₁₀", "³⁄₅", "²⁄₅", "¹⁄₅"],
-        correct: 1
-      },
-      {
-        question: "מהו שבר שקול ל-½?",
-        options: ["¹⁄₃", "²⁄₃", "²⁄₄", "³⁄₅"],
-        correct: 2
-      },
-      {
-        question: "3.45 — מהי הספרה במקום העשיריות?",
-        options: ["3", "4", "5", "0"],
-        correct: 1
-      },
-      {
-        question: "3.5 + 2.3 = ?",
-        options: ["5.8", "5.2", "6.8", "5.35"],
-        correct: 0
-      },
-      {
-        question: "מהו ההיקף של ריבוע עם צלע 6?",
-        options: ["12", "24", "36", "18"],
-        correct: 1
-      },
-      {
-        question: "מהו השטח של מלבן 5×4?",
-        options: ["9", "18", "20", "25"],
-        correct: 2
-      },
-      {
-        question: "מהו השטח של משולש עם בסיס 10 וגובה 6?",
-        options: ["60", "30", "16", "20"],
-        correct: 1
-      },
-      {
-        question: "½ כמספר עשרוני:",
-        options: ["0.1", "0.2", "0.5", "0.12"],
-        correct: 2
-      },
-      {
-        question: "היקף מלבן עם אורך 7 ורוחב 3:",
-        options: ["10", "21", "20", "14"],
-        correct: 2
-      }
+      { question: "בשבר ¾, מהו המונה?", options: ["4", "3", "7", "1"], correct: 1 },
+      { question: "²⁄₅ + ¹⁄₅ = ?", options: ["³⁄₁₀", "³⁄₅", "²⁄₅", "¹⁄₅"], correct: 1 },
+      { question: "מהו שבר שקול ל-½?", options: ["¹⁄₃", "²⁄₃", "²⁄₄", "³⁄₅"], correct: 2 },
+      { question: "3.45 — מהי הספרה במקום העשיריות?", options: ["3", "4", "5", "0"], correct: 1 },
+      { question: "3.5 + 2.3 = ?", options: ["5.8", "5.2", "6.8", "5.35"], correct: 0 },
+      { question: "מהו ההיקף של ריבוע עם צלע 6?", options: ["12", "24", "36", "18"], correct: 1 },
+      { question: "מהו השטח של מלבן 5×4?", options: ["9", "18", "20", "25"], correct: 2 },
+      { question: "מהו השטח של משולש עם בסיס 10 וגובה 6?", options: ["60", "30", "16", "20"], correct: 1 },
+      { question: "½ כמספר עשרוני:", options: ["0.1", "0.2", "0.5", "0.12"], correct: 2 },
+      { question: "היקף מלבן עם אורך 7 ורוחב 3:", options: ["10", "21", "20", "14"], correct: 2 },
+      { question: "⁴⁄₈ - ²⁄₈ = ?", options: ["²⁄₈", "⁶⁄₈", "²⁄₄", "⁴⁄₈"], correct: 0 },
+      { question: "בשבר ⁵⁄₆, מהו המכנה?", options: ["5", "6", "11", "1"], correct: 1 },
+      { question: "7.8 - 3.2 = ?", options: ["4.6", "4.4", "5.6", "3.6"], correct: 0 },
+      { question: "¼ כמספר עשרוני:", options: ["0.4", "0.25", "0.14", "0.5"], correct: 1 },
+      { question: "שטח ריבוע עם צלע 8:", options: ["32", "16", "64", "24"], correct: 2 },
+      { question: "היקף משולש שווה צלעות עם צלע 5:", options: ["10", "15", "25", "20"], correct: 1 },
+      { question: "⅓ + ⅓ = ?", options: ["⅔", "⅙", "²⁄₆", "⅓"], correct: 0 },
+      { question: "מה גדול יותר: 0.5 או 0.45?", options: ["0.5", "0.45", "שווים", "אי אפשר לדעת"], correct: 0 },
+      { question: "12.4 + 3.6 = ?", options: ["15.0", "16.0", "15.10", "14.0"], correct: 1 },
+      { question: "שטח מלבן 6×9:", options: ["15", "54", "30", "45"], correct: 1 },
+      { question: "כמה שמיניות יש בשלם?", options: ["6", "7", "8", "10"], correct: 2 },
+      { question: "¾ כמספר עשרוני:", options: ["0.75", "0.34", "0.43", "0.7"], correct: 0 },
+      { question: "היקף ריבוע עם צלע 10:", options: ["20", "40", "100", "30"], correct: 1 },
+      { question: "⁵⁄₁₀ שווה ל:", options: ["½", "⅓", "¼", "⅔"], correct: 0 },
+      { question: "שטח משולש עם בסיס 8 וגובה 4:", options: ["32", "16", "12", "24"], correct: 1 },
+      { question: "2.7 × 3 = ?", options: ["8.1", "7.1", "6.7", "9.1"], correct: 0 },
+      { question: "מה צריך להוסיף ל-⅓ כדי לקבל 1?", options: ["⅓", "⅔", "½", "¼"], correct: 1 },
+      { question: "איזה שבר קטן יותר?", options: ["½", "⅓", "¼", "⅕"], correct: 3 },
+      { question: "15.0 - 7.5 = ?", options: ["7.5", "8.5", "6.5", "7.0"], correct: 0 },
+      { question: "שטח ריבוע עם צלע 12:", options: ["48", "24", "144", "120"], correct: 2 }
     ],
     flashcards: [
       { front: "מהו שבר?", back: "חלק מתוך שלם\nכמו ¾ = 3 חלקים מתוך 4" },
@@ -588,12 +533,16 @@ const APP_DATA = {
       { front: "²⁄₅ + ¹⁄₅ = ?", back: "³⁄₅\n(מחברים מונים, מכנה נשאר)" },
       { front: "½ = ? עשרוני", back: "0.5" },
       { front: "¼ = ? עשרוני", back: "0.25" },
+      { front: "¾ = ? עשרוני", back: "0.75" },
+      { front: "⅓ = ? עשרוני", back: "0.333..." },
       { front: "היקף ריבוע = ?", back: "צלע × 4" },
       { front: "שטח ריבוע = ?", back: "צלע × צלע" },
       { front: "שטח מלבן = ?", back: "אורך × רוחב" },
       { front: "שטח משולש = ?", back: "(בסיס × גובה) ÷ 2" },
       { front: "היקף מלבן = ?", back: "(אורך + רוחב) × 2" },
-      { front: "מהם שברים שקולים?", back: "שברים ששווים אותו דבר\n½ = ²⁄₄ = ³⁄₆" }
+      { front: "מהם שברים שקולים?", back: "שברים ששווים אותו דבר\n½ = ²⁄₄ = ³⁄₆" },
+      { front: "סדר פעולות חשבון:", back: "סוגריים, כפל/חילוק, חיבור/חיסור" },
+      { front: "כמה רביעיות בשלם?", back: "4 רביעיות = 1 שלם" }
     ]
   },
 
@@ -660,7 +609,15 @@ const APP_DATA = {
       { word: 'ידידות', hint: 'קשר בין חברים' },
       { word: 'ספרייה', hint: 'מקום עם הרבה ספרים' },
       { word: 'חופש', hint: 'כשאין לימודים' },
-      { word: 'משפחה', hint: 'אבא, אמא, אחים' }
+      { word: 'משפחה', hint: 'אבא, אמא, אחים' },
+      { word: 'תלמיד', hint: 'ילד שלומד בבית ספר' },
+      { word: 'מורה', hint: 'מי שמלמד בכיתה' },
+      { word: 'משפט', hint: 'אוסף מילים שיוצרות רעיון' },
+      { word: 'פסיק', hint: 'סימן פיסוק שעוצר קצת' },
+      { word: 'סיפור', hint: 'טקסט עם התחלה, אמצע וסוף' },
+      { word: 'תהילים', hint: 'ספר מזמורים בתנ"ך' },
+      { word: 'ברכה', hint: 'משהו טוב שאומרים למישהו' },
+      { word: 'חברות', hint: 'יחסים טובים בין אנשים' }
     ],
     english: [
       { word: 'CLASSROOM', hint: 'Where you study at school' },
@@ -669,7 +626,15 @@ const APP_DATA = {
       { word: 'PENCIL', hint: 'You write with it' },
       { word: 'TEACHER', hint: 'Someone who teaches you' },
       { word: 'HOMEWORK', hint: 'Work you do at home' },
-      { word: 'BACKPACK', hint: 'You carry books in it' }
+      { word: 'BACKPACK', hint: 'You carry books in it' },
+      { word: 'STUDENT', hint: 'A person who learns at school' },
+      { word: 'DICTIONARY', hint: 'A book with word meanings' },
+      { word: 'BEAUTIFUL', hint: 'Very pretty' },
+      { word: 'DIFFERENT', hint: 'Not the same' },
+      { word: 'IMPORTANT', hint: 'Something that matters a lot' },
+      { word: 'YESTERDAY', hint: 'The day before today' },
+      { word: 'TOMORROW', hint: 'The day after today' },
+      { word: 'PLAYGROUND', hint: 'Where children play outside' }
     ],
     math: [
       { word: 'שבר', hint: 'חלק מתוך שלם, כמו ½' },
@@ -678,7 +643,15 @@ const APP_DATA = {
       { word: 'היקף', hint: 'אורך סביב הצורה' },
       { word: 'שטח', hint: 'כמה מקום הצורה תופסת' },
       { word: 'ריבוע', hint: 'צורה עם 4 צלעות שוות' },
-      { word: 'משולש', hint: 'צורה עם 3 צלעות' }
+      { word: 'משולש', hint: 'צורה עם 3 צלעות' },
+      { word: 'מלבן', hint: 'צורה עם 4 צלעות, 2 ארוכות ו-2 קצרות' },
+      { word: 'עיגול', hint: 'צורה עגולה בלי פינות' },
+      { word: 'חצי', hint: 'שני חלקים שווים' },
+      { word: 'רבע', hint: 'ארבעה חלקים שווים' },
+      { word: 'כפל', hint: 'פעולה של לקחת מספר כמה פעמים' },
+      { word: 'חילוק', hint: 'פעולה של לחלק לקבוצות שוות' },
+      { word: 'זווית', hint: 'המפגש בין שני קווים' },
+      { word: 'קוטר', hint: 'קו שעובר דרך מרכז העיגול' }
     ]
   },
 
@@ -686,15 +659,18 @@ const APP_DATA = {
   memory: {
     hebrew: [
       ['ילד', 'ילדים'], ['ילדה', 'ילדות'], ['ספר', 'ספרים'], ['שם עצם', 'noun'],
-      ['פועל', 'verb'], ['תואר', 'adjective']
+      ['פועל', 'verb'], ['תואר', 'adjective'], ['מחברת', 'מחברות'], ['שיר', 'שירים'],
+      ['בית', 'בתים'], ['מילה', 'מילים'], ['שאלה', 'שאלות'], ['תשובה', 'תשובות']
     ],
     english: [
       ['go', 'went'], ['eat', 'ate'], ['see', 'saw'], ['have', 'had'],
-      ['make', 'made'], ['come', 'came']
+      ['make', 'made'], ['come', 'came'], ['take', 'took'], ['give', 'gave'],
+      ['write', 'wrote'], ['read', 'read'], ['buy', 'bought'], ['think', 'thought']
     ],
     math: [
       ['½', '0.5'], ['¼', '0.25'], ['¾', '0.75'], ['שטח ריבוע', 'צלע×צלע'],
-      ['שטח מלבן', 'אורך×רוחב'], ['היקף ריבוע', 'צלע×4']
+      ['שטח מלבן', 'אורך×רוחב'], ['היקף ריבוע', 'צלע×4'], ['היקף מלבן', '(אורך+רוחב)×2'],
+      ['⅓', '0.33'], ['⅔', '0.67'], ['1', '100%'], ['½', '50%'], ['¼', '25%']
     ]
   },
 
@@ -864,7 +840,21 @@ const APP_DATA_GRADE2 = {
       { question: "איזו אות באה אחרי ב?", options: ["א", "ד", "ג", "ה"], correct: 2 },
       { question: "מה ההפך של 'יחיד'?", options: ["בודד", "רבים", "קטן", "גדול"], correct: 1 },
       { question: "איך נראית נ בסוף מילה?", options: ["ם", "ך", "ן", "ף"], correct: 2 },
-      { question: "מה הרבים של 'ילדה'?", options: ["ילדים", "ילדות", "ילדה", "ילד"], correct: 1 }
+      { question: "מה הרבים של 'ילדה'?", options: ["ילדים", "ילדות", "ילדה", "ילד"], correct: 1 },
+      { question: "איזו אות באה אחרי ה?", options: ["ד", "ז", "ו", "ח"], correct: 2 },
+      { question: "מה הרבים של 'כלב'?", options: ["כלבות", "כלבים", "כלבן", "כלב"], correct: 1 },
+      { question: "איך נראית מ בסוף מילה?", options: ["ם", "ך", "ן", "ף"], correct: 0 },
+      { question: "מה האות הראשונה בא-ב?", options: ["ב", "ג", "א", "ד"], correct: 2 },
+      { question: "מה הרבים של 'עץ'?", options: ["עצים", "עצות", "עצן", "עץ"], correct: 0 },
+      { question: "איזו אות באה לפני ת?", options: ["ר", "ש", "ק", "ס"], correct: 1 },
+      { question: "מה הרבים של 'פרח'?", options: ["פרחות", "פרחים", "פרחן", "פרח"], correct: 1 },
+      { question: "איך נראית פ בסוף מילה?", options: ["ם", "ך", "ן", "ף"], correct: 3 },
+      { question: "מה הרבים של 'בית'?", options: ["ביתות", "בתים", "ביתים", "בית"], correct: 1 },
+      { question: "איזו אות באה אחרי י?", options: ["ח", "ט", "כ", "ל"], correct: 2 },
+      { question: "מה הרבים של 'חתולה'?", options: ["חתולים", "חתולות", "חתול", "חתולן"], correct: 1 },
+      { question: "מה האות האחרונה בא-ב?", options: ["ש", "ר", "ת", "ק"], correct: 2 },
+      { question: "איך נראית כ בסוף מילה?", options: ["ם", "ך", "ן", "ף"], correct: 1 },
+      { question: "מה הרבים של 'שמש'?", options: ["שמשות", "שמשים", "שמש", "שמשן"], correct: 0 }
     ],
     flashcards: [
       { front: "א-ב-ג-ד-ה", back: "חמש האותיות הראשונות!" },
@@ -872,7 +862,13 @@ const APP_DATA_GRADE2 = {
       { front: "כ בסוף מילה", back: "ך (כף סופית)" },
       { front: "מ בסוף מילה", back: "ם (מם סופית)" },
       { front: "ילד → ?", back: "ילדים" },
-      { front: "ילדה → ?", back: "ילדות" }
+      { front: "ילדה → ?", back: "ילדות" },
+      { front: "נ בסוף מילה", back: "ן (נון סופית)" },
+      { front: "פ בסוף מילה", back: "ף (פא סופית)" },
+      { front: "צ בסוף מילה", back: "ץ (צדי סופית)" },
+      { front: "כלב → ?", back: "כלבים" },
+      { front: "חתולה → ?", back: "חתולות" },
+      { front: "בית → ?", back: "בתים" }
     ]
   },
 
@@ -972,7 +968,21 @@ const APP_DATA_GRADE2 = {
       { question: "What comes after 'five'?", options: ["Four", "Seven", "Six", "Eight"], correct: 2 },
       { question: "What color is grass?", options: ["Blue", "Red", "Green", "Orange"], correct: 2 },
       { question: "What is 'שלוש' in English?", options: ["Two", "Three", "Four", "Five"], correct: 1 },
-      { question: "What color is a banana?", options: ["Red", "Orange", "Yellow", "Green"], correct: 2 }
+      { question: "What color is a banana?", options: ["Red", "Orange", "Yellow", "Green"], correct: 2 },
+      { question: "What is 'כלב' in English?", options: ["Cat", "Dog", "Bird", "Fish"], correct: 1 },
+      { question: "What number comes after 10?", options: ["Nine", "Ten", "Eleven", "Twelve"], correct: 2 },
+      { question: "What is 'חתול' in English?", options: ["Dog", "Cat", "Mouse", "Bird"], correct: 1 },
+      { question: "What color is an apple?", options: ["Blue", "Green", "Red", "Purple"], correct: 2 },
+      { question: "What is 'אחת' in English?", options: ["Two", "Three", "One", "Four"], correct: 2 },
+      { question: "What comes before 'three'?", options: ["One", "Two", "Four", "Five"], correct: 1 },
+      { question: "What is 'שמש' in English?", options: ["Moon", "Star", "Sun", "Sky"], correct: 2 },
+      { question: "What color is the sun?", options: ["Blue", "Yellow", "Green", "Purple"], correct: 1 },
+      { question: "What is 'ספר' in English?", options: ["Pen", "Book", "Bag", "Chair"], correct: 1 },
+      { question: "What number is 'ten'?", options: ["8", "9", "10", "11"], correct: 2 },
+      { question: "What is 'בית' in English?", options: ["School", "House", "Park", "Store"], correct: 1 },
+      { question: "What color is milk?", options: ["Blue", "Yellow", "White", "Green"], correct: 2 },
+      { question: "What comes after 'seven'?", options: ["Six", "Nine", "Eight", "Ten"], correct: 2 },
+      { question: "What is 'מים' in English?", options: ["Fire", "Air", "Water", "Earth"], correct: 2 }
     ],
     flashcards: [
       { front: "Red", back: "אדום 🔴" },
@@ -980,7 +990,15 @@ const APP_DATA_GRADE2 = {
       { front: "Green", back: "ירוק 🟢" },
       { front: "Yellow", back: "צהוב 🟡" },
       { front: "One, Two, Three", back: "1, 2, 3" },
-      { front: "Four, Five, Six", back: "4, 5, 6" }
+      { front: "Four, Five, Six", back: "4, 5, 6" },
+      { front: "Seven, Eight, Nine", back: "7, 8, 9" },
+      { front: "Ten", back: "10 עשר" },
+      { front: "Dog", back: "כלב 🐕" },
+      { front: "Cat", back: "חתול 🐈" },
+      { front: "Sun", back: "שמש ☀️" },
+      { front: "Book", back: "ספר 📚" },
+      { front: "House", back: "בית 🏠" },
+      { front: "Water", back: "מים 💧" }
     ]
   },
 
@@ -1085,7 +1103,21 @@ const APP_DATA_GRADE2 = {
       { question: "כמה פינות יש למשולש?", options: ["2", "3", "4", "5"], correct: 1 },
       { question: "7 + 7 = ?", options: ["12", "13", "14", "15"], correct: 2 },
       { question: "15 - 5 = ?", options: ["5", "10", "15", "20"], correct: 1 },
-      { question: "כמה צלעות יש לריבוע?", options: ["3", "4", "5", "6"], correct: 1 }
+      { question: "כמה צלעות יש לריבוע?", options: ["3", "4", "5", "6"], correct: 1 },
+      { question: "2 + 6 = ?", options: ["6", "7", "8", "9"], correct: 2 },
+      { question: "9 - 5 = ?", options: ["3", "4", "5", "6"], correct: 1 },
+      { question: "3 + 4 = ?", options: ["5", "6", "7", "8"], correct: 2 },
+      { question: "12 - 2 = ?", options: ["8", "9", "10", "11"], correct: 2 },
+      { question: "איזו צורה עגולה?", options: ["ריבוע", "משולש", "עיגול", "מלבן"], correct: 2 },
+      { question: "6 + 6 = ?", options: ["10", "11", "12", "13"], correct: 2 },
+      { question: "8 - 3 = ?", options: ["3", "4", "5", "6"], correct: 2 },
+      { question: "כמה פינות יש לעיגול?", options: ["0", "1", "2", "3"], correct: 0 },
+      { question: "4 + 5 = ?", options: ["7", "8", "9", "10"], correct: 2 },
+      { question: "11 - 6 = ?", options: ["4", "5", "6", "7"], correct: 1 },
+      { question: "כמה צלעות יש למשולש?", options: ["2", "3", "4", "5"], correct: 1 },
+      { question: "9 + 2 = ?", options: ["10", "11", "12", "13"], correct: 1 },
+      { question: "14 - 7 = ?", options: ["6", "7", "8", "9"], correct: 1 },
+      { question: "כמה פינות יש למלבן?", options: ["2", "3", "4", "5"], correct: 2 }
     ],
     flashcards: [
       { front: "5 + 5 = ?", back: "10" },
@@ -1093,7 +1125,15 @@ const APP_DATA_GRADE2 = {
       { front: "כמה פינות לעיגול?", back: "0 (אפס)" },
       { front: "כמה פינות לריבוע?", back: "4" },
       { front: "8 + 4 = ?", back: "12" },
-      { front: "16 - 6 = ?", back: "10" }
+      { front: "16 - 6 = ?", back: "10" },
+      { front: "6 + 7 = ?", back: "13" },
+      { front: "18 - 9 = ?", back: "9" },
+      { front: "כמה צלעות למשולש?", back: "3" },
+      { front: "20 - 10 = ?", back: "10" },
+      { front: "9 + 9 = ?", back: "18" },
+      { front: "איזו צורה עגולה?", back: "עיגול" },
+      { front: "3 + 8 = ?", back: "11" },
+      { front: "15 - 8 = ?", back: "7" }
     ]
   },
 
@@ -1160,7 +1200,14 @@ const APP_DATA_GRADE2 = {
       { word: 'שמש', hint: 'מאירה ביום' },
       { word: 'ילד', hint: 'בן קטן' },
       { word: 'פרח', hint: 'צומח בגינה, יפה וצבעוני' },
-      { word: 'עץ', hint: 'גבוה וירוק, יש לו ענפים' }
+      { word: 'עץ', hint: 'גבוה וירוק, יש לו ענפים' },
+      { word: 'מים', hint: 'שותים אותם' },
+      { word: 'תפוח', hint: 'פרי אדום או ירוק' },
+      { word: 'ילדה', hint: 'בת קטנה' },
+      { word: 'גינה', hint: 'מקום עם צמחים ופרחים' },
+      { word: 'ירח', hint: 'נראה בלילה בשמיים' },
+      { word: 'כוכב', hint: 'מנצנץ בלילה' },
+      { word: 'אמא', hint: 'ההורה שהיא אישה' }
     ],
     english: [
       { word: 'CAT', hint: 'A pet that says meow' },
@@ -1169,7 +1216,14 @@ const APP_DATA_GRADE2 = {
       { word: 'RED', hint: 'The color of an apple' },
       { word: 'BOOK', hint: 'You read it' },
       { word: 'TREE', hint: 'Tall and green, has leaves' },
-      { word: 'BALL', hint: 'Round, you play with it' }
+      { word: 'BALL', hint: 'Round, you play with it' },
+      { word: 'FISH', hint: 'Lives in water' },
+      { word: 'BIRD', hint: 'Has wings and can fly' },
+      { word: 'BLUE', hint: 'Color of the sky' },
+      { word: 'MILK', hint: 'White drink from cows' },
+      { word: 'MOON', hint: 'Seen at night in the sky' },
+      { word: 'STAR', hint: 'Shines at night' },
+      { word: 'HAND', hint: 'You have two, with fingers' }
     ],
     math: [
       { word: 'עשר', hint: 'המספר 10' },
@@ -1178,7 +1232,14 @@ const APP_DATA_GRADE2 = {
       { word: 'ריבוע', hint: 'צורה עם 4 צלעות שוות' },
       { word: 'משולש', hint: 'צורה עם 3 פינות' },
       { word: 'חיבור', hint: 'לחבר מספרים יחד' },
-      { word: 'חיסור', hint: 'להוריד מספרים' }
+      { word: 'חיסור', hint: 'להוריד מספרים' },
+      { word: 'שלוש', hint: 'המספר 3' },
+      { word: 'אחד', hint: 'המספר 1' },
+      { word: 'שתיים', hint: 'המספר 2' },
+      { word: 'ארבע', hint: 'המספר 4' },
+      { word: 'שש', hint: 'המספר 6' },
+      { word: 'שבע', hint: 'המספר 7' },
+      { word: 'מלבן', hint: 'כמו ריבוע אבל ארוך יותר' }
     ]
   },
 
@@ -1186,15 +1247,21 @@ const APP_DATA_GRADE2 = {
   memory: {
     hebrew: [
       ['ילד', 'ילדים'], ['ילדה', 'ילדות'], ['ספר', 'ספרים'],
-      ['כלב', 'כלבים'], ['חתול', 'חתולים'], ['בית', 'בתים']
+      ['כלב', 'כלבים'], ['חתול', 'חתולים'], ['בית', 'בתים'],
+      ['פרח', 'פרחים'], ['עץ', 'עצים'], ['כוכב', 'כוכבים'],
+      ['מילה', 'מילים'], ['שיר', 'שירים'], ['ציור', 'ציורים']
     ],
     english: [
       ['cat', 'חתול'], ['dog', 'כלב'], ['sun', 'שמש'],
-      ['red', 'אדום'], ['blue', 'כחול'], ['one', 'אחד']
+      ['red', 'אדום'], ['blue', 'כחול'], ['one', 'אחד'],
+      ['fish', 'דג'], ['bird', 'ציפור'], ['tree', 'עץ'],
+      ['green', 'ירוק'], ['two', 'שתיים'], ['book', 'ספר']
     ],
     math: [
       ['5+5', '10'], ['3+3', '6'], ['10-5', '5'],
-      ['2+2', '4'], ['4+4', '8'], ['10-3', '7']
+      ['2+2', '4'], ['4+4', '8'], ['10-3', '7'],
+      ['1+1', '2'], ['6+4', '10'], ['9-4', '5'],
+      ['7+2', '9'], ['8-3', '5'], ['2+3', '5']
     ]
   },
 

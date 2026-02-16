@@ -1323,8 +1323,8 @@ function renderHangman() {
       <div class="result-text"><strong>ניצחת!</strong> ${s.word}</div>
       <div class="result-stars">${renderStars(stars)}</div>
       <div class="result-btns">
-        <button class="btn-sm btn-primary" onclick="startHangman()">🔄</button>
-        <button class="btn-sm btn-secondary" onclick="goBack()">←</button>
+        <button class="btn-sm btn-primary" onclick="startHangman()">🔄 שוב</button>
+        <button class="btn-sm btn-secondary" onclick="goBack()">← חזרה</button>
       </div>
     </div>`;
     progress.stars += stars;
@@ -1341,8 +1341,8 @@ function renderHangman() {
       <span class="result-emoji">😢</span>
       <div class="result-text">המילה: <strong>${s.word}</strong></div>
       <div class="result-btns">
-        <button class="btn-sm btn-primary" onclick="startHangman()">🔄</button>
-        <button class="btn-sm btn-secondary" onclick="goBack()">←</button>
+        <button class="btn-sm btn-primary" onclick="startHangman()">🔄 שוב</button>
+        <button class="btn-sm btn-secondary" onclick="goBack()">← חזרה</button>
       </div>
     </div>`;
     progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
@@ -1445,8 +1445,8 @@ function flipMemoryCard(index) {
             <div class="result-text"><strong>מצאת את כל הזוגות!</strong><br>${memoryState.moves} מהלכים</div>
             <div class="result-stars">${renderStars(stars)}</div>
             <div class="result-btns">
-              <button class="btn-sm btn-primary" onclick="startMemory()">🔄</button>
-              <button class="btn-sm btn-secondary" onclick="goBack()">←</button>
+              <button class="btn-sm btn-primary" onclick="startMemory()">🔄 שוב</button>
+              <button class="btn-sm btn-secondary" onclick="goBack()">← חזרה</button>
             </div>
           </div>`;
           const starsEarned = Math.max(1, 6 - Math.floor(memoryState.moves / 3));
@@ -1579,8 +1579,8 @@ function endMathRace() {
     <div class="result-text"><strong>${raceState.score} תשובות נכונות!</strong></div>
     <div class="result-stars">${renderStars(starsRating)}</div>
     <div class="result-btns">
-      <button class="btn-sm btn-primary" onclick="startMathRace()">🔄</button>
-      <button class="btn-sm btn-secondary" onclick="goBack()">←</button>
+      <button class="btn-sm btn-primary" onclick="startMathRace()">🔄 שוב</button>
+      <button class="btn-sm btn-secondary" onclick="goBack()">← חזרה</button>
     </div>
   </div>`;
 
@@ -1878,8 +1878,8 @@ function showDictationResults() {
       <div class="result-score">${percent}%</div>
       <p>${score} מתוך ${total} מילים +${score * 2} ⭐</p>
       <div class="result-btns">
-        <button class="btn-sm btn-primary" onclick="startDictation()">🔄</button>
-        <button class="btn-sm btn-secondary" onclick="goBack()">←</button>
+        <button class="btn-sm btn-primary" onclick="startDictation()">🔄 שוב</button>
+        <button class="btn-sm btn-secondary" onclick="goBack()">← חזרה</button>
       </div>
     </div>`;
 

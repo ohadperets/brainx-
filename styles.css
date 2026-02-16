@@ -2490,19 +2490,26 @@ body.theme-pink .app-header {
 
 .compact-result .result-btns {
   display: flex;
-  gap: 10px;
-  margin-top: 6px;
+  gap: 12px;
+  margin-top: 12px;
+  width: 100%;
+  justify-content: center;
 }
 
 .btn-sm {
-  padding: 8px 20px;
-  font-size: 16px;
-  border-radius: var(--radius-sm);
+  padding: 12px 28px;
+  font-size: 18px;
+  border-radius: var(--radius);
   border: none;
   cursor: pointer;
   font-family: var(--font);
-  font-weight: 600;
-  transition: transform 0.15s;
+  font-weight: 700;
+  transition: transform 0.15s, box-shadow 0.15s;
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 .btn-sm:active {
@@ -2510,13 +2517,24 @@ body.theme-pink .app-header {
 }
 
 .btn-sm.btn-primary {
-  background: var(--primary);
+  background: linear-gradient(135deg, var(--primary), #764ba2);
   color: white;
+  box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+}
+
+.btn-sm.btn-primary:hover {
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+  transform: translateY(-2px);
 }
 
 .btn-sm.btn-secondary {
-  background: var(--border);
+  background: var(--card-bg);
   color: var(--text);
+  border: 2px solid var(--border);
+}
+
+.btn-sm.btn-secondary:hover {
+  background: var(--card-hover);
 }
 
 /* Points Popup */

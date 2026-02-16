@@ -1004,7 +1004,6 @@ function selectAnswer(index) {
   const feedback = document.getElementById('quiz-feedback');
 
   options.forEach(o => o.classList.add('disabled'));
-  options[q.correct].classList.add('correct');
 
   if (index === q.correct) {
     quizState.score++;
@@ -1014,7 +1013,7 @@ function selectAnswer(index) {
     showPointsPopup(10);
   } else {
     options[index].classList.add('wrong');
-    feedback.textContent = '😕 לא נכון. התשובה הנכונה מסומנת בירוק.';
+    feedback.textContent = '😕 לא נכון';
     feedback.className = 'quiz-feedback wrong';
     playSound('wrong');
   }

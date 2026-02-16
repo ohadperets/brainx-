@@ -1,5 +1,5 @@
 // ===== SERVICE WORKER — Offline Support =====
-const CACHE_NAME = 'brainx-v7';
+const CACHE_NAME = 'brainx-v8';
 const ASSETS = [
   '/',
   '/index.html',

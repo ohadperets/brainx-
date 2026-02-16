@@ -2171,10 +2171,10 @@ function deleteWord(weekIndex, wordIndex) {
 let aiCurrentTopic = null;
 let aiGeneratedTopics = [];
 
-// Encoded key (decoded at runtime)
-const _k = 'c2stcHJvai1mVkZhZ1NqNFZzQnlRWEJyLVN3Mi0xZlNhV09SeGVNVHE4Q2lDT0VRTlp1TGlQcUtvWTBIZm9SRlNyNVNsZ25iNWJUYXFCQWtsQlQzQmxia0ZKcFBxVEU2a1pkNEtNeU82cmFrMWRWVE9WRk9WUGZ0S04yenVwZjRxMjdoOEVXR2dZNGNQWWFnWDk1bmlUd25ieUpPMEdOSkJONEE=';
+// Encoded Gemini key (decoded at runtime)
+const _k = 'QUl6YVN5QVVCVmx4Y1cxaWViZWJ4QmJ1dDEzZHR2U1lfTDRZWnpR';
 
-function getOpenAIKey() {
+function getGeminiKey() {
   return atob(_k);
 }
 
@@ -2283,8 +2283,6 @@ function renderAIPlay() {
 }
 
 async function generateAIContent() {
-  const apiKey = getOpenAIKey();
-  
   const prompt = document.getElementById('ai-prompt').value.trim();
   if (!prompt) {
     showAIError('נא להזין נושא ליצירה');
@@ -2332,20 +2330,22 @@ ${genHangman ? '- 6-10 words with hints for hangman game' : ''}
 ${genMemory ? '- 6-8 matching pairs for memory game' : ''}`;
 
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const apiKey = getGeminiKey();
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: `Create educational content about: ${prompt}` }
-        ],
-        temperature: 0.7,
-        max_tokens: 3000
+        contents: [{
+          parts: [{
+            text: systemPrompt + '\n\nCreate educational content about: ' + prompt
+          }]
+        }],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 4000
+        }
       })
     });
     
@@ -2355,7 +2355,7 @@ ${genMemory ? '- 6-8 matching pairs for memory game' : ''}`;
     }
     
     const data = await response.json();
-    const content = data.choices[0].message.content;
+    const content = data.candidates[0].content.parts[0].text;
     
     // Parse JSON from response (handle markdown code blocks)
     let jsonStr = content;

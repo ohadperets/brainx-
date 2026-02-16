@@ -2269,3 +2269,81 @@ body.theme-pink .app-header {
 .admin-access {
   cursor: pointer;
 }
+
+/* ===== USER SELECTION ===== */
+.user-select-card {
+  max-width: 400px;
+  width: 90%;
+}
+.user-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 20px 0;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.user-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border-radius: var(--radius-md);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.user-item:hover {
+  border-color: var(--primary);
+  background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+  transform: translateY(-2px);
+}
+.user-item-avatar {
+  font-size: 2.5rem;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.user-item-info {
+  flex: 1;
+  text-align: right;
+}
+.user-item-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.user-item-stats {
+  font-size: 0.85rem;
+  color: var(--text-light);
+  margin-top: 4px;
+}
+.user-item-delete {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  opacity: 0.5;
+  transition: all 0.2s;
+}
+.user-item-delete:hover {
+  opacity: 1;
+  background: rgba(229, 62, 62, 0.1);
+}
+.add-user-btn {
+  width: 100%;
+  margin-top: 10px;
+}
+.no-users-message {
+  text-align: center;
+  padding: 30px;
+  color: var(--text-light);
+}

@@ -13,6 +13,144 @@ let dictationState = {};
 let dailyChallengeState = {};
 let ttsEnabled = false;
 let ttsSpeed = 1;
+let currentUserId = null;
+
+// ===== MULTI-USER MANAGEMENT =====
+function generateUserId() {
+  return 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
+
+function getAllUsers() {
+  try {
+    const data = localStorage.getItem('brainx-users');
+    return data ? JSON.parse(data) : [];
+  } catch { return []; }
+}
+
+function saveAllUsers(users) {
+  try { localStorage.setItem('brainx-users', JSON.stringify(users)); } catch {}
+}
+
+function getCurrentUserId() {
+  try {
+    return localStorage.getItem('brainx-currentUser');
+  } catch { return null; }
+}
+
+function setCurrentUserId(userId) {
+  try { localStorage.setItem('brainx-currentUser', userId); } catch {}
+  currentUserId = userId;
+}
+
+function getUserById(userId) {
+  const users = getAllUsers();
+  return users.find(u => u.id === userId) || null;
+}
+
+function createUser(name, avatar) {
+  const users = getAllUsers();
+  const newUser = {
+    id: generateUserId(),
+    name: name || 'תלמיד',
+    avatar: avatar || '😎',
+    createdAt: Date.now()
+  };
+  users.push(newUser);
+  saveAllUsers(users);
+  return newUser;
+}
+
+function updateUser(userId, updates) {
+  const users = getAllUsers();
+  const index = users.findIndex(u => u.id === userId);
+  if (index !== -1) {
+    users[index] = { ...users[index], ...updates };
+    saveAllUsers(users);
+    return users[index];
+  }
+  return null;
+}
+
+function deleteUser(userId) {
+  let users = getAllUsers();
+  users = users.filter(u => u.id !== userId);
+  saveAllUsers(users);
+  // Clean up user-specific data
+  try {
+    localStorage.removeItem('brainx-progress-' + userId);
+    localStorage.removeItem('brainx-settings-' + userId);
+  } catch {}
+  // If deleted user is current user, clear current user
+  if (getCurrentUserId() === userId) {
+    localStorage.removeItem('brainx-currentUser');
+    currentUserId = null;
+  }
+}
+
+function showUserSelectScreen() {
+  const screen = document.getElementById('user-select-screen');
+  const userList = document.getElementById('user-list');
+  const users = getAllUsers();
+  
+  if (users.length === 0) {
+    userList.innerHTML = '<div class="no-users-message">אין משתמשים עדיין. צור משתמש חדש!</div>';
+  } else {
+    userList.innerHTML = users.map(user => {
+      const userProgress = loadProgressForUser(user.id);
+      return `
+        <div class="user-item" onclick="selectUser('${user.id}')">
+          <div class="user-item-avatar">${user.avatar}</div>
+          <div class="user-item-info">
+            <div class="user-item-name">${user.name}</div>
+            <div class="user-item-stats">⭐ ${userProgress.stars} כוכבים | 🔥 ${userProgress.streak} ימים</div>
+          </div>
+          <button class="user-item-delete" onclick="event.stopPropagation(); confirmDeleteUser('${user.id}', '${user.name}')" title="מחק משתמש">🗑️</button>
+        </div>
+      `;
+    }).join('');
+  }
+  
+  screen.classList.remove('hidden');
+}
+
+function hideUserSelectScreen() {
+  document.getElementById('user-select-screen').classList.add('hidden');
+}
+
+function selectUser(userId) {
+  setCurrentUserId(userId);
+  const user = getUserById(userId);
+  if (user) {
+    profile = { name: user.name, avatar: user.avatar };
+    progress = loadProgress();
+    settings = loadSettings();
+    applyTheme(settings.theme);
+    ttsEnabled = settings.ttsEnabled;
+    ttsSpeed = settings.ttsSpeed;
+    updateStreak();
+    updateUIWithProfile();
+    updateHomeProgress();
+    updateHomeBadges();
+    updateDailyChallengeCard();
+    hideUserSelectScreen();
+  }
+}
+
+function showNewUserForm() {
+  hideUserSelectScreen();
+  showProfileSetup(true); // true = new user mode
+}
+
+function showUserSwitch() {
+  showUserSelectScreen();
+}
+
+function confirmDeleteUser(userId, userName) {
+  if (confirm(`האם למחוק את המשתמש "${userName}"? כל ההתקדמות תימחק!`)) {
+    deleteUser(userId);
+    showUserSelectScreen(); // Refresh the list
+  }
+}
 
 // ===== STORAGE =====
 function getDefaultProgress() {
@@ -31,9 +169,10 @@ function getDefaultProgress() {
   };
 }
 
-function loadProgress() {
+// Load progress for a specific user (for user list display)
+function loadProgressForUser(userId) {
   try {
-    const data = localStorage.getItem('brainx-progress');
+    const data = localStorage.getItem('brainx-progress-' + userId);
     if (data) {
       const p = JSON.parse(data);
       const def = getDefaultProgress();
@@ -49,63 +188,79 @@ function loadProgress() {
   }
 }
 
+function loadProgress() {
+  if (!currentUserId) return getDefaultProgress();
+  return loadProgressForUser(currentUserId);
+}
+
 function saveProgress(p) {
-  try { localStorage.setItem('brainx-progress', JSON.stringify(p)); } catch {}
+  if (!currentUserId) return;
+  try { localStorage.setItem('brainx-progress-' + currentUserId, JSON.stringify(p)); } catch {}
 }
 
 function loadProfile() {
-  try {
-    const data = localStorage.getItem('brainx-profile');
-    return data ? JSON.parse(data) : null;
-  } catch { return null; }
+  if (!currentUserId) return null;
+  const user = getUserById(currentUserId);
+  return user ? { name: user.name, avatar: user.avatar } : null;
 }
 
 function saveProfileData(prof) {
-  try { localStorage.setItem('brainx-profile', JSON.stringify(prof)); } catch {}
+  if (!currentUserId) return;
+  // Update user in users array
+  updateUser(currentUserId, { name: prof.name, avatar: prof.avatar });
 }
 
-function loadSettings() {
+function loadSettingsForUser(userId) {
   try {
-    const data = localStorage.getItem('brainx-settings');
+    const data = localStorage.getItem('brainx-settings-' + userId);
     return data ? JSON.parse(data) : { theme: 'default', ttsEnabled: false, ttsSpeed: 1 };
   } catch { return { theme: 'default', ttsEnabled: false, ttsSpeed: 1 }; }
 }
 
-function saveSettings(s) {
-  try { localStorage.setItem('brainx-settings', JSON.stringify(s)); } catch {}
+function loadSettings() {
+  if (!currentUserId) return { theme: 'default', ttsEnabled: false, ttsSpeed: 1 };
+  return loadSettingsForUser(currentUserId);
 }
 
-let progress = loadProgress();
-let profile = loadProfile();
-let settings = loadSettings();
+function saveSettings(s) {
+  if (!currentUserId) return;
+  try { localStorage.setItem('brainx-settings-' + currentUserId, JSON.stringify(s)); } catch {}
+}
+
+// Initialize with default values, will be updated when user is selected
+let progress = getDefaultProgress();
+let profile = null;
+let settings = { theme: 'default', ttsEnabled: false, ttsSpeed: 1 };
 
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', () => {
-  applyTheme(settings.theme);
-  ttsEnabled = settings.ttsEnabled;
-  ttsSpeed = settings.ttsSpeed;
-  updateStreak();
-
+  // Check for existing user session
+  const savedUserId = getCurrentUserId();
+  const users = getAllUsers();
+  
   setTimeout(() => {
     const splash = document.getElementById('splash-screen');
     splash.classList.add('fade-out');
     setTimeout(() => {
       splash.style.display = 'none';
       document.getElementById('app').classList.remove('hidden');
-      if (!profile) {
-        showProfileSetup();
+      
+      // User flow: check if there's a remembered user
+      if (savedUserId && getUserById(savedUserId)) {
+        // User exists and was logged in - restore session
+        selectUser(savedUserId);
+      } else if (users.length > 0) {
+        // There are users but none remembered - show user select
+        showUserSelectScreen();
       } else {
-        updateUIWithProfile();
+        // No users at all - show profile setup for new user
+        showProfileSetup(true);
       }
     }, 500);
   }, 2000);
 
   const tips = APP_DATA.tips;
   document.getElementById('daily-tip').textContent = tips[Math.floor(Math.random() * tips.length)];
-
-  updateHomeProgress();
-  updateHomeBadges();
-  updateDailyChallengeCard();
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
@@ -137,9 +292,20 @@ function updateStreak() {
 }
 
 // ===== PROFILE SYSTEM =====
-function showProfileSetup() {
+let isCreatingNewUser = false;
+
+function showProfileSetup(newUser = false) {
+  isCreatingNewUser = newUser;
   const modal = document.getElementById('profile-setup');
   modal.classList.remove('hidden');
+  
+  // Update modal header based on mode
+  const header = modal.querySelector('.modal-header');
+  if (newUser) {
+    header.textContent = '👋 ברוכים הבאים!';
+  } else {
+    header.textContent = '✏️ עריכת פרופיל';
+  }
 
   const grid = document.getElementById('avatar-grid');
   grid.innerHTML = APP_DATA.avatars.map((a, i) =>
@@ -157,16 +323,27 @@ function selectAvatar(el, avatar) {
 
 function saveProfile() {
   const name = document.getElementById('profile-name-input').value.trim() || 'תלמיד';
-  profile = { name, avatar: selectedAvatar };
-  saveProfileData(profile);
+  
+  if (isCreatingNewUser) {
+    // Create new user
+    const newUser = createUser(name, selectedAvatar);
+    selectUser(newUser.id);
+  } else {
+    // Update existing user
+    profile = { name, avatar: selectedAvatar };
+    saveProfileData(profile);
+    updateUIWithProfile();
+  }
+  
   document.getElementById('profile-setup').classList.add('hidden');
-  updateUIWithProfile();
+  document.getElementById('profile-name-input').value = '';
+  isCreatingNewUser = false;
 }
 
 function editProfile() {
   document.getElementById('profile-name-input').value = profile ? profile.name : '';
   if (profile) selectedAvatar = profile.avatar;
-  showProfileSetup();
+  showProfileSetup(false);
   setTimeout(() => {
     document.querySelectorAll('.avatar-option').forEach(a => {
       a.classList.toggle('selected', a.dataset.avatar === selectedAvatar);

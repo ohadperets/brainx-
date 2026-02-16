@@ -497,47 +497,47 @@ function navigate(screen, subject) {
 
     case 'lessons':
       document.getElementById('screen-lessons').classList.add('active');
-      headerTitle.textContent = 'שיעורים — ' + getData()[currentSubject].name;
+      headerTitle.textContent = '📚 שיעורים';
       renderLessons();
       break;
 
     case 'lesson-detail':
       document.getElementById('screen-lesson-detail').classList.add('active');
-      headerTitle.textContent = 'שיעור';
+      headerTitle.textContent = '📖 שיעור';
       break;
 
     case 'quiz':
       document.getElementById('screen-quiz').classList.add('active');
-      headerTitle.textContent = 'חידון — ' + getData()[currentSubject].name;
+      headerTitle.textContent = '❓ חידון';
       startQuiz();
       break;
 
     case 'flashcards':
       document.getElementById('screen-flashcards').classList.add('active');
-      headerTitle.textContent = 'כרטיסיות — ' + getData()[currentSubject].name;
+      headerTitle.textContent = '🃏 כרטיסיות';
       startFlashcards();
       break;
 
     case 'games':
       document.getElementById('screen-games').classList.add('active');
-      headerTitle.textContent = 'משחקים — ' + getData()[currentSubject].name;
+      headerTitle.textContent = '🎮 משחקים';
       break;
 
     case 'game-hangman':
       document.getElementById('screen-game-hangman').classList.add('active');
-      headerTitle.textContent = 'תלייה — ' + getData()[currentSubject].name;
+      headerTitle.textContent = '🎯 תלייה';
       startHangman();
       break;
 
     case 'game-memory':
       document.getElementById('screen-game-memory').classList.add('active');
-      headerTitle.textContent = 'זיכרון — ' + getData()[currentSubject].name;
+      headerTitle.textContent = '🧠 זיכרון';
       startMemory();
       break;
 
     case 'game-math-race':
       document.getElementById('screen-game-math-race').classList.add('active');
-      headerTitle.textContent = 'מרוץ חשבון';
+      headerTitle.textContent = '🏎️ מרוץ חשבון';
       initMathRace();
       break;
 

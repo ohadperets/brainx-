@@ -412,6 +412,9 @@ let settings = { theme: 'default', ttsEnabled: false, ttsSpeed: 1 };
 
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', () => {
+  // Initialize browser history state
+  history.replaceState({ screen: 'home' }, '', location.pathname);
+  
   // Check for existing user session
   const savedUserId = getCurrentUserId();
   const users = getAllUsers();
@@ -619,17 +622,29 @@ function readLessonAloud() {
 }
 
 // ===== NAVIGATION =====
+let isNavigatingBack = false;
+
 function goHome() {
   navigate('home');
 }
 
-function navigate(screen, subject) {
+function navigate(screen, subject, skipHistory = false) {
   if (currentScreen !== screen || (subject !== undefined && subject !== currentSubject)) {
     screenHistory.push({ screen: currentScreen, subject: currentSubject });
   }
 
   currentScreen = screen;
   if (subject !== undefined) currentSubject = subject;
+
+  // Update browser history for back button support
+  if (!skipHistory && !isNavigatingBack) {
+    const state = { screen, subject: currentSubject };
+    if (screen === 'home') {
+      history.replaceState(state, '', location.pathname);
+    } else {
+      history.pushState(state, '', location.pathname + '#' + screen);
+    }
+  }
 
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
 
@@ -793,17 +808,35 @@ function goBack() {
   if ('speechSynthesis' in window) window.speechSynthesis.cancel();
   if (raceState.timer) { clearInterval(raceState.timer); raceState.timer = null; }
 
+  // Use browser history for back navigation
+  if (screenHistory.length > 0) {
+    isNavigatingBack = true;
+    history.back();
+  } else {
+    navigate('home');
+  }
+}
+
+// Handle browser back button
+window.addEventListener('popstate', (event) => {
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  if (raceState.timer) { clearInterval(raceState.timer); raceState.timer = null; }
+  
   if (screenHistory.length > 0) {
     const prev = screenHistory.pop();
     currentScreen = prev.screen;
     currentSubject = prev.subject || currentSubject;
     const tempHistory = [...screenHistory];
-    navigate(prev.screen, prev.subject || currentSubject);
+    navigate(prev.screen, prev.subject || currentSubject, true);
     screenHistory = tempHistory;
+  } else if (currentScreen !== 'home') {
+    navigate('home', undefined, true);
   } else {
-    navigate('home');
+    // Already at home - push state back to prevent exit
+    history.pushState({ screen: 'home' }, '', location.pathname);
   }
-}
+  isNavigatingBack = false;
+});
 
 // ===== SUBJECT FEATURES =====
 function updateSubjectFeatures() {

@@ -1079,8 +1079,8 @@ html, body {
 
 /* ===== GRADE INDICATOR ===== */
 .grade-indicator {
-  background: rgba(102, 126, 234, 0.15);
-  color: var(--primary);
+  background: rgba(255, 255, 255, 0.25);
+  color: white;
   border-radius: 12px;
   padding: 4px 12px;
   font-size: 13px;

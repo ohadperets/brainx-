@@ -47,12 +47,13 @@ function getUserById(userId) {
   return users.find(u => u.id === userId) || null;
 }
 
-function createUser(name, avatar) {
+function createUser(name, avatar, grade) {
   const users = getAllUsers();
   const newUser = {
     id: generateUserId(),
     name: name || 'תלמיד',
     avatar: avatar || '😎',
+    grade: grade || 5,
     createdAt: Date.now()
   };
   users.push(newUser);
@@ -97,12 +98,14 @@ function showUserSelectScreen() {
   } else {
     userList.innerHTML = users.map(user => {
       const userProgress = loadProgressForUser(user.id);
+      const gradeText = user.grade === 2 ? "כיתה ב׳" : "כיתה ה׳";
       return `
         <div class="user-item" onclick="selectUser('${user.id}')">
           <div class="user-item-avatar">${user.avatar}</div>
           <div class="user-item-info">
             <div class="user-item-name">${user.name}</div>
             <div class="user-item-stats">⭐ ${userProgress.stars} כוכבים | 🔥 ${userProgress.streak} ימים</div>
+            <span class="user-item-grade">${gradeText}</span>
           </div>
           <button class="user-item-delete" onclick="event.stopPropagation(); confirmDeleteUser('${user.id}', '${user.name}')" title="מחק משתמש">🗑️</button>
         </div>
@@ -121,7 +124,7 @@ function selectUser(userId) {
   setCurrentUserId(userId);
   const user = getUserById(userId);
   if (user) {
-    profile = { name: user.name, avatar: user.avatar };
+    profile = { name: user.name, avatar: user.avatar, grade: user.grade || 5 };
     progress = loadProgress();
     settings = loadSettings();
     applyTheme(settings.theme);
@@ -201,13 +204,19 @@ function saveProgress(p) {
 function loadProfile() {
   if (!currentUserId) return null;
   const user = getUserById(currentUserId);
-  return user ? { name: user.name, avatar: user.avatar } : null;
+  return user ? { name: user.name, avatar: user.avatar, grade: user.grade || 5 } : null;
 }
 
 function saveProfileData(prof) {
   if (!currentUserId) return;
   // Update user in users array
   updateUser(currentUserId, { name: prof.name, avatar: prof.avatar });
+}
+
+// Get content data based on user's grade
+function getData() {
+  const grade = profile?.grade || 5;
+  return grade === 2 ? APP_DATA_GRADE2 : APP_DATA;
 }
 
 function loadSettingsForUser(userId) {
@@ -293,19 +302,30 @@ function updateStreak() {
 
 // ===== PROFILE SYSTEM =====
 let isCreatingNewUser = false;
+let selectedGrade = 2;
 
 function showProfileSetup(newUser = false) {
   isCreatingNewUser = newUser;
+  selectedGrade = 2; // Default to grade 2
   const modal = document.getElementById('profile-setup');
   modal.classList.remove('hidden');
   
-  // Update modal header based on mode
+  // Update modal header and grade selector visibility based on mode
   const header = modal.querySelector('.modal-header');
+  const gradeSelector = document.getElementById('grade-selector');
+  
   if (newUser) {
     header.textContent = '👋 ברוכים הבאים!';
+    if (gradeSelector) gradeSelector.style.display = 'flex';
   } else {
     header.textContent = '✏️ עריכת פרופיל';
+    if (gradeSelector) gradeSelector.style.display = 'none';
   }
+  
+  // Reset grade selector
+  document.querySelectorAll('.grade-option').forEach(g => {
+    g.classList.toggle('selected', parseInt(g.dataset.grade) === selectedGrade);
+  });
 
   const grid = document.getElementById('avatar-grid');
   grid.innerHTML = APP_DATA.avatars.map((a, i) =>
@@ -314,6 +334,12 @@ function showProfileSetup(newUser = false) {
 }
 
 let selectedAvatar = '😎';
+
+function selectGrade(el, grade) {
+  document.querySelectorAll('.grade-option').forEach(g => g.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedGrade = grade;
+}
 
 function selectAvatar(el, avatar) {
   document.querySelectorAll('.avatar-option').forEach(a => a.classList.remove('selected'));
@@ -325,8 +351,8 @@ function saveProfile() {
   const name = document.getElementById('profile-name-input').value.trim() || 'תלמיד';
   
   if (isCreatingNewUser) {
-    // Create new user
-    const newUser = createUser(name, selectedAvatar);
+    // Create new user with grade
+    const newUser = createUser(name, selectedAvatar, selectedGrade);
     selectUser(newUser.id);
   } else {
     // Update existing user
@@ -463,7 +489,7 @@ function navigate(screen, subject) {
 
     case 'subject':
       document.getElementById('screen-subject').classList.add('active');
-      headerTitle.textContent = APP_DATA[currentSubject].name;
+      headerTitle.textContent = getData()[currentSubject].name;
       { const navEl = document.getElementById(`nav-${currentSubject}`);
         if (navEl) navEl.classList.add('active'); }
       updateSubjectFeatures();
@@ -471,7 +497,7 @@ function navigate(screen, subject) {
 
     case 'lessons':
       document.getElementById('screen-lessons').classList.add('active');
-      headerTitle.textContent = 'שיעורים — ' + APP_DATA[currentSubject].name;
+      headerTitle.textContent = 'שיעורים — ' + getData()[currentSubject].name;
       renderLessons();
       break;
 
@@ -482,30 +508,30 @@ function navigate(screen, subject) {
 
     case 'quiz':
       document.getElementById('screen-quiz').classList.add('active');
-      headerTitle.textContent = 'חידון — ' + APP_DATA[currentSubject].name;
+      headerTitle.textContent = 'חידון — ' + getData()[currentSubject].name;
       startQuiz();
       break;
 
     case 'flashcards':
       document.getElementById('screen-flashcards').classList.add('active');
-      headerTitle.textContent = 'כרטיסיות — ' + APP_DATA[currentSubject].name;
+      headerTitle.textContent = 'כרטיסיות — ' + getData()[currentSubject].name;
       startFlashcards();
       break;
 
     case 'games':
       document.getElementById('screen-games').classList.add('active');
-      headerTitle.textContent = 'משחקים — ' + APP_DATA[currentSubject].name;
+      headerTitle.textContent = 'משחקים — ' + getData()[currentSubject].name;
       break;
 
     case 'game-hangman':
       document.getElementById('screen-game-hangman').classList.add('active');
-      headerTitle.textContent = 'תלייה — ' + APP_DATA[currentSubject].name;
+      headerTitle.textContent = 'תלייה — ' + getData()[currentSubject].name;
       startHangman();
       break;
 
     case 'game-memory':
       document.getElementById('screen-game-memory').classList.add('active');
-      headerTitle.textContent = 'זיכרון — ' + APP_DATA[currentSubject].name;
+      headerTitle.textContent = 'זיכרון — ' + getData()[currentSubject].name;
       startMemory();
       break;
 
@@ -690,7 +716,7 @@ function updateDailyChallengeCard() {
 // ===== LESSONS =====
 function renderLessons() {
   const container = document.getElementById('lessons-list');
-  const lessons = APP_DATA[currentSubject].lessons;
+  const lessons = getData()[currentSubject].lessons;
   const readList = progress[currentSubject].lessonsRead;
 
   container.innerHTML = lessons.map((lesson, i) => {
@@ -707,7 +733,7 @@ function renderLessons() {
 }
 
 function openLesson(index) {
-  const lesson = APP_DATA[currentSubject].lessons[index];
+  const lesson = getData()[currentSubject].lessons[index];
   document.getElementById('lesson-content').innerHTML = lesson.content;
 
   if (!progress[currentSubject].lessonsRead.includes(lesson.id)) {
@@ -723,7 +749,7 @@ function openLesson(index) {
 
 // ===== QUIZ =====
 function startQuiz() {
-  const questions = [...APP_DATA[currentSubject].quiz];
+  const questions = [...getData()[currentSubject].quiz];
   shuffle(questions);
 
   quizState = { questions, current: 0, score: 0, answered: false };
@@ -830,7 +856,7 @@ function restartQuiz() { startQuiz(); }
 
 // ===== FLASHCARDS =====
 function startFlashcards() {
-  const cards = [...APP_DATA[currentSubject].flashcards];
+  const cards = [...getData()[currentSubject].flashcards];
   shuffle(cards);
   flashcardState = { cards, current: 0, knew: 0, didnt: 0, flipped: false };
 
@@ -912,7 +938,7 @@ function restartFlashcards() { startFlashcards(); }
 
 // ===== HANGMAN GAME =====
 function startHangman() {
-  const words = APP_DATA.hangman[currentSubject];
+  const words = getData().hangman[currentSubject];
   const choice = words[Math.floor(Math.random() * words.length)];
   const isHebrew = currentSubject !== 'english';
 
@@ -1007,7 +1033,7 @@ function guessLetter(letter) {
 
 // ===== MEMORY GAME =====
 function startMemory() {
-  const pairs = APP_DATA.memory[currentSubject];
+  const pairs = getData().memory[currentSubject];
   let cards = [];
   pairs.forEach(([a, b], i) => {
     cards.push({ id: i * 2, pairId: i, text: a, flipped: false, matched: false });
@@ -1222,10 +1248,11 @@ function startDailyChallenge() {
   }
 
   const seed = hashCode(today);
+  const data = getData();
   const allQuestions = [
-    ...APP_DATA.hebrew.quiz.map(q => ({ ...q, subjectName: 'עברית' })),
-    ...APP_DATA.english.quiz.map(q => ({ ...q, subjectName: 'אנגלית' })),
-    ...APP_DATA.math.quiz.map(q => ({ ...q, subjectName: 'מתמטיקה' }))
+    ...data.hebrew.quiz.map(q => ({ ...q, subjectName: 'עברית' })),
+    ...data.english.quiz.map(q => ({ ...q, subjectName: 'אנגלית' })),
+    ...data.math.quiz.map(q => ({ ...q, subjectName: 'מתמטיקה' }))
   ];
 
   const selectedQs = [];
@@ -1917,10 +1944,10 @@ function saveCustomDictation(data) {
 
 function getMergedDictation() {
   const custom = getCustomDictation();
-  if (!custom) return APP_DATA.dictation;
+  if (!custom) return getData().dictation;
   
   // Merge custom words with original data
-  return APP_DATA.dictation.map((week, index) => {
+  return getData().dictation.map((week, index) => {
     if (custom[index] && custom[index].words) {
       return { ...week, words: custom[index].words };
     }
@@ -1973,7 +2000,7 @@ function addDictationWord() {
   let custom = getCustomDictation();
   if (!custom) {
     // Initialize with current data
-    custom = APP_DATA.dictation.map(week => ({
+    custom = getData().dictation.map(week => ({
       week: week.week,
       words: [...week.words]
     }));
@@ -1992,7 +2019,7 @@ function deleteWord(weekIndex, wordIndex) {
   
   let custom = getCustomDictation();
   if (!custom) {
-    custom = APP_DATA.dictation.map(week => ({
+    custom = getData().dictation.map(week => ({
       week: week.week,
       words: [...week.words]
     }));

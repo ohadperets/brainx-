@@ -743,3 +743,470 @@ const APP_DATA = {
     { hebrew: 'תיק גב', english: 'backpack' }
   ]
 };
+
+// ===== GRADE 2 DATA (כיתה ב׳) =====
+const APP_DATA_GRADE2 = {
+  tips: [
+    "ידעת? קריאה כל יום עוזרת לך להיות חכם יותר!",
+    "טיפ: נסה לצייר את המילים החדשות שלמדת!",
+    "מדהים! כשאתה משחק משחקים אתה גם לומד!",
+    "טיפ: תמיד עדיף לשאול שאלות כשלא מבינים!",
+    "ידעת? הפסקות קצרות עוזרות ללמוד טוב יותר!",
+    "טיפ: לפני שתירדם, נסה לזכור מה למדת היום!",
+    "מדהים! ציורים עוזרים לזכור דברים חדשים!"
+  ],
+
+  // ========== HEBREW (עברית) - כיתה ב׳ ==========
+  hebrew: {
+    name: "עברית",
+    icon: "📖",
+    lessons: [
+      {
+        id: "heb-b-1",
+        title: "האותיות שלנו",
+        preview: "חזרה על אותיות הא-ב",
+        content: `
+          <h2>📖 האותיות שלנו</h2>
+          <p>בעברית יש לנו <span class="highlight">22 אותיות</span>!</p>
+          
+          <h3>אותיות ראשונות:</h3>
+          <div class="example">א ב ג ד ה ו ז ח ט י</div>
+          
+          <h3>אותיות אמצעיות:</h3>
+          <div class="example">כ ל מ נ ס ע פ צ</div>
+          
+          <h3>אותיות אחרונות:</h3>
+          <div class="example">ק ר ש ת</div>
+          
+          <h3>אותיות סופיות:</h3>
+          <p>יש אותיות שנראות אחרת בסוף מילה:</p>
+          <div class="example">
+            כ → ך<br>
+            מ → ם<br>
+            נ → ן<br>
+            פ → ף<br>
+            צ → ץ
+          </div>
+        `
+      },
+      {
+        id: "heb-b-2",
+        title: "קריאה במילים",
+        preview: "איך קוראים מילים",
+        content: `
+          <h2>📖 קריאה במילים</h2>
+          <p>בואו נלמד לקרוא מילים פשוטות!</p>
+          
+          <h3>מילים קצרות:</h3>
+          <div class="example">בא, גם, דג, הר, זה, יד, כן, לא</div>
+          
+          <h3>מילים עם 3 אותיות:</h3>
+          <div class="example">ספר, ילד, בית, שמש, כלב, חתול</div>
+          
+          <h3>בואו נתרגל:</h3>
+          <p>נסו לקרוא את המשפט:</p>
+          <div class="example">הילד קורא ספר טוב.</div>
+          <div class="example">הכלב רץ בגן.</div>
+          <div class="example">אני אוהב ללמוד!</div>
+        `
+      },
+      {
+        id: "heb-b-3",
+        title: "יחיד ורבים",
+        preview: "אחד או הרבה",
+        content: `
+          <h2>📖 יחיד ורבים</h2>
+          <p><span class="highlight">יחיד</span> = אחד</p>
+          <p><span class="highlight">רבים</span> = הרבה</p>
+          
+          <h3>דוגמאות:</h3>
+          <div class="example">
+            ילד אחד → ילדים הרבה<br>
+            ילדה אחת → ילדות הרבה<br>
+            ספר אחד → ספרים הרבה<br>
+            תפוח אחד → תפוחים הרבה
+          </div>
+          
+          <h3>כלל חשוב:</h3>
+          <p>בנים (זכר) - מוסיפים <span class="highlight">ים</span></p>
+          <p>בנות (נקבה) - מוסיפים <span class="highlight">ות</span></p>
+        `
+      }
+    ],
+    quiz: [
+      { question: "כמה אותיות יש בעברית?", options: ["20", "22", "26", "24"], correct: 1 },
+      { question: "מה הרבים של 'ספר'?", options: ["ספרות", "ספרים", "ספריה", "ספרן"], correct: 1 },
+      { question: "איזו אות באה אחרי ב?", options: ["א", "ד", "ג", "ה"], correct: 2 },
+      { question: "מה ההפך של 'יחיד'?", options: ["בודד", "רבים", "קטן", "גדול"], correct: 1 },
+      { question: "איך נראית נ בסוף מילה?", options: ["ם", "ך", "ן", "ף"], correct: 2 },
+      { question: "מה הרבים של 'ילדה'?", options: ["ילדים", "ילדות", "ילדה", "ילד"], correct: 1 }
+    ],
+    flashcards: [
+      { front: "א-ב-ג-ד-ה", back: "חמש האותיות הראשונות!" },
+      { front: "ספר → ?", back: "ספרים" },
+      { front: "כ בסוף מילה", back: "ך (כף סופית)" },
+      { front: "מ בסוף מילה", back: "ם (מם סופית)" },
+      { front: "ילד → ?", back: "ילדים" },
+      { front: "ילדה → ?", back: "ילדות" }
+    ]
+  },
+
+  // ========== ENGLISH - כיתה ב׳ ==========
+  english: {
+    name: "אנגלית",
+    icon: "🔤",
+    lessons: [
+      {
+        id: "eng-b-1",
+        title: "The Alphabet",
+        preview: "A B C D E F G...",
+        content: `
+          <h2>🔤 The Alphabet</h2>
+          <p>The English alphabet has <span class="highlight">26 letters</span>!</p>
+          
+          <h3>First Letters:</h3>
+          <div class="example">A B C D E F G H I J</div>
+          
+          <h3>Middle Letters:</h3>
+          <div class="example">K L M N O P Q R</div>
+          
+          <h3>Last Letters:</h3>
+          <div class="example">S T U V W X Y Z</div>
+          
+          <h3>Let's Sing! 🎵</h3>
+          <div class="example">A B C D E F G,<br>H I J K L M N O P,<br>Q R S T U V,<br>W X Y and Z!</div>
+        `
+      },
+      {
+        id: "eng-b-2",
+        title: "Colors",
+        preview: "Red, Blue, Green...",
+        content: `
+          <h2>🎨 Colors</h2>
+          <p>Let's learn colors in English!</p>
+          
+          <h3>Basic Colors:</h3>
+          <div class="example">
+            🔴 Red = אדום<br>
+            🔵 Blue = כחול<br>
+            🟢 Green = ירוק<br>
+            🟡 Yellow = צהוב<br>
+            🟠 Orange = כתום<br>
+            🟣 Purple = סגול
+          </div>
+          
+          <h3>More Colors:</h3>
+          <div class="example">
+            ⚫ Black = שחור<br>
+            ⚪ White = לבן<br>
+            🩷 Pink = ורוד<br>
+            🤎 Brown = חום
+          </div>
+        `
+      },
+      {
+        id: "eng-b-3",
+        title: "Numbers 1-20",
+        preview: "One, Two, Three...",
+        content: `
+          <h2>🔢 Numbers 1-20</h2>
+          
+          <h3>1-10:</h3>
+          <div class="example">
+            1 = One<br>
+            2 = Two<br>
+            3 = Three<br>
+            4 = Four<br>
+            5 = Five<br>
+            6 = Six<br>
+            7 = Seven<br>
+            8 = Eight<br>
+            9 = Nine<br>
+            10 = Ten
+          </div>
+          
+          <h3>11-20:</h3>
+          <div class="example">
+            11 = Eleven<br>
+            12 = Twelve<br>
+            13 = Thirteen<br>
+            14 = Fourteen<br>
+            15 = Fifteen<br>
+            16 = Sixteen<br>
+            17 = Seventeen<br>
+            18 = Eighteen<br>
+            19 = Nineteen<br>
+            20 = Twenty
+          </div>
+        `
+      }
+    ],
+    quiz: [
+      { question: "What color is the sky?", options: ["Red", "Blue", "Green", "Yellow"], correct: 1 },
+      { question: "How many letters in the alphabet?", options: ["22", "24", "26", "28"], correct: 2 },
+      { question: "What comes after 'five'?", options: ["Four", "Seven", "Six", "Eight"], correct: 2 },
+      { question: "What color is grass?", options: ["Blue", "Red", "Green", "Orange"], correct: 2 },
+      { question: "What is 'שלוש' in English?", options: ["Two", "Three", "Four", "Five"], correct: 1 },
+      { question: "What color is a banana?", options: ["Red", "Orange", "Yellow", "Green"], correct: 2 }
+    ],
+    flashcards: [
+      { front: "Red", back: "אדום 🔴" },
+      { front: "Blue", back: "כחול 🔵" },
+      { front: "Green", back: "ירוק 🟢" },
+      { front: "Yellow", back: "צהוב 🟡" },
+      { front: "One, Two, Three", back: "1, 2, 3" },
+      { front: "Four, Five, Six", back: "4, 5, 6" }
+    ]
+  },
+
+  // ========== MATH (מתמטיקה) - כיתה ב׳ ==========
+  math: {
+    name: "מתמטיקה",
+    icon: "🔢",
+    lessons: [
+      {
+        id: "math-b-1",
+        title: "חיבור עד 20",
+        preview: "5 + 3 = ?",
+        content: `
+          <h2>➕ חיבור עד 20</h2>
+          <p><span class="highlight">חיבור</span> = לחבר דברים יחד!</p>
+          
+          <h3>דוגמאות:</h3>
+          <div class="example">
+            3 + 2 = 5<br>
+            4 + 4 = 8<br>
+            5 + 5 = 10<br>
+            7 + 3 = 10
+          </div>
+          
+          <h3>טריק מגניב:</h3>
+          <p>כשמחברים לעשר, קל לחשב!</p>
+          <div class="example">
+            8 + 2 = 10<br>
+            7 + 3 = 10<br>
+            6 + 4 = 10<br>
+            5 + 5 = 10
+          </div>
+          
+          <h3>חיבור גדול יותר:</h3>
+          <div class="example">
+            10 + 5 = 15<br>
+            10 + 8 = 18<br>
+            11 + 5 = 16
+          </div>
+        `
+      },
+      {
+        id: "math-b-2",
+        title: "חיסור עד 20",
+        preview: "10 - 4 = ?",
+        content: `
+          <h2>➖ חיסור עד 20</h2>
+          <p><span class="highlight">חיסור</span> = להוריד, לקחת משהו.</p>
+          
+          <h3>דוגמאות:</h3>
+          <div class="example">
+            5 - 2 = 3<br>
+            8 - 3 = 5<br>
+            10 - 4 = 6<br>
+            7 - 7 = 0
+          </div>
+          
+          <h3>חיסור מ-10:</h3>
+          <div class="example">
+            10 - 1 = 9<br>
+            10 - 5 = 5<br>
+            10 - 8 = 2<br>
+            10 - 10 = 0
+          </div>
+          
+          <h3>חיסור גדול יותר:</h3>
+          <div class="example">
+            15 - 5 = 10<br>
+            18 - 8 = 10<br>
+            20 - 10 = 10
+          </div>
+        `
+      },
+      {
+        id: "math-b-3",
+        title: "צורות",
+        preview: "עיגול, ריבוע, משולש",
+        content: `
+          <h2>🔷 צורות</h2>
+          
+          <h3>צורות בסיסיות:</h3>
+          <div class="example">
+            ⭕ <strong>עיגול</strong> - עגול, בלי פינות<br><br>
+            🟥 <strong>ריבוע</strong> - 4 צלעות שוות, 4 פינות<br><br>
+            🔺 <strong>משולש</strong> - 3 צלעות, 3 פינות<br><br>
+            🟦 <strong>מלבן</strong> - 4 צלעות (2 ארוכות, 2 קצרות)
+          </div>
+          
+          <h3>כמה פינות?</h3>
+          <div class="example">
+            עיגול = 0 פינות<br>
+            משולש = 3 פינות<br>
+            ריבוע = 4 פינות<br>
+            מלבן = 4 פינות
+          </div>
+        `
+      }
+    ],
+    quiz: [
+      { question: "5 + 3 = ?", options: ["6", "7", "8", "9"], correct: 2 },
+      { question: "10 - 4 = ?", options: ["5", "6", "7", "8"], correct: 1 },
+      { question: "כמה פינות יש למשולש?", options: ["2", "3", "4", "5"], correct: 1 },
+      { question: "7 + 7 = ?", options: ["12", "13", "14", "15"], correct: 2 },
+      { question: "15 - 5 = ?", options: ["5", "10", "15", "20"], correct: 1 },
+      { question: "כמה צלעות יש לריבוע?", options: ["3", "4", "5", "6"], correct: 1 }
+    ],
+    flashcards: [
+      { front: "5 + 5 = ?", back: "10" },
+      { front: "10 - 3 = ?", back: "7" },
+      { front: "כמה פינות לעיגול?", back: "0 (אפס)" },
+      { front: "כמה פינות לריבוע?", back: "4" },
+      { front: "8 + 4 = ?", back: "12" },
+      { front: "16 - 6 = ?", back: "10" }
+    ]
+  },
+
+  // ========== AVATARS (same as grade 5) ==========
+  avatars: ['😎','🦊','🐱','🐶','🦁','🐼','🦄','🌟','🚀','⚡','👑','💎'],
+
+  // ========== THEMES (same as grade 5) ==========
+  themes: [
+    { id: 'default', name: 'ברירת מחדל', color: '#667eea', class: '' },
+    { id: 'ocean', name: 'אוקיינוס', color: '#0ea5e9', class: 'theme-ocean' },
+    { id: 'forest', name: 'יער', color: '#22c55e', class: 'theme-forest' },
+    { id: 'sunset', name: 'שקיעה', color: '#f97316', class: 'theme-sunset' },
+    { id: 'pink', name: 'ורוד', color: '#ec4899', class: 'theme-pink' },
+    { id: 'dark', name: 'כהה', color: '#2d3748', class: 'theme-dark' }
+  ],
+
+  // ========== ACHIEVEMENTS (same as grade 5) ==========
+  achievements: [
+    { id: 'first-lesson', icon: '📖', name: 'קורא מתחיל', desc: 'קרא שיעור אחד', check: p => p.hebrew.lessonsRead.length + p.english.lessonsRead.length + p.math.lessonsRead.length >= 1 },
+    { id: 'all-lessons', icon: '📚', name: 'תולעת ספרים', desc: 'קרא את כל השיעורים', check: p => p.hebrew.lessonsRead.length + p.english.lessonsRead.length + p.math.lessonsRead.length >= 9 },
+    { id: 'first-quiz', icon: '❓', name: 'סקרן', desc: 'סיים חידון אחד', check: p => p.hebrew.quizAttempts + p.english.quizAttempts + p.math.quizAttempts >= 1 },
+    { id: 'quiz-master', icon: '🏆', name: 'אלוף החידונים', desc: 'קבל 100% בחידון', check: p => p.hebrew.quizBest === 100 || p.english.quizBest === 100 || p.math.quizBest === 100 },
+    { id: 'flashcard-fan', icon: '🃏', name: 'מלך הכרטיסיות', desc: 'סיים כרטיסיות 5 פעמים', check: p => p.hebrew.flashcardsCompleted + p.english.flashcardsCompleted + p.math.flashcardsCompleted >= 5 },
+    { id: 'star-10', icon: '⭐', name: '10 כוכבים', desc: 'צבור 10 כוכבים', check: p => p.stars >= 10 },
+    { id: 'star-50', icon: '🌟', name: '50 כוכבים', desc: 'צבור 50 כוכבים', check: p => p.stars >= 50 },
+    { id: 'star-100', icon: '💫', name: '100 כוכבים', desc: 'צבור 100 כוכבים', check: p => p.stars >= 100 },
+    { id: 'streak-3', icon: '🔥', name: 'רצף שלושה', desc: '3 ימים ברצף', check: p => (p.streak || 0) >= 3 },
+    { id: 'streak-7', icon: '🔥', name: 'שבוע ברצף!', desc: '7 ימים ברצף', check: p => (p.streak || 0) >= 7 },
+    { id: 'gamer', icon: '🎮', name: 'גיימר', desc: 'שחק 3 משחקים', check: p => (p.gamesPlayed || 0) >= 3 },
+    { id: 'dictation', icon: '📝', name: 'מכתיב מצטיין', desc: 'סיים הכתבה שבועית', check: p => (p.dictationsCompleted || 0) >= 1 }
+  ],
+
+  // ========== HANGMAN WORDS - כיתה ב׳ ==========
+  hangman: {
+    hebrew: [
+      { word: 'ספר', hint: 'קוראים בו סיפורים' },
+      { word: 'כלב', hint: 'חיית מחמד שנובחת' },
+      { word: 'בית', hint: 'גרים בו' },
+      { word: 'שמש', hint: 'מאירה ביום' },
+      { word: 'ילד', hint: 'בן קטן' },
+      { word: 'פרח', hint: 'צומח בגינה, יפה וצבעוני' },
+      { word: 'עץ', hint: 'גבוה וירוק, יש לו ענפים' }
+    ],
+    english: [
+      { word: 'CAT', hint: 'A pet that says meow' },
+      { word: 'DOG', hint: 'A pet that barks' },
+      { word: 'SUN', hint: 'Yellow and in the sky' },
+      { word: 'RED', hint: 'The color of an apple' },
+      { word: 'BOOK', hint: 'You read it' },
+      { word: 'TREE', hint: 'Tall and green, has leaves' },
+      { word: 'BALL', hint: 'Round, you play with it' }
+    ],
+    math: [
+      { word: 'עשר', hint: 'המספר 10' },
+      { word: 'חמש', hint: 'המספר 5' },
+      { word: 'עיגול', hint: 'צורה עגולה' },
+      { word: 'ריבוע', hint: 'צורה עם 4 צלעות שוות' },
+      { word: 'משולש', hint: 'צורה עם 3 פינות' },
+      { word: 'חיבור', hint: 'לחבר מספרים יחד' },
+      { word: 'חיסור', hint: 'להוריד מספרים' }
+    ]
+  },
+
+  // ========== MEMORY PAIRS - כיתה ב׳ ==========
+  memory: {
+    hebrew: [
+      ['ילד', 'ילדים'], ['ילדה', 'ילדות'], ['ספר', 'ספרים'],
+      ['כלב', 'כלבים'], ['חתול', 'חתולים'], ['בית', 'בתים']
+    ],
+    english: [
+      ['cat', 'חתול'], ['dog', 'כלב'], ['sun', 'שמש'],
+      ['red', 'אדום'], ['blue', 'כחול'], ['one', 'אחד']
+    ],
+    math: [
+      ['5+5', '10'], ['3+3', '6'], ['10-5', '5'],
+      ['2+2', '4'], ['4+4', '8'], ['10-3', '7']
+    ]
+  },
+
+  // ========== DICTATION - כיתה ב׳ (פשוט יותר) ==========
+  dictation: [
+    {
+      week: 'שבוע 1 — חיות',
+      words: [
+        { word: 'cat', hebrewHint: 'חתול' },
+        { word: 'dog', hebrewHint: 'כלב' },
+        { word: 'fish', hebrewHint: 'דג' },
+        { word: 'bird', hebrewHint: 'ציפור' },
+        { word: 'cow', hebrewHint: 'פרה' },
+        { word: 'pig', hebrewHint: 'חזיר' }
+      ]
+    },
+    {
+      week: 'שבוע 2 — צבעים',
+      words: [
+        { word: 'red', hebrewHint: 'אדום' },
+        { word: 'blue', hebrewHint: 'כחול' },
+        { word: 'green', hebrewHint: 'ירוק' },
+        { word: 'yellow', hebrewHint: 'צהוב' },
+        { word: 'black', hebrewHint: 'שחור' },
+        { word: 'white', hebrewHint: 'לבן' }
+      ]
+    },
+    {
+      week: 'שבוע 3 — מספרים',
+      words: [
+        { word: 'one', hebrewHint: 'אחד' },
+        { word: 'two', hebrewHint: 'שתיים' },
+        { word: 'three', hebrewHint: 'שלוש' },
+        { word: 'four', hebrewHint: 'ארבע' },
+        { word: 'five', hebrewHint: 'חמש' },
+        { word: 'ten', hebrewHint: 'עשר' }
+      ]
+    },
+    {
+      week: 'שבוע 4 — משפחה',
+      words: [
+        { word: 'mom', hebrewHint: 'אמא' },
+        { word: 'dad', hebrewHint: 'אבא' },
+        { word: 'boy', hebrewHint: 'ילד' },
+        { word: 'girl', hebrewHint: 'ילדה' },
+        { word: 'baby', hebrewHint: 'תינוק' },
+        { word: 'family', hebrewHint: 'משפחה' }
+      ]
+    }
+  ],
+
+  // ========== WORD MATCHING - כיתה ב׳ ==========
+  wordMatch: [
+    { hebrew: 'חתול', english: 'cat' },
+    { hebrew: 'כלב', english: 'dog' },
+    { hebrew: 'אדום', english: 'red' },
+    { hebrew: 'כחול', english: 'blue' },
+    { hebrew: 'ירוק', english: 'green' },
+    { hebrew: 'אמא', english: 'mom' },
+    { hebrew: 'אבא', english: 'dad' },
+    { hebrew: 'ילד', english: 'boy' },
+    { hebrew: 'ילדה', english: 'girl' },
+    { hebrew: 'ספר', english: 'book' }
+  ]
+};

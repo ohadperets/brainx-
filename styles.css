@@ -2375,3 +2375,49 @@ body.theme-pink .app-header {
   padding: 30px;
   color: var(--text-light);
 }
+
+/* ===== GRADE SELECTOR ===== */
+.grade-selector {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin: 12px 0 20px;
+}
+.grade-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 24px;
+  border: 3px solid #e2e8f0;
+  border-radius: var(--radius);
+  background: #f8fafc;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.grade-option:hover {
+  border-color: var(--primary);
+  background: #eef2ff;
+}
+.grade-option.selected {
+  border-color: var(--primary);
+  background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+.grade-icon {
+  font-size: 2rem;
+}
+.grade-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.user-item-grade {
+  font-size: 0.75rem;
+  color: var(--primary);
+  background: rgba(102, 126, 234, 0.1);
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-top: 4px;
+  display: inline-block;
+}

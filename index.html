@@ -27,6 +27,17 @@
   <div id="profile-setup" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-header">👋 ברוכים הבאים!</div>
+      <p>באיזו כיתה אתה?</p>
+      <div class="grade-selector" id="grade-selector">
+        <button class="grade-option selected" onclick="selectGrade(this, 2)" data-grade="2">
+          <span class="grade-icon">📗</span>
+          <span class="grade-label">כיתה ב׳</span>
+        </button>
+        <button class="grade-option" onclick="selectGrade(this, 5)" data-grade="5">
+          <span class="grade-icon">📘</span>
+          <span class="grade-label">כיתה ה׳</span>
+        </button>
+      </div>
       <p>איך קוראים לך?</p>
       <input type="text" id="profile-name-input" class="text-input" placeholder="השם שלך..." maxlength="20">
       <p>בחר אווטאר:</p>
@@ -40,7 +51,7 @@
     <div class="splash-content">
       <div class="splash-icon">🧠</div>
       <h1>BrainX</h1>
-      <p>לימודים לכיתה ה׳</p>
+      <p>לימודים חכמים</p>
       <div class="loading-dots">
         <span></span><span></span><span></span>
       </div>

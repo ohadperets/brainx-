@@ -2454,3 +2454,163 @@ body.theme-pink .app-header {
   margin-top: 4px;
   display: inline-block;
 }
+
+/* ===== GAMIFICATION SYSTEM ===== */
+
+/* Compact Result */
+.compact-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.compact-result .result-emoji {
+  font-size: 36px;
+}
+
+.compact-result .result-text {
+  font-size: 14px;
+  text-align: center;
+}
+
+.compact-result .result-stars {
+  font-size: 20px;
+  letter-spacing: 4px;
+}
+
+.compact-result .result-score {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.compact-result .result-btns {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.btn-sm {
+  padding: 8px 20px;
+  font-size: 16px;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  font-family: var(--font);
+  font-weight: 600;
+  transition: transform 0.15s;
+}
+
+.btn-sm:active {
+  transform: scale(0.95);
+}
+
+.btn-sm.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-sm.btn-secondary {
+  background: var(--border);
+  color: var(--text);
+}
+
+/* Points Popup */
+.points-popup {
+  position: fixed;
+  font-size: 24px;
+  font-weight: 700;
+  color: #f6ad55;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%) scale(0.5);
+  opacity: 0;
+  transition: all 0.5s ease-out;
+}
+
+.points-popup.animate {
+  transform: translate(-50%, -150%) scale(1.2);
+  opacity: 1;
+}
+
+/* Record Banner */
+.record-banner {
+  position: fixed;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #ffd700, #ffb347);
+  color: #7c5c00;
+  padding: 12px 32px;
+  border-radius: 0 0 16px 16px;
+  font-size: 18px;
+  font-weight: 700;
+  box-shadow: 0 4px 20px rgba(255, 193, 7, 0.5);
+  z-index: 9999;
+  transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.record-banner.show {
+  top: 0;
+}
+
+/* Streak Banner */
+.streak-banner {
+  position: fixed;
+  bottom: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+  color: white;
+  padding: 12px 32px;
+  border-radius: 16px 16px 0 0;
+  font-size: 18px;
+  font-weight: 700;
+  box-shadow: 0 -4px 20px rgba(255, 107, 107, 0.4);
+  z-index: 9999;
+  transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.streak-banner.show {
+  bottom: 0;
+}
+
+/* Compact Hangman */
+.hangman-display {
+  font-size: 32px !important;
+  min-height: 45px !important;
+  margin-bottom: 8px !important;
+}
+
+.hangman-word {
+  font-size: 24px !important;
+  letter-spacing: 4px !important;
+  margin: 8px 0 !important;
+}
+
+.hangman-hint {
+  font-size: 12px !important;
+  margin-bottom: 6px !important;
+}
+
+.hangman-lives {
+  font-size: 16px !important;
+  margin-bottom: 10px !important;
+}
+
+.hangman-key {
+  min-width: 30px !important;
+  height: 34px !important;
+  font-size: 14px !important;
+}
+
+#screen-game-hangman .game-result {
+  margin-top: 10px !important;
+  padding: 10px !important;
+}

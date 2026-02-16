@@ -15,6 +15,175 @@ let ttsEnabled = false;
 let ttsSpeed = 1;
 let currentUserId = null;
 
+// ===== SOUND EFFECTS =====
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playSound(type) {
+  try {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    switch(type) {
+      case 'correct':
+        osc.frequency.setValueAtTime(523, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(659, audioCtx.currentTime + 0.1);
+        osc.frequency.setValueAtTime(784, audioCtx.currentTime + 0.2);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialDecayTo && gain.gain.exponentialDecayTo(0.01, audioCtx.currentTime + 0.4);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+        break;
+      case 'wrong':
+        osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(150, audioCtx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.25);
+        break;
+      case 'win':
+        [523, 659, 784, 1047].forEach((f, i) => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.connect(g); g.connect(audioCtx.destination);
+          o.frequency.value = f;
+          g.gain.setValueAtTime(0.2, audioCtx.currentTime + i * 0.12);
+          g.gain.exponentialDecayTo && g.gain.exponentialDecayTo(0.01, audioCtx.currentTime + i * 0.12 + 0.3);
+          o.start(audioCtx.currentTime + i * 0.12);
+          o.stop(audioCtx.currentTime + i * 0.12 + 0.3);
+        });
+        break;
+      case 'record':
+        [523, 659, 784, 880, 1047, 1319].forEach((f, i) => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.connect(g); g.connect(audioCtx.destination);
+          o.frequency.value = f;
+          g.gain.setValueAtTime(0.25, audioCtx.currentTime + i * 0.08);
+          o.start(audioCtx.currentTime + i * 0.08);
+          o.stop(audioCtx.currentTime + i * 0.08 + 0.2);
+        });
+        break;
+      case 'points':
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(1100, audioCtx.currentTime + 0.05);
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+        break;
+      case 'levelup':
+        [392, 523, 659, 784, 1047].forEach((f, i) => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.connect(g); g.connect(audioCtx.destination);
+          o.frequency.value = f;
+          g.gain.setValueAtTime(0.2, audioCtx.currentTime + i * 0.1);
+          o.start(audioCtx.currentTime + i * 0.1);
+          o.stop(audioCtx.currentTime + i * 0.1 + 0.15);
+        });
+        break;
+    }
+  } catch (e) { console.log('Sound error:', e); }
+}
+
+// Points popup
+function showPointsPopup(points, x, y) {
+  const popup = document.createElement('div');
+  popup.className = 'points-popup';
+  popup.innerHTML = `+${points} ⭐`;
+  popup.style.left = (x || window.innerWidth / 2) + 'px';
+  popup.style.top = (y || window.innerHeight / 2) + 'px';
+  document.body.appendChild(popup);
+  playSound('points');
+  setTimeout(() => popup.classList.add('animate'), 10);
+  setTimeout(() => popup.remove(), 1000);
+}
+
+// High Scores
+function getHighScores() {
+  const saved = localStorage.getItem('brainx-highscores-' + currentUserId);
+  return saved ? JSON.parse(saved) : {};
+}
+
+function saveHighScore(gameId, score, extraData = {}) {
+  const scores = getHighScores();
+  const prev = scores[gameId]?.score || 0;
+  const isRecord = score > prev;
+  
+  if (isRecord) {
+    scores[gameId] = { score, date: new Date().toISOString(), ...extraData };
+    localStorage.setItem('brainx-highscores-' + currentUserId, JSON.stringify(scores));
+    showRecordBanner();
+    playSound('record');
+  }
+  
+  return isRecord;
+}
+
+function showRecordBanner() {
+  const banner = document.createElement('div');
+  banner.className = 'record-banner';
+  banner.innerHTML = '🏆 שיא חדש! 🏆';
+  document.body.appendChild(banner);
+  setTimeout(() => banner.classList.add('show'), 10);
+  setTimeout(() => {
+    banner.classList.remove('show');
+    setTimeout(() => banner.remove(), 500);
+  }, 2500);
+}
+
+// Streak tracking
+function getStreak() {
+  const data = localStorage.getItem('brainx-streak-' + currentUserId);
+  if (!data) return { count: 0, lastDate: null };
+  return JSON.parse(data);
+}
+
+function updateStreak() {
+  const streak = getStreak();
+  const today = new Date().toDateString();
+  const yesterday = new Date(Date.now() - 86400000).toDateString();
+  
+  if (streak.lastDate === today) return streak.count;
+  
+  if (streak.lastDate === yesterday) {
+    streak.count++;
+    if (streak.count % 5 === 0) {
+      playSound('levelup');
+      showStreakMilestone(streak.count);
+    }
+  } else {
+    streak.count = 1;
+  }
+  
+  streak.lastDate = today;
+  localStorage.setItem('brainx-streak-' + currentUserId, JSON.stringify(streak));
+  return streak.count;
+}
+
+function showStreakMilestone(count) {
+  const banner = document.createElement('div');
+  banner.className = 'streak-banner';
+  banner.innerHTML = `🔥 ${count} ימים ברצף! 🔥`;
+  document.body.appendChild(banner);
+  setTimeout(() => banner.classList.add('show'), 10);
+  setTimeout(() => {
+    banner.classList.remove('show');
+    setTimeout(() => banner.remove(), 500);
+  }, 3000);
+}
+
+// Stars rating
+function getStarsRating(percent) {
+  if (percent >= 90) return 3;
+  if (percent >= 70) return 2;
+  if (percent >= 50) return 1;
+  return 0;
+}
+
+function renderStars(count, max = 3) {
+  return '⭐'.repeat(count) + '☆'.repeat(max - count);
+}
+
 // ===== MULTI-USER MANAGEMENT =====
 function generateUserId() {
   return 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -797,10 +966,13 @@ function selectAnswer(index) {
     quizState.score++;
     feedback.textContent = '🎉 נכון! כל הכבוד!';
     feedback.className = 'quiz-feedback correct';
+    playSound('correct');
+    showPointsPopup(10);
   } else {
     options[index].classList.add('wrong');
     feedback.textContent = '😕 לא נכון. התשובה הנכונה מסומנת בירוק.';
     feedback.className = 'quiz-feedback wrong';
+    playSound('wrong');
   }
 
   feedback.classList.remove('hidden');
@@ -829,6 +1001,7 @@ function showQuizResults() {
   const score = quizState.score;
   const total = quizState.questions.length;
   const percent = Math.round((score / total) * 100);
+  const stars = getStarsRating(percent);
 
   progress[currentSubject].quizAttempts++;
   if (percent > progress[currentSubject].quizBest) {
@@ -837,6 +1010,8 @@ function showQuizResults() {
   progress.stars += score;
   saveProgress(progress);
   checkAchievements();
+  saveHighScore('quiz-' + currentSubject, percent);
+  updateStreak();
 
   let emoji, title;
   if (percent >= 90) { emoji = '🏆'; title = 'מדהים! מצוין!'; }
@@ -847,9 +1022,12 @@ function showQuizResults() {
   document.getElementById('results-emoji').textContent = emoji;
   document.getElementById('results-title').textContent = title;
   document.getElementById('results-score').textContent = `${percent}%`;
-  document.getElementById('results-details').innerHTML = `ענית נכון על ${score} מתוך ${total} שאלות<br>+${score} ⭐ כוכבים!`;
+  document.getElementById('results-details').innerHTML = `ענית נכון על ${score} מתוך ${total} שאלות<br>${renderStars(stars)} +${score} ⭐ כוכבים!`;
 
-  if (percent >= 70) launchConfetti();
+  if (percent >= 70) {
+    playSound('win');
+    launchConfetti();
+  }
 }
 
 function restartQuiz() { startQuiz(); }
@@ -986,6 +1164,8 @@ function popBalloon(balloon, isCorrect) {
   if (isCorrect) {
     balloonPopState.score += 10;
     document.getElementById('balloon-score').textContent = balloonPopState.score;
+    playSound('correct');
+    showPointsPopup(10);
     
     // Pop all remaining balloons
     document.querySelectorAll('.balloon:not(.popped)').forEach(b => {
@@ -998,6 +1178,7 @@ function popBalloon(balloon, isCorrect) {
   } else {
     balloonPopState.lives--;
     updateLives();
+    playSound('wrong');
     
     setTimeout(() => {
       if (balloonPopState.lives <= 0) {
@@ -1047,16 +1228,25 @@ function endBalloonPop() {
     saveProgress(progress);
   }
   
+  const percent = Math.round((correct / total) * 100);
+  const stars = getStarsRating(percent);
+  saveHighScore('balloon-' + currentSubject, s.score);
+  updateStreak();
+  
   const title = s.lives > 0 ? '🎉 כל הכבוד!' : '💪 נסה שוב!';
   document.getElementById('balloon-result-title').textContent = title;
   
   document.getElementById('balloon-summary').innerHTML = `
     🎯 ניקוד: ${s.score} נקודות<br>
+    ${renderStars(stars)}<br>
     ✅ תשובות נכונות: ${correct} מתוך ${total}<br>
     +${correct} ⭐ כוכבים!
   `;
   
-  if (correct > total / 2) launchConfetti();
+  if (correct > total / 2) {
+    playSound('win');
+    launchConfetti();
+  }
 }
 
 function restartBalloonPop() { startBalloonPop(); }
@@ -1123,25 +1313,39 @@ function renderHangman() {
   const result = document.getElementById('hangman-result');
   if (revealed && !s.won) {
     s.won = true;
+    const stars = getStarsRating((s.lives / 6) * 100);
+    const isRecord = saveHighScore('hangman-' + currentSubject, s.lives);
     result.classList.remove('hidden');
-    result.innerHTML = `<div class="results-emoji">🎉</div><h2>כל הכבוד! ניצחת!</h2>
-      <p>המילה: ${s.word}</p>
-      <button class="btn-primary" onclick="startHangman()">שחק שוב 🔄</button>
-      <button class="btn-secondary" onclick="goBack()">חזרה</button>`;
-    progress.stars += 3;
+    result.innerHTML = `<div class="compact-result">
+      <span class="result-emoji">${stars === 3 ? '🏆' : '🎉'}</span>
+      <div class="result-text"><strong>ניצחת!</strong> ${s.word}</div>
+      <div class="result-stars">${renderStars(stars)}</div>
+      <div class="result-btns">
+        <button class="btn-sm btn-primary" onclick="startHangman()">🔄</button>
+        <button class="btn-sm btn-secondary" onclick="goBack()">←</button>
+      </div>
+    </div>`;
+    progress.stars += stars;
     progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
     saveProgress(progress);
+    playSound('win');
     checkAchievements();
     launchConfetti();
+    showPointsPopup(stars * 10);
   } else if (s.lives <= 0 && !s.lost) {
     s.lost = true;
     result.classList.remove('hidden');
-    result.innerHTML = `<div class="results-emoji">😢</div><h2>הפסדת!</h2>
-      <p>המילה הייתה: <strong>${s.word}</strong></p>
-      <button class="btn-primary" onclick="startHangman()">נסה שוב 🔄</button>
-      <button class="btn-secondary" onclick="goBack()">חזרה</button>`;
+    result.innerHTML = `<div class="compact-result">
+      <span class="result-emoji">😢</span>
+      <div class="result-text">המילה: <strong>${s.word}</strong></div>
+      <div class="result-btns">
+        <button class="btn-sm btn-primary" onclick="startHangman()">🔄</button>
+        <button class="btn-sm btn-secondary" onclick="goBack()">←</button>
+      </div>
+    </div>`;
     progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
     saveProgress(progress);
+    playSound('wrong');
     checkAchievements();
   }
 }
@@ -1152,7 +1356,12 @@ function guessLetter(letter) {
 
   hangmanState.guessed.push(letter);
   const inWord = hangmanState.word.toUpperCase().includes(letter) || hangmanState.word.includes(letter);
-  if (!inWord) hangmanState.lives--;
+  if (inWord) {
+    playSound('correct');
+  } else {
+    hangmanState.lives--;
+    playSound('wrong');
+  }
   renderHangman();
 }
 
@@ -1220,24 +1429,37 @@ function flipMemoryCard(index) {
       document.getElementById('memory-pairs').textContent = memoryState.matchedPairs;
       memoryState.flippedCards = [];
       memoryState.locked = false;
+      playSound('correct');
+      showPointsPopup(10);
       renderMemoryGrid();
 
       if (memoryState.matchedPairs === memoryState.totalPairs) {
         setTimeout(() => {
+          const stars = getStarsRating(100 - memoryState.moves * 3);
           const result = document.getElementById('memory-result');
           result.classList.remove('hidden');
-          result.innerHTML = `<div class="results-emoji">🎉</div><h2>מצאת את כל הזוגות!</h2>
-            <p>ב-${memoryState.moves} מהלכים</p>
-            <button class="btn-primary" onclick="startMemory()">שחק שוב 🔄</button>
-            <button class="btn-secondary" onclick="goBack()">חזרה</button>`;
-          progress.stars += Math.max(1, 6 - Math.floor(memoryState.moves / 3));
+          result.innerHTML = `<div class="compact-result">
+            <span class="result-emoji">🎉</span>
+            <div class="result-text"><strong>מצאת את כל הזוגות!</strong><br>${memoryState.moves} מהלכים</div>
+            <div class="result-stars">${renderStars(stars)}</div>
+            <div class="result-btns">
+              <button class="btn-sm btn-primary" onclick="startMemory()">🔄</button>
+              <button class="btn-sm btn-secondary" onclick="goBack()">←</button>
+            </div>
+          </div>`;
+          const starsEarned = Math.max(1, 6 - Math.floor(memoryState.moves / 3));
+          progress.stars += starsEarned;
           progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
           saveProgress(progress);
+          saveHighScore('memory-' + currentSubject, 100 - memoryState.moves);
+          playSound('win');
           checkAchievements();
           launchConfetti();
+          updateStreak();
         }, 500);
       }
     } else {
+      playSound('wrong');
       setTimeout(() => {
         c1.flipped = false;
         c2.flipped = false;
@@ -1328,12 +1550,15 @@ function raceAnswer(selected, correct) {
     raceState.score++;
     document.getElementById('race-score').textContent = raceState.score;
     document.getElementById('race-question').style.color = '#48bb78';
+    playSound('correct');
+    showPointsPopup(10);
     setTimeout(() => {
       document.getElementById('race-question').style.color = '';
       generateRaceQuestion();
     }, 200);
   } else {
     document.getElementById('race-question').style.color = '#fc8181';
+    playSound('wrong');
     setTimeout(() => { document.getElementById('race-question').style.color = ''; }, 300);
   }
 }
@@ -1344,17 +1569,28 @@ function endMathRace() {
   document.getElementById('race-options').innerHTML = '';
 
   const stars = Math.min(raceState.score, 10);
-  result.innerHTML = `<div class="results-emoji">${raceState.score >= 10 ? '🏆' : raceState.score >= 5 ? '🌟' : '💪'}</div>
-    <h2>סיימת! ${raceState.score} תשובות נכונות!</h2>
-    <p>+${stars} ⭐ כוכבים</p>
-    <button class="btn-primary" onclick="startMathRace()">שחק שוב 🔄</button>
-    <button class="btn-secondary" onclick="goBack()">חזרה</button>`;
+  const starsRating = getStarsRating(raceState.score * 10);
+  saveHighScore('mathrace', raceState.score);
+  
+  result.innerHTML = `<div class="compact-result">
+    <span class="result-emoji">${raceState.score >= 10 ? '🏆' : raceState.score >= 5 ? '🌟' : '💪'}</span>
+    <div class="result-text"><strong>${raceState.score} תשובות נכונות!</strong></div>
+    <div class="result-stars">${renderStars(starsRating)}</div>
+    <div class="result-btns">
+      <button class="btn-sm btn-primary" onclick="startMathRace()">🔄</button>
+      <button class="btn-sm btn-secondary" onclick="goBack()">←</button>
+    </div>
+  </div>`;
 
   progress.stars += stars;
   progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
   saveProgress(progress);
+  updateStreak();
   checkAchievements();
-  if (raceState.score >= 10) launchConfetti();
+  if (raceState.score >= 10) {
+    playSound('win');
+    launchConfetti();
+  }
 }
 
 // ===== DAILY CHALLENGE =====
@@ -1572,6 +1808,8 @@ function checkDictation() {
     feedback.textContent = `✅ נכון! ${w.word}`;
     feedback.className = 'quiz-feedback correct';
     feedback.classList.remove('hidden');
+    playSound('correct');
+    showPointsPopup(20);
 
     const btn = document.querySelector('#screen-dictation-typing .btn-primary');
     if (dictationState.current < dictationState.words.length - 1) {
@@ -1582,6 +1820,7 @@ function checkDictation() {
   } else {
     // Wrong
     dictationState.tries++;
+    playSound('wrong');
     
     if (dictationState.tries < 2) {
       // First try - give another chance
@@ -1611,10 +1850,13 @@ function showDictationResults() {
   const score = dictationState.score;
   const total = dictationState.words.length;
   const percent = Math.round((score / total) * 100);
+  const stars = getStarsRating(percent);
 
   progress.stars += score * 2;
   progress.dictationsCompleted = (progress.dictationsCompleted || 0) + 1;
   saveProgress(progress);
+  saveHighScore('dictation', percent);
+  updateStreak();
   checkAchievements();
 
   // Hide word area
@@ -1627,14 +1869,22 @@ function showDictationResults() {
   const results = document.getElementById('dictation-results');
   results.classList.remove('hidden');
   results.innerHTML = `
-    <div class="results-emoji">${percent >= 80 ? '🏆' : percent >= 50 ? '🌟' : '💪'}</div>
-    <h2>${percent >= 80 ? 'מצוין!' : percent >= 50 ? 'כל הכבוד!' : 'המשך לתרגל!'}</h2>
-    <div class="results-score">${percent}%</div>
-    <p>${score} מתוך ${total} מילים נכונות<br>+${score * 2} ⭐</p>
-    <button class="btn-primary" onclick="startDictation()">נסה שוב 🔄</button>
-    <button class="btn-secondary" onclick="goBack()">חזרה</button>`;
+    <div class="compact-result">
+      <span class="result-emoji">${percent >= 80 ? '🏆' : percent >= 50 ? '🌟' : '💪'}</span>
+      <div class="result-text"><strong>${percent >= 80 ? 'מצוין!' : percent >= 50 ? 'כל הכבוד!' : 'המשך לתרגל!'}</strong></div>
+      <div class="result-stars">${renderStars(stars)}</div>
+      <div class="result-score">${percent}%</div>
+      <p>${score} מתוך ${total} מילים +${score * 2} ⭐</p>
+      <div class="result-btns">
+        <button class="btn-sm btn-primary" onclick="startDictation()">🔄</button>
+        <button class="btn-sm btn-secondary" onclick="goBack()">←</button>
+      </div>
+    </div>`;
 
-  if (percent >= 70) launchConfetti();
+  if (percent >= 70) {
+    playSound('win');
+    launchConfetti();
+  }
 }
 
 // Handle Enter key in dictation
@@ -1817,6 +2067,7 @@ function showAchievementToast(ach) {
   toast.className = 'achievement-toast';
   toast.innerHTML = `<span class="toast-icon">${ach.icon}</span><div><strong>הישג חדש!</strong><br>${ach.name}</div>`;
   document.body.appendChild(toast);
+  playSound('levelup');
 
   setTimeout(() => toast.classList.add('show'), 10);
   setTimeout(() => {

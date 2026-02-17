@@ -1413,7 +1413,9 @@ function guessLetter(letter) {
 
 // ===== MEMORY GAME =====
 function startMemory() {
-  const pairs = getData().memory[currentSubject];
+  const allPairs = getData().memory[currentSubject];
+  // Limit to 10 pairs (20 cards) to avoid scroll
+  const pairs = allPairs.slice(0, 10);
   let cards = [];
   pairs.forEach(([a, b], i) => {
     cards.push({ id: i * 2, pairId: i, text: a, flipped: false, matched: false });

@@ -2326,6 +2326,9 @@ function showMatchResults() {
 }
 
 // ===== ACHIEVEMENTS =====
+let achievementQueue = [];
+let isShowingAchievement = false;
+
 function checkAchievements() {
   const unlocked = progress.unlockedAchievements || [];
   let newUnlocks = false;
@@ -2334,7 +2337,7 @@ function checkAchievements() {
     if (!unlocked.includes(ach.id) && ach.check(progress)) {
       unlocked.push(ach.id);
       newUnlocks = true;
-      showAchievementToast(ach);
+      queueAchievementToast(ach);
     }
   });
 
@@ -2344,7 +2347,22 @@ function checkAchievements() {
   }
 }
 
-function showAchievementToast(ach) {
+function queueAchievementToast(ach) {
+  achievementQueue.push(ach);
+  if (!isShowingAchievement) {
+    showNextAchievement();
+  }
+}
+
+function showNextAchievement() {
+  if (achievementQueue.length === 0) {
+    isShowingAchievement = false;
+    return;
+  }
+  
+  isShowingAchievement = true;
+  const ach = achievementQueue.shift();
+  
   const toast = document.createElement('div');
   toast.className = 'achievement-toast';
   toast.innerHTML = `<span class="toast-icon">${ach.icon}</span><div><strong>הישג חדש!</strong><br>${ach.name}</div>`;
@@ -2354,8 +2372,15 @@ function showAchievementToast(ach) {
   setTimeout(() => toast.classList.add('show'), 10);
   setTimeout(() => {
     toast.classList.remove('show');
-    setTimeout(() => toast.remove(), 400);
-  }, 3000);
+    setTimeout(() => {
+      toast.remove();
+      showNextAchievement(); // Show next achievement in queue
+    }, 400);
+  }, 2500);
+}
+
+function showAchievementToast(ach) {
+  queueAchievementToast(ach);
 }
 
 function renderAchievements() {

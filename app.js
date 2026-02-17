@@ -2810,3 +2810,94 @@ function deleteWord(weekIndex, wordIndex) {
   loadWeekWords();
 }
 
+// ===== FIREBASE CLOUD SYNC =====
+// Sync user data to Firestore for analytics
+
+function getDeviceId() {
+  let deviceId = localStorage.getItem('brainx-device-id');
+  if (!deviceId) {
+    deviceId = 'device_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('brainx-device-id', deviceId);
+  }
+  return deviceId;
+}
+
+async function syncUserToCloud(userData) {
+  if (!window.firebaseReady || !window.firebaseDB) return;
+  
+  try {
+    const deviceId = getDeviceId();
+    const docRef = window.firebaseDoc(window.firebaseDB, 'users', deviceId + '_' + userData.id);
+    
+    await window.firebaseSetDoc(docRef, {
+      userId: userData.id,
+      name: userData.name,
+      avatar: userData.avatar,
+      grade: userData.grade || 5,
+      deviceId: deviceId,
+      lastSeen: window.firebaseServerTimestamp(),
+      createdAt: userData.createdAt || new Date().toISOString()
+    }, { merge: true });
+    
+    console.log('User synced to cloud:', userData.name);
+  } catch (error) {
+    console.log('Cloud sync error (non-critical):', error.message);
+  }
+}
+
+async function syncProgressToCloud(userId, progressData) {
+  if (!window.firebaseReady || !window.firebaseDB) return;
+  
+  try {
+    const deviceId = getDeviceId();
+    const docRef = window.firebaseDoc(window.firebaseDB, 'progress', deviceId + '_' + userId);
+    
+    await window.firebaseSetDoc(docRef, {
+      userId: userId,
+      deviceId: deviceId,
+      stars: progressData.stars || 0,
+      streak: progressData.streak || 0,
+      achievements: progressData.unlockedAchievements || [],
+      gamesPlayed: progressData.gamesPlayed || 0,
+      quizAttempts: {
+        hebrew: progressData.hebrew?.quizAttempts || 0,
+        english: progressData.english?.quizAttempts || 0,
+        math: progressData.math?.quizAttempts || 0
+      },
+      lastUpdated: window.firebaseServerTimestamp()
+    }, { merge: true });
+    
+    console.log('Progress synced to cloud');
+  } catch (error) {
+    console.log('Progress sync error (non-critical):', error.message);
+  }
+}
+
+// Hook into existing save functions
+const originalSaveProgress = saveProgress;
+saveProgress = function(p) {
+  originalSaveProgress(p);
+  // Sync to cloud in background (don't wait)
+  if (currentUserId) {
+    syncProgressToCloud(currentUserId, p);
+  }
+};
+
+const originalSaveProfileData = saveProfileData;
+saveProfileData = function(prof) {
+  originalSaveProfileData(prof);
+  // Sync to cloud in background
+  if (currentUserId && prof) {
+    syncUserToCloud({ id: currentUserId, ...prof });
+  }
+};
+
+// Sync on app load when Firebase is ready
+window.addEventListener('firebaseReady', () => {
+  console.log('Firebase connected - cloud sync enabled');
+  // Sync current user if exists
+  if (currentUserId && profile) {
+    syncUserToCloud({ id: currentUserId, ...profile });
+    syncProgressToCloud(currentUserId, progress);
+  }
+});

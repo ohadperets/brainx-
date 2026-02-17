@@ -697,47 +697,47 @@ function navigate(screen, subject, skipHistory = false) {
 
     case 'lessons':
       document.getElementById('screen-lessons').classList.add('active');
-      headerTitle.textContent = '📚 שיעורים';
+      headerTitle.textContent = 'שיעורים';
       renderLessons();
       break;
 
     case 'lesson-detail':
       document.getElementById('screen-lesson-detail').classList.add('active');
-      headerTitle.textContent = '📖 שיעור';
+      headerTitle.textContent = 'שיעור';
       break;
 
     case 'quiz':
       document.getElementById('screen-quiz').classList.add('active');
-      headerTitle.textContent = '❓ חידון';
+      headerTitle.textContent = 'חידון';
       startQuiz();
       break;
 
     case 'balloon-pop':
       document.getElementById('screen-balloon-pop').classList.add('active');
-      headerTitle.textContent = '🎈 פיצוץ בלונים';
+      headerTitle.textContent = 'פיצוץ בלונים';
       startBalloonPop();
       break;
 
     case 'games':
       document.getElementById('screen-games').classList.add('active');
-      headerTitle.textContent = '🎮 משחקים';
+      headerTitle.textContent = 'משחקים';
       break;
 
     case 'game-hangman':
       document.getElementById('screen-game-hangman').classList.add('active');
-      headerTitle.textContent = '🎯 תלייה';
+      headerTitle.textContent = 'תלייה';
       startHangman();
       break;
 
     case 'game-memory':
       document.getElementById('screen-game-memory').classList.add('active');
-      headerTitle.textContent = '🧠 זיכרון';
+      headerTitle.textContent = 'זיכרון';
       startMemory();
       break;
 
     case 'game-math-race':
       document.getElementById('screen-game-math-race').classList.add('active');
-      headerTitle.textContent = '🏎️ מרוץ חשבון';
+      headerTitle.textContent = 'מרוץ חשבון';
       initMathRace();
       break;
 

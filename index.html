@@ -508,6 +508,10 @@
         <div class="admin-container">
           <h2>🛠️ לוח ניהול</h2>
           <div class="admin-menu">
+            <button class="admin-menu-btn" onclick="navigate('admin-analytics')">
+              <span class="admin-btn-icon">📊</span>
+              <span class="admin-btn-text">דשבורד משתמשים</span>
+            </button>
             <button class="admin-menu-btn" onclick="navigate('admin-dictation')">
               <span class="admin-btn-icon">📝</span>
               <span class="admin-btn-text">ניהול הכתבות</span>
@@ -522,6 +526,41 @@
             </button>
           </div>
           <button class="btn-secondary" onclick="adminLogout()" style="margin-top:20px">🚪 יציאה</button>
+        </div>
+      </section>
+
+      <!-- Admin Analytics Dashboard -->
+      <section id="screen-admin-analytics" class="screen">
+        <div class="admin-container" style="max-width: 100%; padding: 10px;">
+          <h2>📊 דשבורד משתמשים</h2>
+          
+          <div class="stats-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 20px;">
+            <div class="stat-card-mini" style="background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 12px; padding: 15px; text-align: center; color: white;">
+              <div id="stat-users" style="font-size: 2rem; font-weight: bold;">-</div>
+              <div style="font-size: 0.8rem;">משתמשים</div>
+            </div>
+            <div class="stat-card-mini" style="background: linear-gradient(135deg, #f093fb, #f5576c); border-radius: 12px; padding: 15px; text-align: center; color: white;">
+              <div id="stat-stars" style="font-size: 2rem; font-weight: bold;">-</div>
+              <div style="font-size: 0.8rem;">⭐ כוכבים</div>
+            </div>
+            <div class="stat-card-mini" style="background: linear-gradient(135deg, #4facfe, #00f2fe); border-radius: 12px; padding: 15px; text-align: center; color: white;">
+              <div id="stat-games" style="font-size: 2rem; font-weight: bold;">-</div>
+              <div style="font-size: 0.8rem;">🎮 משחקים</div>
+            </div>
+            <div class="stat-card-mini" style="background: linear-gradient(135deg, #43e97b, #38f9d7); border-radius: 12px; padding: 15px; text-align: center; color: white;">
+              <div id="stat-quizzes" style="font-size: 2rem; font-weight: bold;">-</div>
+              <div style="font-size: 0.8rem;">📝 חידונים</div>
+            </div>
+          </div>
+          
+          <button class="btn-primary" onclick="loadAnalytics()" style="margin-bottom: 15px; width: 100%;">🔄 רענן נתונים</button>
+          <div id="analytics-last-update" style="text-align: center; color: #666; font-size: 0.8rem; margin-bottom: 15px;"></div>
+          
+          <div id="analytics-table" style="background: white; border-radius: 12px; padding: 10px; overflow-x: auto;">
+            <div style="text-align: center; padding: 30px; color: #666;">לחץ על 'רענן נתונים' לטעינה</div>
+          </div>
+          
+          <button class="btn-secondary" onclick="navigate('admin-dashboard')" style="margin-top: 15px; width: 100%;">🔙 חזרה</button>
         </div>
       </section>
 

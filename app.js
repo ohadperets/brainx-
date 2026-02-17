@@ -872,6 +872,12 @@ function navigate(screen, subject, skipHistory = false) {
       headerTitle.textContent = 'לוח ניהול';
       break;
 
+    case 'admin-analytics':
+      document.getElementById('screen-admin-analytics').classList.add('active');
+      headerTitle.textContent = 'דשבורד משתמשים';
+      loadAnalytics();
+      break;
+
     case 'admin-dictation':
       document.getElementById('screen-admin-dictation').classList.add('active');
       headerTitle.textContent = 'ניהול הכתבות';
@@ -2916,3 +2922,103 @@ window.addEventListener('firebaseReady', () => {
     console.log('⚠️ No user logged in yet, will sync when user is selected');
   }
 });
+
+// Admin Analytics Dashboard
+async function loadAnalytics() {
+  const tableEl = document.getElementById('analytics-table');
+  const updateEl = document.getElementById('analytics-last-update');
+  
+  if (!window.firebaseReady || !window.firebaseDB) {
+    tableEl.innerHTML = '<div style="text-align: center; padding: 30px; color: #e74c3c;">Firebase לא מחובר. נסה לרענן את הדף.</div>';
+    return;
+  }
+  
+  tableEl.innerHTML = '<div style="text-align: center; padding: 30px; color: #666;">⏳ טוען נתונים...</div>';
+  
+  try {
+    // Get users
+    const usersSnapshot = await window.firebaseGetDocs(window.firebaseCollection(window.firebaseDB, 'users'));
+    const users = {};
+    usersSnapshot.forEach(doc => {
+      const data = doc.data();
+      users[data.userId] = data;
+    });
+    
+    // Get progress
+    const progressSnapshot = await window.firebaseGetDocs(window.firebaseCollection(window.firebaseDB, 'progress'));
+    const progressList = [];
+    let totalStars = 0;
+    let totalGames = 0;
+    let totalQuizzes = 0;
+    
+    progressSnapshot.forEach(doc => {
+      const data = doc.data();
+      progressList.push(data);
+      totalStars += data.stars || 0;
+      totalGames += data.gamesPlayed || 0;
+      totalQuizzes += (data.quizAttempts?.hebrew || 0) + 
+                     (data.quizAttempts?.english || 0) + 
+                     (data.quizAttempts?.math || 0);
+    });
+    
+    // Update stats
+    document.getElementById('stat-users').textContent = Object.keys(users).length || progressList.length;
+    document.getElementById('stat-stars').textContent = totalStars;
+    document.getElementById('stat-games').textContent = totalGames;
+    document.getElementById('stat-quizzes').textContent = totalQuizzes;
+    updateEl.textContent = 'עודכן: ' + new Date().toLocaleString('he-IL');
+    
+    // Build table
+    let html = `
+      <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+        <thead>
+          <tr style="background: #f8f9fa;">
+            <th style="padding: 10px; text-align: right; border-bottom: 2px solid #dee2e6;">משתמש</th>
+            <th style="padding: 10px; text-align: center; border-bottom: 2px solid #dee2e6;">⭐</th>
+            <th style="padding: 10px; text-align: center; border-bottom: 2px solid #dee2e6;">🔥</th>
+            <th style="padding: 10px; text-align: center; border-bottom: 2px solid #dee2e6;">🎮</th>
+            <th style="padding: 10px; text-align: center; border-bottom: 2px solid #dee2e6;">חידונים</th>
+            <th style="padding: 10px; text-align: center; border-bottom: 2px solid #dee2e6;">🏆</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+    
+    // Sort by stars descending
+    progressList.sort((a, b) => (b.stars || 0) - (a.stars || 0));
+    
+    progressList.forEach((p, index) => {
+      const user = users[p.userId] || {};
+      const quizHeb = p.quizAttempts?.hebrew || 0;
+      const quizEng = p.quizAttempts?.english || 0;
+      const quizMath = p.quizAttempts?.math || 0;
+      const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
+      
+      html += `
+        <tr style="border-bottom: 1px solid #eee;">
+          <td style="padding: 10px; text-align: right;">
+            ${medal} <span style="font-size: 1.2rem;">${user.avatar || '👤'}</span>
+            ${p.userName || user.name || 'לא ידוע'}
+          </td>
+          <td style="padding: 10px; text-align: center;"><span style="background: #ffd700; padding: 2px 8px; border-radius: 10px;">${p.stars || 0}</span></td>
+          <td style="padding: 10px; text-align: center;"><span style="background: #ff6b6b; color: white; padding: 2px 8px; border-radius: 10px;">${p.streak || 0}</span></td>
+          <td style="padding: 10px; text-align: center;">${p.gamesPlayed || 0}</td>
+          <td style="padding: 10px; text-align: center; font-size: 0.75rem;">עב:${quizHeb} אנ:${quizEng} מת:${quizMath}</td>
+          <td style="padding: 10px; text-align: center;">${(p.achievements || []).length}</td>
+        </tr>
+      `;
+    });
+    
+    html += '</tbody></table>';
+    
+    if (progressList.length === 0) {
+      html = '<div style="text-align: center; padding: 30px; color: #666;">אין נתונים עדיין</div>';
+    }
+    
+    tableEl.innerHTML = html;
+    
+  } catch (error) {
+    console.error('Analytics error:', error);
+    tableEl.innerHTML = `<div style="text-align: center; padding: 30px; color: #e74c3c;">שגיאה: ${error.message}</div>`;
+  }
+}

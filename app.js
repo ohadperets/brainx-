@@ -2823,10 +2823,15 @@ function getDeviceId() {
 }
 
 async function syncUserToCloud(userData) {
-  if (!window.firebaseReady || !window.firebaseDB) return;
+  console.log('🔄 syncUserToCloud called, firebaseReady:', window.firebaseReady, 'firebaseDB:', !!window.firebaseDB);
+  if (!window.firebaseReady || !window.firebaseDB) {
+    console.log('⚠️ Firebase not ready, skipping sync');
+    return;
+  }
   
   try {
     const deviceId = getDeviceId();
+    console.log('📤 Syncing user:', userData.name, 'deviceId:', deviceId);
     const docRef = window.firebaseDoc(window.firebaseDB, 'users', deviceId + '_' + userData.id);
     
     await window.firebaseSetDoc(docRef, {
@@ -2839,14 +2844,18 @@ async function syncUserToCloud(userData) {
       createdAt: userData.createdAt || new Date().toISOString()
     }, { merge: true });
     
-    console.log('User synced to cloud:', userData.name);
+    console.log('✅ User synced to cloud:', userData.name);
   } catch (error) {
-    console.log('Cloud sync error (non-critical):', error.message);
+    console.error('❌ Cloud sync error:', error);
   }
 }
 
 async function syncProgressToCloud(userId, progressData) {
-  if (!window.firebaseReady || !window.firebaseDB) return;
+  console.log('🔄 syncProgressToCloud called');
+  if (!window.firebaseReady || !window.firebaseDB) {
+    console.log('⚠️ Firebase not ready, skipping progress sync');
+    return;
+  }
   
   try {
     const deviceId = getDeviceId();
@@ -2867,9 +2876,9 @@ async function syncProgressToCloud(userId, progressData) {
       lastUpdated: window.firebaseServerTimestamp()
     }, { merge: true });
     
-    console.log('Progress synced to cloud');
+    console.log('✅ Progress synced to cloud');
   } catch (error) {
-    console.log('Progress sync error (non-critical):', error.message);
+    console.error('❌ Progress sync error:', error);
   }
 }
 
@@ -2894,10 +2903,14 @@ saveProfileData = function(prof) {
 
 // Sync on app load when Firebase is ready
 window.addEventListener('firebaseReady', () => {
-  console.log('Firebase connected - cloud sync enabled');
+  console.log('🔥 Firebase connected - cloud sync enabled');
+  console.log('Current user ID:', currentUserId);
+  console.log('Profile:', profile);
   // Sync current user if exists
   if (currentUserId && profile) {
     syncUserToCloud({ id: currentUserId, ...profile });
     syncProgressToCloud(currentUserId, progress);
+  } else {
+    console.log('⚠️ No user logged in yet, will sync when user is selected');
   }
 });

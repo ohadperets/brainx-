@@ -40,34 +40,40 @@
   
   <!-- Firebase SDK -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    
-    const firebaseConfig = {
-      apiKey: "AIzaSyASqhMNCsgNlFRNcBMJ92P-s17WLwK0dhY",
-      authDomain: "brainx-a65b8.firebaseapp.com",
-      projectId: "brainx-a65b8",
-      storageBucket: "brainx-a65b8.firebasestorage.app",
-      messagingSenderId: "611913012672",
-      appId: "1:611913012672:web:684d7aabc7769f46fc6425",
-      measurementId: "G-Y4RQ277T4D"
-    };
-    
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    
-    // Make Firestore available globally
-    window.firebaseDB = db;
-    window.firebaseDoc = doc;
-    window.firebaseSetDoc = setDoc;
-    window.firebaseGetDoc = getDoc;
-    window.firebaseCollection = collection;
-    window.firebaseGetDocs = getDocs;
-    window.firebaseServerTimestamp = serverTimestamp;
-    window.firebaseReady = true;
-    
-    // Dispatch event when Firebase is ready
-    window.dispatchEvent(new Event('firebaseReady'));
+    try {
+      const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js");
+      const { getFirestore, doc, setDoc, getDoc, collection, getDocs, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+      
+      const firebaseConfig = {
+        apiKey: "AIzaSyASqhMNCsgNlFRNcBMJ92P-s17WLwK0dhY",
+        authDomain: "brainx-a65b8.firebaseapp.com",
+        projectId: "brainx-a65b8",
+        storageBucket: "brainx-a65b8.firebasestorage.app",
+        messagingSenderId: "611913012672",
+        appId: "1:611913012672:web:684d7aabc7769f46fc6425",
+        measurementId: "G-Y4RQ277T4D"
+      };
+      
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      
+      // Make Firestore available globally
+      window.firebaseDB = db;
+      window.firebaseDoc = doc;
+      window.firebaseSetDoc = setDoc;
+      window.firebaseGetDoc = getDoc;
+      window.firebaseCollection = collection;
+      window.firebaseGetDocs = getDocs;
+      window.firebaseServerTimestamp = serverTimestamp;
+      window.firebaseReady = true;
+      
+      console.log('✅ Firebase initialized successfully');
+      
+      // Dispatch event when Firebase is ready
+      window.dispatchEvent(new Event('firebaseReady'));
+    } catch (error) {
+      console.error('❌ Firebase init error:', error);
+    }
   </script>
 </head>
 <body>

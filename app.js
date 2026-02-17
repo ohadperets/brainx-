@@ -791,6 +791,11 @@ function navigate(screen, subject, skipHistory = false) {
     case 'games':
       document.getElementById('screen-games').classList.add('active');
       headerTitle.textContent = 'משחקים';
+      // Show Math Race only for math subject
+      const mathRaceBtn = document.getElementById('game-math-race-btn');
+      if (mathRaceBtn) {
+        mathRaceBtn.style.display = currentSubject === 'math' ? '' : 'none';
+      }
       break;
 
     case 'game-hangman':

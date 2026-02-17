@@ -148,8 +148,9 @@ html, body {
 }
 
 .app-header h1 {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .btn-back, .btn-header-icon {
@@ -1312,7 +1313,7 @@ html, body {
 .race-options {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 12px;
   margin-bottom: 16px;
 }
 
@@ -1320,12 +1321,16 @@ html, body {
   background: var(--card-bg);
   border: 2px solid #e2e8f0;
   border-radius: var(--radius-sm);
-  padding: 16px;
-  font-size: 22px;
+  padding: 24px 16px;
+  font-size: 26px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s;
   font-family: var(--font);
+  min-height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .race-option:active { transform: scale(0.95); }

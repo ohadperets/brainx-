@@ -666,12 +666,15 @@ function navigate(screen, subject, skipHistory = false) {
 
   const headerTitle = document.getElementById('header-title');
   const btnBack = document.getElementById('btn-back');
+  const headerBrain = document.querySelector('.header-brain');
 
   if (screen === 'home') {
     btnBack.classList.add('hidden');
+    if (headerBrain) headerBrain.style.display = '';
     screenHistory = [];
   } else {
     btnBack.classList.remove('hidden');
+    if (headerBrain) headerBrain.style.display = 'none';
   }
 
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));

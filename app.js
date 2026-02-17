@@ -449,8 +449,8 @@ function loadProfile() {
 
 function saveProfileData(prof) {
   if (!currentUserId) return;
-  // Update user in users array
-  updateUser(currentUserId, { name: prof.name, avatar: prof.avatar });
+  // Update user in users array - include grade too
+  updateUser(currentUserId, { name: prof.name, avatar: prof.avatar, grade: prof.grade });
 }
 
 // Get content data based on user's grade
@@ -598,8 +598,8 @@ function saveProfile() {
     const newUser = createUser(name, selectedAvatar, selectedGrade);
     selectUser(newUser.id);
   } else {
-    // Update existing user
-    profile = { name, avatar: selectedAvatar };
+    // Update existing user - include grade
+    profile = { name, avatar: selectedAvatar, grade: profile?.grade || 5 };
     saveProfileData(profile);
     updateUIWithProfile();
   }

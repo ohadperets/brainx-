@@ -249,10 +249,10 @@
             <div class="feature-name">זיכרון</div>
             <div class="feature-desc">מצא זוגות</div>
           </button>
-          <button class="feature-card" id="game-math-race-btn" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb)" onclick="navigate('game-math-race')">
-            <div class="feature-icon">🏎️</div>
-            <div class="feature-name">מרוץ חשבון</div>
-            <div class="feature-desc">פתור מהר!</div>
+          <button class="feature-card" id="game-race-btn" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb)" onclick="navigate('game-race')">
+            <div class="feature-icon" id="game-race-icon">🏎️</div>
+            <div class="feature-name" id="game-race-name">מרוץ ידע</div>
+            <div class="feature-desc">ענה מהר!</div>
           </button>
         </div>
       </section>
@@ -282,15 +282,15 @@
         </div>
       </section>
 
-      <!-- Math Race Game Screen -->
-      <section id="screen-game-math-race" class="screen">
+      <!-- Knowledge Race Game Screen -->
+      <section id="screen-game-race" class="screen">
         <div class="game-container">
           <div class="race-timer">⏱️ <span id="race-timer">30</span></div>
           <div class="race-score">ניקוד: <strong id="race-score">0</strong></div>
           <div class="race-question" id="race-question"></div>
           <div class="race-options" id="race-options"></div>
           <div id="race-result" class="game-result hidden"></div>
-          <button id="race-start" class="btn-primary" onclick="startMathRace()">התחל! 🏁</button>
+          <button id="race-start" class="btn-primary" onclick="startRace()">התחל! 🏁</button>
         </div>
       </section>
 

@@ -791,11 +791,8 @@ function navigate(screen, subject, skipHistory = false) {
     case 'games':
       document.getElementById('screen-games').classList.add('active');
       headerTitle.textContent = 'משחקים';
-      // Show Math Race only for math subject
-      const mathRaceBtn = document.getElementById('game-math-race-btn');
-      if (mathRaceBtn) {
-        mathRaceBtn.style.display = currentSubject === 'math' ? '' : 'none';
-      }
+      // Update race button for current subject
+      updateRaceButton();
       break;
 
     case 'game-hangman':
@@ -810,10 +807,10 @@ function navigate(screen, subject, skipHistory = false) {
       startMemory();
       break;
 
-    case 'game-math-race':
-      document.getElementById('screen-game-math-race').classList.add('active');
-      headerTitle.textContent = 'מרוץ חשבון';
-      initMathRace();
+    case 'game-race':
+      document.getElementById('screen-game-race').classList.add('active');
+      headerTitle.textContent = getRaceTitle();
+      initRace();
       break;
 
     case 'daily-challenge':
@@ -1744,10 +1741,42 @@ function flipMemoryCard(index) {
   }
 }
 
-// ===== MATH RACE GAME =====
-function initMathRace() {
+// ===== KNOWLEDGE RACE GAME (Universal for all subjects) =====
+function getRaceTitle() {
+  const titles = {
+    hebrew: 'מרוץ עברית',
+    english: 'מרוץ אנגלית', 
+    math: 'מרוץ חשבון'
+  };
+  return titles[currentSubject] || 'מרוץ ידע';
+}
+
+function updateRaceButton() {
+  const btn = document.getElementById('game-race-btn');
+  const iconEl = document.getElementById('game-race-icon');
+  const nameEl = document.getElementById('game-race-name');
+  
+  if (!btn) return;
+  
+  const config = {
+    hebrew: { icon: '📖', name: 'מרוץ עברית', bg: 'linear-gradient(135deg,#fff8e1,#ffecb3)' },
+    english: { icon: '🔤', name: 'מרוץ אנגלית', bg: 'linear-gradient(135deg,#e8f5e9,#c8e6c9)' },
+    math: { icon: '🔢', name: 'מרוץ חשבון', bg: 'linear-gradient(135deg,#e3f2fd,#bbdefb)' }
+  };
+  
+  const cfg = config[currentSubject] || config.math;
+  iconEl.textContent = cfg.icon;
+  nameEl.textContent = cfg.name;
+  btn.style.background = cfg.bg;
+}
+
+function initRace() {
   if (raceState.timer) { clearInterval(raceState.timer); raceState.timer = null; }
-  raceState = { score: 0, timeLeft: 30, timer: null, active: false };
+  raceState = { score: 0, timeLeft: 30, timer: null, active: false, questions: [], currentQ: null };
+  
+  // Prepare questions based on subject
+  prepareRaceQuestions();
+  
   document.getElementById('race-score').textContent = '0';
   document.getElementById('race-timer').textContent = '30';
   document.getElementById('race-question').textContent = 'לחץ "התחל" כדי להתחיל!';
@@ -1756,9 +1785,25 @@ function initMathRace() {
   document.getElementById('race-start').classList.remove('hidden');
 }
 
-function startMathRace() {
+function prepareRaceQuestions() {
+  if (currentSubject === 'math') {
+    // Math questions are generated on the fly
+    raceState.questions = [];
+    return;
+  }
+  
+  // For Hebrew and English, use quiz questions
+  const quizData = getData()[currentSubject].quiz;
+  raceState.questions = shuffle([...quizData]);
+}
+
+function startRace() {
   if (raceState.timer) clearInterval(raceState.timer);
-  raceState = { score: 0, timeLeft: 30, timer: null, active: true };
+  raceState.score = 0;
+  raceState.timeLeft = 30;
+  raceState.active = true;
+  raceState.questionIndex = 0;
+  
   document.getElementById('race-start').classList.add('hidden');
   document.getElementById('race-result').classList.add('hidden');
   document.getElementById('race-score').textContent = '0';
@@ -1772,12 +1817,20 @@ function startMathRace() {
       clearInterval(raceState.timer);
       raceState.timer = null;
       raceState.active = false;
-      endMathRace();
+      endRace();
     }
   }, 1000);
 }
 
 function generateRaceQuestion() {
+  if (currentSubject === 'math') {
+    generateMathRaceQuestion();
+  } else {
+    generateSubjectRaceQuestion();
+  }
+}
+
+function generateMathRaceQuestion() {
   const ops = ['+', '-', '×'];
   const op = ops[Math.floor(Math.random() * ops.length)];
   let a, b, answer;
@@ -1811,23 +1864,55 @@ function generateRaceQuestion() {
   }
   shuffle(options);
 
-  document.getElementById('race-options').innerHTML = options.map(opt =>
-    `<button class="quiz-option" onclick="raceAnswer(${opt}, ${answer})">${opt}</button>`
+  raceState.currentQ = { correct: answer, isMath: true };
+
+  document.getElementById('race-options').innerHTML = options.map((opt, idx) =>
+    `<button class="quiz-option" onclick="raceAnswer(${idx})" data-value="${opt}">${opt}</button>`
   ).join('');
 }
 
-function raceAnswer(selected, correct) {
+function generateSubjectRaceQuestion() {
+  // Get next question or reshuffle if exhausted
+  if (raceState.questionIndex >= raceState.questions.length) {
+    raceState.questions = shuffle([...getData()[currentSubject].quiz]);
+    raceState.questionIndex = 0;
+  }
+  
+  const q = raceState.questions[raceState.questionIndex++];
+  
+  document.getElementById('race-question').textContent = q.question;
+  
+  raceState.currentQ = { correct: q.correct, isMath: false };
+
+  document.getElementById('race-options').innerHTML = q.options.map((opt, idx) =>
+    `<button class="quiz-option" onclick="raceAnswer(${idx})" data-value="${idx}">${opt}</button>`
+  ).join('');
+}
+
+function raceAnswer(selectedIdx) {
   if (!raceState.active) return;
 
   const options = document.querySelectorAll('#race-options .quiz-option');
+  const correctIdx = raceState.currentQ.correct;
+  const isMath = raceState.currentQ.isMath;
   
-  if (selected === correct) {
+  let isCorrect;
+  if (isMath) {
+    const selectedValue = parseInt(options[selectedIdx].dataset.value);
+    isCorrect = selectedValue === raceState.currentQ.correct;
+  } else {
+    isCorrect = selectedIdx === correctIdx;
+  }
+  
+  if (isCorrect) {
     raceState.score++;
     document.getElementById('race-score').textContent = raceState.score;
-    options.forEach(btn => {
+    options.forEach((btn, idx) => {
       btn.disabled = true;
-      if (parseInt(btn.textContent) === correct) {
-        btn.classList.add('correct');
+      if (isMath) {
+        if (parseInt(btn.dataset.value) === raceState.currentQ.correct) btn.classList.add('correct');
+      } else {
+        if (idx === correctIdx) btn.classList.add('correct');
       }
     });
     playSound('correct');
@@ -1836,46 +1921,48 @@ function raceAnswer(selected, correct) {
       generateRaceQuestion();
     }, 300);
   } else {
-    // Disable all buttons and show correct/wrong
-    options.forEach(btn => {
+    options.forEach((btn, idx) => {
       btn.disabled = true;
-      const val = parseInt(btn.textContent);
-      if (val === correct) {
-        btn.classList.add('correct');
-      } else if (val === selected) {
-        btn.classList.add('wrong');
+      if (isMath) {
+        if (parseInt(btn.dataset.value) === raceState.currentQ.correct) btn.classList.add('correct');
+        else if (idx === selectedIdx) btn.classList.add('wrong');
+      } else {
+        if (idx === correctIdx) btn.classList.add('correct');
+        else if (idx === selectedIdx) btn.classList.add('wrong');
       }
     });
     playSound('wrong');
-    // Wait 1.5 seconds then continue
     setTimeout(() => {
       generateRaceQuestion();
     }, 1500);
   }
 }
 
-function endMathRace() {
+function endRace() {
   const result = document.getElementById('race-result');
   result.classList.remove('hidden');
   document.getElementById('race-options').innerHTML = '';
 
   const stars = Math.min(raceState.score, 10);
   const starsRating = getStarsRating(raceState.score * 10);
-  saveHighScore('mathrace', raceState.score);
+  const raceKey = currentSubject + 'race';
+  saveHighScore(raceKey, raceState.score);
   
   result.innerHTML = `<div class="compact-result">
     <span class="result-emoji">${raceState.score >= 10 ? '🏆' : raceState.score >= 5 ? '🌟' : '💪'}</span>
     <div class="result-text"><strong>${raceState.score} תשובות נכונות!</strong></div>
     <div class="result-stars">${renderStars(starsRating)}</div>
     <div class="result-btns">
-      <button class="btn-sm btn-primary" onclick="startMathRace()">🔄 שוב</button>
+      <button class="btn-sm btn-primary" onclick="startRace()">🔄 שוב</button>
       <button class="btn-sm btn-secondary" onclick="goBack()">← חזרה</button>
     </div>
   </div>`;
 
   progress.stars += stars;
   progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
-  progress.mathRaces = (progress.mathRaces || 0) + 1;
+  if (currentSubject === 'math') {
+    progress.mathRaces = (progress.mathRaces || 0) + 1;
+  }
   saveProgress(progress);
   updateStreak();
   checkAchievements();
@@ -1884,6 +1971,11 @@ function endMathRace() {
     launchConfetti();
   }
 }
+
+// Keep old function names for backward compatibility
+function initMathRace() { initRace(); }
+function startMathRace() { startRace(); }
+function endMathRace() { endRace(); }
 
 // ===== DAILY CHALLENGE =====
 function startDailyChallenge() {

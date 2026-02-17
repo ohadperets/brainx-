@@ -1031,9 +1031,141 @@ function openLesson(index) {
 }
 
 // ===== QUIZ =====
+function generateMathQuestions(grade, count = 10) {
+  const questions = [];
+  
+  if (grade === 2) {
+    // Grade 2: Simple addition/subtraction up to 20, shapes
+    for (let i = 0; i < count; i++) {
+      const type = Math.floor(Math.random() * 4);
+      let q;
+      
+      if (type === 0) {
+        // Addition up to 20
+        const a = Math.floor(Math.random() * 10) + 1;
+        const b = Math.floor(Math.random() * (20 - a)) + 1;
+        const answer = a + b;
+        const options = generateOptions(answer, 1, 20);
+        q = { question: `${a} + ${b} = ?`, options, correct: options.indexOf(answer.toString()) };
+      } else if (type === 1) {
+        // Subtraction from numbers up to 20
+        const a = Math.floor(Math.random() * 15) + 5;
+        const b = Math.floor(Math.random() * a) + 1;
+        const answer = a - b;
+        const options = generateOptions(answer, 0, 20);
+        q = { question: `${a} - ${b} = ?`, options, correct: options.indexOf(answer.toString()) };
+      } else if (type === 2) {
+        // Shape corners
+        const shapes = [
+          { name: 'עיגול', corners: 0 },
+          { name: 'משולש', corners: 3 },
+          { name: 'ריבוע', corners: 4 },
+          { name: 'מלבן', corners: 4 }
+        ];
+        const shape = shapes[Math.floor(Math.random() * shapes.length)];
+        const options = generateOptions(shape.corners, 0, 6);
+        q = { question: `כמה פינות יש ל${shape.name}?`, options, correct: options.indexOf(shape.corners.toString()) };
+      } else {
+        // Counting by 2s, 5s, 10s
+        const skip = [2, 5, 10][Math.floor(Math.random() * 3)];
+        const start = skip * Math.floor(Math.random() * 5);
+        const answer = start + skip;
+        const options = generateOptions(answer, 0, 50);
+        q = { question: `מה המספר הבא? ${start}, ${answer}, ...`, options, correct: options.indexOf((answer + skip).toString()) };
+        q.question = `מה המספר הבא אחרי ${start} כשסופרים ב-${skip}?`;
+        const nextAnswer = start + skip;
+        q.options = generateOptions(nextAnswer, 0, 60);
+        q.correct = q.options.indexOf(nextAnswer.toString());
+      }
+      questions.push(q);
+    }
+  } else {
+    // Grade 5: Multiplication, division, fractions, percentages
+    for (let i = 0; i < count; i++) {
+      const type = Math.floor(Math.random() * 6);
+      let q;
+      
+      if (type === 0) {
+        // Multiplication
+        const a = Math.floor(Math.random() * 9) + 2;
+        const b = Math.floor(Math.random() * 9) + 2;
+        const answer = a * b;
+        const options = generateOptions(answer, 10, 100);
+        q = { question: `${a} × ${b} = ?`, options, correct: options.indexOf(answer.toString()) };
+      } else if (type === 1) {
+        // Division
+        const b = Math.floor(Math.random() * 9) + 2;
+        const answer = Math.floor(Math.random() * 10) + 2;
+        const a = b * answer;
+        const options = generateOptions(answer, 1, 20);
+        q = { question: `${a} ÷ ${b} = ?`, options, correct: options.indexOf(answer.toString()) };
+      } else if (type === 2) {
+        // Fractions to decimals
+        const fracs = [
+          { frac: '½', dec: '0.5' }, { frac: '¼', dec: '0.25' }, { frac: '¾', dec: '0.75' },
+          { frac: '⅓', dec: '0.33' }, { frac: '⅔', dec: '0.67' }, { frac: '⅕', dec: '0.2' }
+        ];
+        const f = fracs[Math.floor(Math.random() * fracs.length)];
+        const options = fracs.map(x => x.dec).sort(() => Math.random() - 0.5).slice(0, 4);
+        if (!options.includes(f.dec)) options[0] = f.dec;
+        options.sort(() => Math.random() - 0.5);
+        q = { question: `מה הערך העשרוני של ${f.frac}?`, options, correct: options.indexOf(f.dec) };
+      } else if (type === 3) {
+        // Percentages
+        const percs = [
+          { perc: '50%', val: '½' }, { perc: '25%', val: '¼' }, { perc: '75%', val: '¾' },
+          { perc: '10%', val: '0.1' }, { perc: '20%', val: '⅕' }
+        ];
+        const p = percs[Math.floor(Math.random() * percs.length)];
+        const options = [p.val, '⅓', '⅔', '0.5'].sort(() => Math.random() - 0.5);
+        q = { question: `מה השבר המתאים ל-${p.perc}?`, options, correct: options.indexOf(p.val) };
+      } else if (type === 4) {
+        // Area of square/rectangle
+        const side = Math.floor(Math.random() * 8) + 3;
+        const answer = side * side;
+        const options = generateOptions(answer, 10, 100);
+        q = { question: `מה שטח ריבוע עם צלע ${side}?`, options, correct: options.indexOf(answer.toString()) };
+      } else {
+        // Perimeter
+        const side = Math.floor(Math.random() * 8) + 3;
+        const answer = side * 4;
+        const options = generateOptions(answer, 10, 60);
+        q = { question: `מה היקף ריבוע עם צלע ${side}?`, options, correct: options.indexOf(answer.toString()) };
+      }
+      questions.push(q);
+    }
+  }
+  
+  return questions;
+}
+
+function generateOptions(correct, min, max) {
+  const options = [correct.toString()];
+  while (options.length < 4) {
+    let opt = Math.floor(Math.random() * (max - min + 1)) + min;
+    if (!options.includes(opt.toString()) && opt !== correct) {
+      options.push(opt.toString());
+    }
+  }
+  // Shuffle options
+  for (let i = options.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [options[i], options[j]] = [options[j], options[i]];
+  }
+  return options;
+}
+
 function startQuiz() {
-  const questions = [...getData()[currentSubject].quiz];
-  shuffle(questions);
+  let questions;
+  
+  if (currentSubject === 'math') {
+    // Generate dynamic math questions
+    questions = generateMathQuestions(profile?.grade || 5, 10);
+  } else {
+    // Use predefined questions for Hebrew/English
+    questions = [...getData()[currentSubject].quiz];
+    shuffle(questions);
+  }
 
   quizState = { questions, current: 0, score: 0, answered: false };
 

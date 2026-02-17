@@ -160,7 +160,17 @@ const APP_DATA = {
       { front: "הרבים של 'ילדה'?", back: "ילדות" },
       { front: "מהו שם תואר?", back: "מילה שמתארת שם עצם\nדוגמה: גדול, יפה, חכם" },
       { front: "דרגות השוואה של 'יפה'?", back: "יפה → יותר יפה → הכי יפה" },
-      { front: "מהו פועל?", back: "מילה שמתארת פעולה או מצב\nדוגמה: רץ, אוכל, חושב" }
+      { front: "מהו פועל?", back: "מילה שמתארת פעולה או מצב\nדוגמה: רץ, אוכל, חושב" },
+      { front: "שורש של 'מספר'?", back: "ס.פ.ר" },
+      { front: "שורש של 'שומר'?", back: "ש.מ.ר" },
+      { front: "שורש של 'הולך'?", back: "ה.ל.כ" },
+      { front: "מה זה מילת קישור?", back: "מילה שמחברת בין משפטים\nדוגמה: ו, אבל, כי, לכן" },
+      { front: "זכר של 'גדולה'?", back: "גדול" },
+      { front: "נקבה של 'יפה'?", back: "יפה (נשאר אותו דבר!)" },
+      { front: "זמן עבר של 'אני הולך'?", back: "הלכתי" },
+      { front: "זמן עתיד של 'אני כותב'?", back: "אכתוב" },
+      { front: "הרבים של 'עיר'?", back: "ערים" },
+      { front: "הרבים של 'שולחן'?", back: "שולחנות" }
     ]
   },
 
@@ -358,7 +368,22 @@ const APP_DATA = {
       { front: "family", back: "משפחה" },
       { front: "house", back: "בית" },
       { front: "dog", back: "כלב" },
-      { front: "cat", back: "חתול" }
+      { front: "cat", back: "חתול" },
+      { front: "run → ?", back: "ran (עבר)" },
+      { front: "swim → ?", back: "swam (עבר)" },
+      { front: "sing → ?", back: "sang (עבר)" },
+      { front: "drink → ?", back: "drank (עבר)" },
+      { front: "think → ?", back: "thought (עבר)" },
+      { front: "buy → ?", back: "bought (עבר)" },
+      { front: "bring → ?", back: "brought (עבר)" },
+      { front: "know → ?", back: "knew (עבר)" },
+      { front: "beautiful", back: "יפה" },
+      { front: "important", back: "חשוב" },
+      { front: "difficult", back: "קשה" },
+      { front: "easy", back: "קל" },
+      { front: "always", back: "תמיד" },
+      { front: "never", back: "אף פעם" },
+      { front: "sometimes", back: "לפעמים" }
     ]
   },
 
@@ -868,7 +893,15 @@ const APP_DATA_GRADE2 = {
       { front: "צ בסוף מילה", back: "ץ (צדי סופית)" },
       { front: "כלב → ?", back: "כלבים" },
       { front: "חתולה → ?", back: "חתולות" },
-      { front: "בית → ?", back: "בתים" }
+      { front: "בית → ?", back: "בתים" },
+      { front: "כמה אותיות בעברית?", back: "22 אותיות" },
+      { front: "פרח → ?", back: "פרחים" },
+      { front: "עץ → ?", back: "עצים" },
+      { front: "שמש → ?", back: "שמשות" },
+      { front: "כוכב → ?", back: "כוכבים" },
+      { front: "ציפור → ?", back: "ציפורים" },
+      { front: "האות האחרונה?", back: "ת (תו)" },
+      { front: "ו-ז-ח-ט-י", back: "האותיות אחרי ה!" }
     ]
   },
 
@@ -998,7 +1031,23 @@ const APP_DATA_GRADE2 = {
       { front: "Sun", back: "שמש ☀️" },
       { front: "Book", back: "ספר 📚" },
       { front: "House", back: "בית 🏠" },
-      { front: "Water", back: "מים 💧" }
+      { front: "Water", back: "מים 💧" },
+      { front: "Orange (color)", back: "כתום 🟠" },
+      { front: "Purple", back: "סגול 🟣" },
+      { front: "Pink", back: "ורוד 🩷" },
+      { front: "Black", back: "שחור ⚫" },
+      { front: "White", back: "לבן ⚪" },
+      { front: "Bird", back: "ציפור 🐦" },
+      { front: "Fish", back: "דג 🐟" },
+      { front: "Tree", back: "עץ 🌳" },
+      { front: "Flower", back: "פרח 🌸" },
+      { front: "Moon", back: "ירח 🌙" },
+      { front: "Star", back: "כוכב ⭐" },
+      { front: "Apple", back: "תפוח 🍎" },
+      { front: "Banana", back: "בננה 🍌" },
+      { front: "Happy", back: "שמח 😊" },
+      { front: "Sad", back: "עצוב 😢" },
+      { front: "Hello!", back: "שלום! 👋" }
     ]
   },
 

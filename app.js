@@ -2859,10 +2859,12 @@ async function syncProgressToCloud(userId, progressData) {
   
   try {
     const deviceId = getDeviceId();
+    const userName = profile?.name || 'Unknown';
     const docRef = window.firebaseDoc(window.firebaseDB, 'progress', deviceId + '_' + userId);
     
     await window.firebaseSetDoc(docRef, {
       userId: userId,
+      userName: userName,
       deviceId: deviceId,
       stars: progressData.stars || 0,
       streak: progressData.streak || 0,

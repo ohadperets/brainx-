@@ -21,66 +21,133 @@ const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 function playSound(type) {
   try {
     if (audioCtx.state === 'suspended') audioCtx.resume();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
+    const now = audioCtx.currentTime;
     
     switch(type) {
-      case 'correct':
-        osc.frequency.setValueAtTime(523, audioCtx.currentTime);
-        osc.frequency.setValueAtTime(659, audioCtx.currentTime + 0.1);
-        osc.frequency.setValueAtTime(784, audioCtx.currentTime + 0.2);
-        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-        gain.gain.exponentialDecayTo && gain.gain.exponentialDecayTo(0.01, audioCtx.currentTime + 0.4);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.4);
-        break;
-      case 'wrong':
-        osc.frequency.setValueAtTime(200, audioCtx.currentTime);
-        osc.frequency.setValueAtTime(150, audioCtx.currentTime + 0.15);
-        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.25);
-        break;
-      case 'win':
-        [523, 659, 784, 1047].forEach((f, i) => {
-          const o = audioCtx.createOscillator();
-          const g = audioCtx.createGain();
-          o.connect(g); g.connect(audioCtx.destination);
-          o.frequency.value = f;
-          g.gain.setValueAtTime(0.2, audioCtx.currentTime + i * 0.12);
-          g.gain.exponentialDecayTo && g.gain.exponentialDecayTo(0.01, audioCtx.currentTime + i * 0.12 + 0.3);
-          o.start(audioCtx.currentTime + i * 0.12);
-          o.stop(audioCtx.currentTime + i * 0.12 + 0.3);
+      case 'correct': {
+        // Happy cheerful ascending chime - like getting a star!
+        const notes = [523, 659, 784, 1047]; // C5, E5, G5, C6 - major chord arpeggio
+        notes.forEach((freq, i) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.frequency.value = freq;
+          const startTime = now + i * 0.08;
+          gain.gain.setValueAtTime(0, startTime);
+          gain.gain.linearRampToValueAtTime(0.25, startTime + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.25);
+          osc.start(startTime);
+          osc.stop(startTime + 0.3);
         });
         break;
-      case 'record':
-        [523, 659, 784, 880, 1047, 1319].forEach((f, i) => {
-          const o = audioCtx.createOscillator();
-          const g = audioCtx.createGain();
-          o.connect(g); g.connect(audioCtx.destination);
-          o.frequency.value = f;
-          g.gain.setValueAtTime(0.25, audioCtx.currentTime + i * 0.08);
-          o.start(audioCtx.currentTime + i * 0.08);
-          o.stop(audioCtx.currentTime + i * 0.08 + 0.2);
+      }
+      case 'wrong': {
+        // Gentle "oops" sound - descending soft buzz, not harsh
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.setValueAtTime(330, now);
+        osc.frequency.linearRampToValueAtTime(220, now + 0.3);
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.2, now + 0.02);
+        gain.gain.linearRampToValueAtTime(0.15, now + 0.15);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+        osc.start(now);
+        osc.stop(now + 0.4);
+        break;
+      }
+      case 'win': {
+        // Victory fanfare - happy celebratory sound!
+        const melody = [523, 659, 784, 880, 1047, 1319, 1568]; // ascending victory scale
+        melody.forEach((freq, i) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.frequency.value = freq;
+          const startTime = now + i * 0.1;
+          gain.gain.setValueAtTime(0, startTime);
+          gain.gain.linearRampToValueAtTime(0.2, startTime + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.35);
+          osc.start(startTime);
+          osc.stop(startTime + 0.4);
+        });
+        // Add a sparkle at the end
+        setTimeout(() => {
+          [1760, 2093, 2637].forEach((freq, i) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.25);
+          });
+        }, 600);
+        break;
+      }
+      case 'record': {
+        // Amazing achievement sound - magical sparkle cascade
+        const notes = [523, 659, 784, 1047, 1319, 1568, 2093];
+        notes.forEach((freq, i) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.frequency.value = freq;
+          const startTime = now + i * 0.07;
+          gain.gain.setValueAtTime(0, startTime);
+          gain.gain.linearRampToValueAtTime(0.2, startTime + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.25);
+          osc.start(startTime);
+          osc.stop(startTime + 0.3);
         });
         break;
-      case 'points':
-        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-        osc.frequency.setValueAtTime(1100, audioCtx.currentTime + 0.05);
-        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+      }
+      case 'points': {
+        // Quick happy "ding!" for points
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.setValueAtTime(880, now);
+        osc.frequency.setValueAtTime(1175, now + 0.05);
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.15, now + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+        osc.start(now);
+        osc.stop(now + 0.2);
         break;
-      case 'levelup':
-        [392, 523, 659, 784, 1047].forEach((f, i) => {
-          const o = audioCtx.createOscillator();
-          const g = audioCtx.createGain();
-          o.connect(g); g.connect(audioCtx.destination);
-          o.frequency.value = f;
-          g.gain.setValueAtTime(0.2, audioCtx.currentTime + i * 0.1);
-          o.start(audioCtx.currentTime + i * 0.1);
-          o.stop(audioCtx.currentTime + i * 0.1 + 0.15);
+      }
+      case 'levelup': {
+        // Level up - triumphant ascending scale
+        const notes = [392, 494, 587, 784, 988, 1175];
+        notes.forEach((freq, i) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.frequency.value = freq;
+          const startTime = now + i * 0.09;
+          gain.gain.setValueAtTime(0, startTime);
+          gain.gain.linearRampToValueAtTime(0.18, startTime + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.2);
+          osc.start(startTime);
+          osc.stop(startTime + 0.25);
         });
         break;
+      }
     }
   } catch (e) { console.log('Sound error:', e); }
 }

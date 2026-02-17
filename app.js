@@ -1436,6 +1436,26 @@ function startMemory() {
   document.getElementById('memory-pairs').textContent = '0';
   document.getElementById('memory-total').textContent = pairs.length;
   document.getElementById('memory-result').classList.add('hidden');
+  
+  // Set hint based on subject and grade
+  const hintEl = document.getElementById('memory-hint');
+  const grade = profile.grade;
+  if (currentSubject === 'hebrew') {
+    hintEl.textContent = '💡 חפש זוגות: יחיד ↔ רבים';
+  } else if (currentSubject === 'english') {
+    if (grade === 2) {
+      hintEl.textContent = '💡 חפש זוגות: מילה ↔ תרגום';
+    } else {
+      hintEl.textContent = '💡 חפש זוגות: עבר ↔ הווה';
+    }
+  } else if (currentSubject === 'math') {
+    if (grade === 2) {
+      hintEl.textContent = '💡 חפש זוגות: תרגיל ↔ תוצאה';
+    } else {
+      hintEl.textContent = '💡 חפש זוגות: שבר ↔ עשרוני';
+    }
+  }
+  
   renderMemoryGrid();
 }
 

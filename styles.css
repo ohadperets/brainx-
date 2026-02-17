@@ -1282,6 +1282,17 @@ html, body {
 
 .memory-card:active { transform: scale(0.95); }
 
+.memory-hint {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 12px;
+}
+
 /* Math Race */
 .race-timer {
   font-size: 28px;

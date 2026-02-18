@@ -670,10 +670,31 @@ function renderThemeGrid() {
 function speak(text, lang) {
   if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
+  
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = lang || 'he-IL';
   utter.rate = ttsSpeed;
+  
+  // Try to find a matching voice for the language
+  const voices = window.speechSynthesis.getVoices();
+  const langCode = (lang || 'he-IL').substring(0, 2);
+  const matchingVoice = voices.find(v => v.lang.startsWith(langCode));
+  if (matchingVoice) {
+    utter.voice = matchingVoice;
+  }
+  
+  // Slower rate for Hebrew for better clarity
+  if (langCode === 'he') {
+    utter.rate = Math.min(ttsSpeed, 0.9);
+  }
+  
   window.speechSynthesis.speak(utter);
+}
+
+// Preload voices (needed for some browsers)
+if ('speechSynthesis' in window) {
+  window.speechSynthesis.getVoices();
+  window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
 }
 
 function toggleTTS() {
@@ -699,7 +720,9 @@ function updateTTSSpeed() {
 }
 
 function readLessonAloud() {
-  const content = document.getElementById('lesson-content').textContent;
+  let content = document.getElementById('lesson-content').textContent;
+  // Clean up text: remove extra whitespace, trim
+  content = content.replace(/\s+/g, ' ').trim();
   const lang = currentSubject === 'english' ? 'en-US' : 'he-IL';
   speak(content, lang);
 }

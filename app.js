@@ -11,8 +11,6 @@ let memoryState = {};
 let raceState = {};
 let dictationState = {};
 let dailyChallengeState = {};
-let ttsEnabled = false;
-let ttsSpeed = 1;
 let currentUserId = null;
 
 // ===== SOUND EFFECTS =====
@@ -364,8 +362,6 @@ function selectUser(userId) {
     progress = loadProgress();
     settings = loadSettings();
     applyTheme(settings.theme);
-    ttsEnabled = settings.ttsEnabled;
-    ttsSpeed = settings.ttsSpeed;
     updateStreak();
     updateUIWithProfile();
     updateHomeProgress();
@@ -462,12 +458,12 @@ function getData() {
 function loadSettingsForUser(userId) {
   try {
     const data = localStorage.getItem('brainx-settings-' + userId);
-    return data ? JSON.parse(data) : { theme: 'default', ttsEnabled: false, ttsSpeed: 1 };
-  } catch { return { theme: 'default', ttsEnabled: false, ttsSpeed: 1 }; }
+    return data ? JSON.parse(data) : { theme: 'default' };
+  } catch { return { theme: 'default' }; }
 }
 
 function loadSettings() {
-  if (!currentUserId) return { theme: 'default', ttsEnabled: false, ttsSpeed: 1 };
+  if (!currentUserId) return { theme: 'default' };
   return loadSettingsForUser(currentUserId);
 }
 
@@ -479,7 +475,7 @@ function saveSettings(s) {
 // Initialize with default values, will be updated when user is selected
 let progress = getDefaultProgress();
 let profile = null;
-let settings = { theme: 'default', ttsEnabled: false, ttsSpeed: 1 };
+let settings = { theme: 'default' };
 
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', () => {
@@ -666,26 +662,21 @@ function renderThemeGrid() {
   `).join('');
 }
 
-// ===== TEXT-TO-SPEECH =====
+// ===== TEXT-TO-SPEECH (for dictation) =====
 function speak(text, lang) {
   if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
   
   const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = lang || 'he-IL';
-  utter.rate = ttsSpeed;
+  utter.lang = lang || 'en-US';
+  utter.rate = 0.9;
   
   // Try to find a matching voice for the language
   const voices = window.speechSynthesis.getVoices();
-  const langCode = (lang || 'he-IL').substring(0, 2);
+  const langCode = (lang || 'en-US').substring(0, 2);
   const matchingVoice = voices.find(v => v.lang.startsWith(langCode));
   if (matchingVoice) {
     utter.voice = matchingVoice;
-  }
-  
-  // Slower rate for Hebrew for better clarity
-  if (langCode === 'he') {
-    utter.rate = Math.min(ttsSpeed, 0.9);
   }
   
   window.speechSynthesis.speak(utter);
@@ -695,36 +686,6 @@ function speak(text, lang) {
 if ('speechSynthesis' in window) {
   window.speechSynthesis.getVoices();
   window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
-}
-
-function toggleTTS() {
-  ttsEnabled = !ttsEnabled;
-  settings.ttsEnabled = ttsEnabled;
-  saveSettings(settings);
-  const btn = document.getElementById('btn-tts');
-  btn.querySelector('span').textContent = ttsEnabled ? '🔊' : '🔇';
-}
-
-function toggleTTSSetting() {
-  ttsEnabled = document.getElementById('tts-toggle').checked;
-  settings.ttsEnabled = ttsEnabled;
-  saveSettings(settings);
-  const btn = document.getElementById('btn-tts');
-  if (btn) btn.querySelector('span').textContent = ttsEnabled ? '🔊' : '🔇';
-}
-
-function updateTTSSpeed() {
-  ttsSpeed = parseFloat(document.getElementById('tts-speed').value);
-  settings.ttsSpeed = ttsSpeed;
-  saveSettings(settings);
-}
-
-function readLessonAloud() {
-  let content = document.getElementById('lesson-content').textContent;
-  // Clean up text: remove extra whitespace, trim
-  content = content.replace(/\s+/g, ' ').trim();
-  const lang = currentSubject === 'english' ? 'en-US' : 'he-IL';
-  speak(content, lang);
 }
 
 // ===== NAVIGATION =====
@@ -1221,11 +1182,6 @@ function renderQuestion() {
   document.getElementById('quiz-feedback').classList.add('hidden');
   document.getElementById('quiz-next').classList.add('hidden');
   quizState.answered = false;
-
-  if (ttsEnabled) {
-    const lang = currentSubject === 'english' ? 'en-US' : 'he-IL';
-    speak(q.question, lang);
-  }
 }
 
 function selectAnswer(index) {

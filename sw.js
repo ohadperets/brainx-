@@ -1,6 +1,6 @@
 // ===== SERVICE WORKER — Offline Support =====
 
-const CACHE_NAME = 'brainx-v31';
+const CACHE_NAME = 'brainx-v32';
 const ASSETS = [
   '/',
   '/index.html',
@@ -36,9 +36,17 @@ self.addEventListener('activate', event => {
 
 // Fetch
 self.addEventListener('fetch', event => {
+  // Only handle GET requests with http/https
+  if (event.request.method !== 'GET') return;
+  if (!event.request.url.startsWith('http')) return;
+  
   event.respondWith(
     caches.match(event.request).then(response => {
       return response || fetch(event.request).then(fetchRes => {
+        // Only cache successful responses
+        if (!fetchRes || fetchRes.status !== 200 || fetchRes.type !== 'basic') {
+          return fetchRes;
+        }
         return caches.open(CACHE_NAME).then(cache => {
           cache.put(event.request, fetchRes.clone());
           return fetchRes;

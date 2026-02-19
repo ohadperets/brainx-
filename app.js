@@ -196,47 +196,6 @@ function showRecordBanner() {
   }, 2500);
 }
 
-// Streak tracking
-function getStreak() {
-  const data = localStorage.getItem('brainx-streak-' + currentUserId);
-  if (!data) return { count: 0, lastDate: null };
-  return JSON.parse(data);
-}
-
-function updateStreak() {
-  const streak = getStreak();
-  const today = new Date().toDateString();
-  const yesterday = new Date(Date.now() - 86400000).toDateString();
-  
-  if (streak.lastDate === today) return streak.count;
-  
-  if (streak.lastDate === yesterday) {
-    streak.count++;
-    if (streak.count % 5 === 0) {
-      playSound('levelup');
-      showStreakMilestone(streak.count);
-    }
-  } else {
-    streak.count = 1;
-  }
-  
-  streak.lastDate = today;
-  localStorage.setItem('brainx-streak-' + currentUserId, JSON.stringify(streak));
-  return streak.count;
-}
-
-function showStreakMilestone(count) {
-  const banner = document.createElement('div');
-  banner.className = 'streak-banner';
-  banner.innerHTML = `🔥 ${count} ימים ברצף! 🔥`;
-  document.body.appendChild(banner);
-  setTimeout(() => banner.classList.add('show'), 10);
-  setTimeout(() => {
-    banner.classList.remove('show');
-    setTimeout(() => banner.remove(), 500);
-  }, 3000);
-}
-
 // Stars rating
 function getStarsRating(percent) {
   if (percent >= 90) return 3;
@@ -1019,7 +978,6 @@ function openLesson(index) {
   }
 
   navigate('lesson-detail');
-  if (ttsEnabled) setTimeout(() => readLessonAloud(), 500);
 }
 
 // ===== QUIZ =====
@@ -1961,11 +1919,6 @@ function endRace() {
   }
 }
 
-// Keep old function names for backward compatibility
-function initMathRace() { initRace(); }
-function startMathRace() { startRace(); }
-function endMathRace() { endRace(); }
-
 // ===== DAILY CHALLENGE =====
 function startDailyChallenge() {
   const container = document.getElementById('daily-challenge-container');
@@ -2469,10 +2422,6 @@ function showNextAchievement() {
   }, 2500);
 }
 
-function showAchievementToast(ach) {
-  queueAchievementToast(ach);
-}
-
 function renderAchievements() {
   const container = document.getElementById('achievements-container');
   const unlocked = progress.unlockedAchievements || [];
@@ -2613,10 +2562,6 @@ function resetProgress() {
 // ===== SETTINGS =====
 function renderSettings() {
   renderThemeGrid();
-  const ttsToggle = document.getElementById('tts-toggle');
-  if (ttsToggle) ttsToggle.checked = ttsEnabled;
-  const ttsSpeedEl = document.getElementById('tts-speed');
-  if (ttsSpeedEl) ttsSpeedEl.value = ttsSpeed;
 }
 
 // ===== UTILITIES =====

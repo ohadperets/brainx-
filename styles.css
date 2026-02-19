@@ -1857,38 +1857,6 @@ body.theme-pink .app-header {
   justify-content: center;
 }
 
-/* ===== DAILY CHALLENGE CARD ===== */
-.daily-challenge-card {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  background: linear-gradient(135deg, #fef3c7, #fde68a);
-  border-radius: var(--radius);
-  padding: 14px 18px;
-  margin: 12px 0;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  transition: transform 0.2s;
-}
-.daily-challenge-card:active { transform: scale(0.97); }
-.dc-icon { font-size: 28px; }
-.dc-info { flex: 1; }
-.dc-title { font-weight: 700; font-size: 15px; color: #92400e; }
-.dc-subtitle { font-size: 13px; color: #a16207; }
-.dc-arrow { font-size: 18px; color: #92400e; }
-
-/* ===== STREAK BADGE ===== */
-.streak-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: rgba(255,255,255,0.3);
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 13px;
-  margin-top: 6px;
-}
-
 /* ===== BADGES PREVIEW ===== */
 .badges-preview {
   background: var(--card-bg);
@@ -1908,19 +1876,6 @@ body.theme-pink .app-header {
   align-items: center;
   flex-wrap: wrap;
   gap: 6px;
-}
-
-/* ===== INLINE TTS BUTTON ===== */
-.btn-tts-inline {
-  background: var(--primary);
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: var(--radius-sm);
-  font-size: 14px;
-  cursor: pointer;
-  font-family: inherit;
-  margin: 12px 0;
 }
 
 /* ===== GAME CONTAINER ===== */

@@ -354,7 +354,7 @@ function hideUserSelectScreen() {
   document.getElementById('user-select-screen').classList.add('hidden');
 }
 
-function selectUser(userId)ק {
+function selectUser(userId) {
   setCurrentUserId(userId);
   const user = getUserById(userId);
   if (user) {

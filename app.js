@@ -354,7 +354,7 @@ function hideUserSelectScreen() {
   document.getElementById('user-select-screen').classList.add('hidden');
 }
 
-function selectUser(userId) {
+function selectUser(userId)ק {
   setCurrentUserId(userId);
   const user = getUserById(userId);
   if (user) {
@@ -1173,7 +1173,11 @@ function renderQuestion() {
 
   document.getElementById('quiz-progress-fill').style.width = `${(current / total) * 100}%`;
   document.getElementById('quiz-counter').textContent = `שאלה ${current} מתוך ${total}`;
-  document.getElementById('quiz-question').textContent = q.question;
+  
+  const questionEl = document.getElementById('quiz-question');
+  questionEl.textContent = q.question;
+  // Math questions should be LTR
+  questionEl.dir = currentSubject === 'math' ? 'ltr' : 'rtl';
 
   document.getElementById('quiz-options').innerHTML = q.options.map((opt, i) =>
     `<button class="quiz-option" onclick="selectAnswer(${i})">${opt}</button>`
@@ -2008,7 +2012,7 @@ function renderDailyChallengeQuestion(container) {
       <div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${(current/total)*100}%"></div></div>
       <div class="quiz-counter">אתגר יומי — שאלה ${current} מתוך ${total} (${q.subjectName})</div>
     </div>
-    <div class="quiz-question">${q.question}</div>
+    <div class="quiz-question" dir="${q.subjectName === 'מתמטיקה' ? 'ltr' : 'rtl'}">${q.question}</div>
     <div class="quiz-options">${q.options.map((opt, i) =>
       `<button class="quiz-option" onclick="dailyChallengeAnswer(${i})">${opt}</button>`
     ).join('')}</div>

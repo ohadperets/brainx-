@@ -1973,11 +1973,13 @@ function startDailyChallenge() {
 
   if (progress.dailyChallengeDate === today && progress.dailyChallengeScore !== null) {
     container.innerHTML = `
-      <div class="results-emoji">✅</div>
-      <h2>כבר סיימת את האתגר היומי!</h2>
-      <div class="results-score">${progress.dailyChallengeScore}%</div>
-      <p>חזור מחר לאתגר חדש!</p>
-      <button class="btn-secondary" onclick="goBack()">חזרה</button>`;
+      <div class="quiz-results" style="display:flex; flex-direction:column; align-items:center; text-align:center;">
+        <div class="results-emoji">✅</div>
+        <h2>כבר סיימת את האתגר היומי!</h2>
+        <div class="results-score">${progress.dailyChallengeScore}%</div>
+        <p>חזור מחר לאתגר חדש!</p>
+        <button class="btn-secondary" onclick="goBack()">חזרה</button>
+      </div>`;
     return;
   }
 
@@ -2061,11 +2063,13 @@ function nextDailyChallenge() {
 
     const container = document.getElementById('daily-challenge-container');
     container.innerHTML = `
-      <div class="results-emoji">${percent >= 80 ? '🏆' : percent >= 60 ? '🌟' : '💪'}</div>
-      <h2>${percent >= 80 ? 'מצוין!' : percent >= 60 ? 'כל הכבוד!' : 'נסה שוב מחר!'}</h2>
-      <div class="results-score">${percent}%</div>
-      <p>${score} מתוך ${total} נכונות | +${score * 2} ⭐</p>
-      <button class="btn-secondary" onclick="goBack()">חזרה</button>`;
+      <div class="quiz-results" style="display:flex; flex-direction:column; align-items:center; text-align:center;">
+        <div class="results-emoji">${percent >= 80 ? '🏆' : percent >= 60 ? '🌟' : '💪'}</div>
+        <h2>${percent >= 80 ? 'מצוין!' : percent >= 60 ? 'כל הכבוד!' : 'נסה שוב מחר!'}</h2>
+        <div class="results-score">${percent}%</div>
+        <p>${score} מתוך ${total} נכונות | +${score * 2} ⭐</p>
+        <button class="btn-secondary" onclick="goBack()">חזרה</button>
+      </div>`;
 
     if (percent >= 60) launchConfetti();
   } else {

@@ -2893,8 +2893,8 @@ async function loadAnalytics() {
                      (data.quizAttempts?.math || 0);
     });
     
-    // Update stats
-    document.getElementById('stat-users').textContent = Object.keys(users).length || progressList.length;
+    // Update stats - use progressList.length as primary (reflects actual activity)
+    document.getElementById('stat-users').textContent = progressList.length || Object.keys(users).length;
     document.getElementById('stat-stars').textContent = totalStars;
     document.getElementById('stat-games').textContent = totalGames;
     document.getElementById('stat-quizzes').textContent = totalQuizzes;

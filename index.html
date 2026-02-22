@@ -363,7 +363,29 @@
       <section id="screen-dictation" class="screen">
         <div class="game-container">
           <div class="dictation-header">
-            <h2>📝 הכתבה שבועית</h2>
+            <h2>📝 הכתבה באנגלית</h2>
+            <p style="color: #666; margin-bottom: 1rem;">בחר סוג הכתבה:</p>
+          </div>
+          <div class="feature-grid">
+            <button class="feature-card" style="background:linear-gradient(135deg,#fce4ec,#f8bbd9)" onclick="startTestPrepDictation()">
+              <div class="feature-icon">📚</div>
+              <div class="feature-name">הכנה למבחן</div>
+              <div class="feature-desc">מילים למבחן הקרוב</div>
+            </button>
+            <button class="feature-card" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb)" onclick="showGeneralDictationMenu()">
+              <div class="feature-icon">📖</div>
+              <div class="feature-name">הכתבה כללי</div>
+              <div class="feature-desc">הכתבה שבועית לפי נושא</div>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- General Dictation Week Selection -->
+      <section id="screen-dictation-general" class="screen">
+        <div class="game-container">
+          <div class="dictation-header">
+            <h2>📖 הכתבה כללי</h2>
             <div class="dictation-week-selector">
               <label>בחר שבוע:</label>
               <select id="dictation-week-select" class="admin-select" onchange="updateDictationWeekPreview()"></select>

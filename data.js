@@ -755,6 +755,20 @@ const APP_DATA = {
     }
   ],
 
+  // ========== TEST PREP DICTATION (הכנה למבחן) ==========
+  testPrepDictation: [
+    { word: 'dangerous', hebrewHint: 'מסוכן' },
+    { word: 'only', hebrewHint: 'רק' },
+    { word: 'come back', hebrewHint: 'לחזור' },
+    { word: 'here', hebrewHint: 'כאן' },
+    { word: 'are you ready', hebrewHint: 'האם אתה מוכן' },
+    { word: 'drive', hebrewHint: 'לנהוג' },
+    { word: "I'm ready", hebrewHint: 'אני מוכן' },
+    { word: 'poor', hebrewHint: 'עני' },
+    { word: 'teach', hebrewHint: 'ללמד' },
+    { word: 'tonight', hebrewHint: 'הלילה' }
+  ],
+
   // ========== WORD MATCHING ==========
   wordMatch: [
     { hebrew: 'בית ספר', english: 'school' },
@@ -1360,6 +1374,20 @@ const APP_DATA_GRADE2 = {
         { word: 'family', hebrewHint: 'משפחה' }
       ]
     }
+  ],
+
+  // ========== TEST PREP DICTATION (הכנה למבחן) - כיתה ב׳ ==========
+  testPrepDictation: [
+    { word: 'dangerous', hebrewHint: 'מסוכן' },
+    { word: 'only', hebrewHint: 'רק' },
+    { word: 'come back', hebrewHint: 'לחזור' },
+    { word: 'here', hebrewHint: 'כאן' },
+    { word: 'are you ready', hebrewHint: 'האם אתה מוכן' },
+    { word: 'drive', hebrewHint: 'לנהוג' },
+    { word: "I'm ready", hebrewHint: 'אני מוכן' },
+    { word: 'poor', hebrewHint: 'עני' },
+    { word: 'teach', hebrewHint: 'ללמד' },
+    { word: 'tonight', hebrewHint: 'הלילה' }
   ],
 
   // ========== WORD MATCHING - כיתה ב׳ ==========

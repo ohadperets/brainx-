@@ -764,7 +764,12 @@ function navigate(screen, subject, skipHistory = false) {
 
     case 'dictation':
       document.getElementById('screen-dictation').classList.add('active');
-      headerTitle.textContent = 'הכתבה שבועית';
+      headerTitle.textContent = 'הכתבה באנגלית';
+      break;
+
+    case 'dictation-general':
+      document.getElementById('screen-dictation-general').classList.add('active');
+      headerTitle.textContent = 'הכתבה כללי';
       showDictationMenu();
       break;
 
@@ -899,8 +904,8 @@ function updateSubjectFeatures() {
     html += `
     <button class="feature-card" style="background:linear-gradient(135deg,#fff3e0,#ffe0b2)" onclick="navigate('dictation')">
       <div class="feature-icon">📝</div>
-      <div class="feature-name">הכתבה שבועית</div>
-      <div class="feature-desc">הכתבה וחיבור מילים</div>
+      <div class="feature-name">הכתבה באנגלית</div>
+      <div class="feature-desc">הכנה למבחן והכתבה כללי</div>
     </button>`;
   }
 
@@ -2032,6 +2037,44 @@ function nextDailyChallenge() {
 
 // ===== DICTATION (English) =====
 let selectedDictationWeek = 0;
+let dictationMode = 'general'; // 'general' or 'test-prep'
+
+function showGeneralDictationMenu() {
+  dictationMode = 'general';
+  navigate('dictation-general');
+}
+
+function startTestPrepDictation() {
+  dictationMode = 'test-prep';
+  const data = getData();
+  const words = [...(data.testPrepDictation || [])];
+  
+  if (words.length === 0) {
+    alert('אין מילים להכתבה הכנה למבחן');
+    return;
+  }
+  
+  shuffle(words);
+  dictationState = { words, current: 0, score: 0, weekTitle: 'הכנה למבחן', answered: false, tries: 0, isTestPrep: true };
+
+  document.getElementById('dictation-week').textContent = '📚 הכנה למבחן';
+  document.getElementById('dictation-results').classList.add('hidden');
+  document.getElementById('dictation-feedback').classList.add('hidden');
+
+  // Show word area, hide results
+  const wordArea = document.querySelector('.dictation-word-area');
+  if (wordArea) wordArea.style.display = '';
+  const counter = document.querySelector('.dictation-progress');
+  if (counter) counter.style.display = '';
+
+  // Navigate to dictation typing screen
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-dictation-typing').classList.add('active');
+  document.getElementById('header-title').textContent = 'הכנה למבחן';
+  history.pushState({ screen: 'dictation-test-prep' }, '', '');
+
+  renderDictationWord();
+}
 
 function showDictationMenu() {
   const data = getMergedDictation();

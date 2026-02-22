@@ -1224,7 +1224,9 @@ function renderQuestion() {
   ).join('');
 
   document.getElementById('quiz-feedback').classList.add('hidden');
-  document.getElementById('quiz-next').classList.add('hidden');
+  const quizNextBtn = document.getElementById('quiz-next');
+  quizNextBtn.classList.add('hidden');
+  quizNextBtn.classList.remove('btn-timer-fill');
   quizState.answered = false;
 }
 
@@ -1242,19 +1244,20 @@ function selectAnswer(index) {
     quizState.score++;
     playSound('correct');
     showPointsPopup(10);
-    options[q.correct].classList.add('correct-timer');
-    setTimeout(() => nextQuestion(), 2000);
   } else {
     options[index].classList.add('wrong');
     playSound('wrong');
   }
 
-  document.getElementById('quiz-next').classList.remove('hidden');
+  const nextBtn = document.getElementById('quiz-next');
+  nextBtn.classList.remove('hidden');
+  nextBtn.classList.add('btn-timer-fill');
+  setTimeout(() => nextQuestion(), 2000);
 
   if (quizState.current === quizState.questions.length - 1) {
-    document.getElementById('quiz-next').textContent = 'סיום ←';
+    nextBtn.textContent = 'סיום ←';
   } else {
-    document.getElementById('quiz-next').textContent = 'הבא →';
+    nextBtn.textContent = 'הבא →';
   }
 }
 
@@ -2381,7 +2384,9 @@ function renderGeoQuestion() {
   document.getElementById('geo-progress-fill').style.width = `${((s.current) / s.questions.length) * 100}%`;
   document.getElementById('geo-question').textContent = q.question;
   document.getElementById('geo-feedback').classList.add('hidden');
-  document.getElementById('geo-next').classList.add('hidden');
+  const geoNextBtn = document.getElementById('geo-next');
+  geoNextBtn.classList.add('hidden');
+  geoNextBtn.classList.remove('btn-timer-fill');
   const optionsDiv = document.getElementById('geo-options');
   const shuffledOpts = q.options.map((opt, i) => ({ text: opt, isCorrect: i === q.correct }));
   shuffle(shuffledOpts);
@@ -2402,11 +2407,13 @@ function answerGeo(btn, isCorrect) {
   fb.textContent = isCorrect ? '✅ נכון!' : `❌ התשובה הנכונה: ${correctText}`;
   document.querySelectorAll('#geo-options .quiz-option').forEach(b => {
     b.disabled = true;
-    if (b.textContent === correctText) b.classList.add(isCorrect ? 'correct-timer' : 'correct');
+    if (b.textContent === correctText) b.classList.add('correct');
     if (b === btn && !isCorrect) b.classList.add('wrong');
   });
-  document.getElementById('geo-next').classList.remove('hidden');
-  if (isCorrect) setTimeout(() => nextGeoQuestion(), 2000);
+  const geoNext = document.getElementById('geo-next');
+  geoNext.classList.remove('hidden');
+  geoNext.classList.add('btn-timer-fill');
+  setTimeout(() => nextGeoQuestion(), 2000);
 }
 
 function nextGeoQuestion() {
@@ -2451,7 +2458,9 @@ function renderMulQuestion() {
   document.getElementById('mul-progress-fill').style.width = `${((s.current) / s.questions.length) * 100}%`;
   document.getElementById('mul-question').textContent = q.question;
   document.getElementById('mul-feedback').classList.add('hidden');
-  document.getElementById('mul-next').classList.add('hidden');
+  const mulNextBtn = document.getElementById('mul-next');
+  mulNextBtn.classList.add('hidden');
+  mulNextBtn.classList.remove('btn-timer-fill');
   const optionsDiv = document.getElementById('mul-options');
   const shuffledOpts = q.options.map((opt, i) => ({ text: opt, isCorrect: i === q.correct }));
   shuffle(shuffledOpts);
@@ -2472,11 +2481,13 @@ function answerMul(btn, isCorrect) {
   fb.textContent = isCorrect ? '✅ נכון!' : `❌ התשובה הנכונה: ${correctText}`;
   document.querySelectorAll('#mul-options .quiz-option').forEach(b => {
     b.disabled = true;
-    if (b.textContent === correctText) b.classList.add(isCorrect ? 'correct-timer' : 'correct');
+    if (b.textContent === correctText) b.classList.add('correct');
     if (b === btn && !isCorrect) b.classList.add('wrong');
   });
-  document.getElementById('mul-next').classList.remove('hidden');
-  if (isCorrect) setTimeout(() => nextMulQuestion(), 2000);
+  const mulNext = document.getElementById('mul-next');
+  mulNext.classList.remove('hidden');
+  mulNext.classList.add('btn-timer-fill');
+  setTimeout(() => nextMulQuestion(), 2000);
 }
 
 function nextMulQuestion() {
@@ -2527,7 +2538,9 @@ function renderGrammarQuestion() {
   document.getElementById('grammar-progress-fill').style.width = `${((s.current) / s.questions.length) * 100}%`;
   document.getElementById('grammar-question').textContent = q.question;
   document.getElementById('grammar-feedback').classList.add('hidden');
-  document.getElementById('grammar-next').classList.add('hidden');
+  const grammarNextBtn = document.getElementById('grammar-next');
+  grammarNextBtn.classList.add('hidden');
+  grammarNextBtn.classList.remove('btn-timer-fill');
   const optionsDiv = document.getElementById('grammar-options');
   const shuffled = [...q.options];
   shuffle(shuffled);
@@ -2548,11 +2561,13 @@ function answerGrammar(selected) {
   fb.textContent = correct ? '✅ נכון!' : `❌ התשובה הנכונה: ${q.answer}`;
   document.querySelectorAll('#grammar-options .quiz-option').forEach(btn => {
     btn.disabled = true;
-    if (btn.textContent === q.answer) btn.classList.add(correct ? 'correct-timer' : 'correct');
+    if (btn.textContent === q.answer) btn.classList.add('correct');
     if (btn.textContent === selected && !correct) btn.classList.add('wrong');
   });
-  document.getElementById('grammar-next').classList.remove('hidden');
-  if (correct) setTimeout(() => nextGrammarQuestion(), 2000);
+  const grammarNext = document.getElementById('grammar-next');
+  grammarNext.classList.remove('hidden');
+  grammarNext.classList.add('btn-timer-fill');
+  setTimeout(() => nextGrammarQuestion(), 2000);
 }
 
 function nextGrammarQuestion() {
@@ -2665,7 +2680,9 @@ function renderWritingQuestion() {
   document.getElementById('writing-progress-fill').style.width = `${((s.current) / s.questions.length) * 100}%`;
   document.getElementById('writing-sentence').innerHTML = q.sentence.replace('___', '<span style="border-bottom:2px solid #333; padding:0 12px; font-weight:bold;">___</span>');
   document.getElementById('writing-feedback').classList.add('hidden');
-  document.getElementById('writing-next').classList.add('hidden');
+  const writingNextBtn = document.getElementById('writing-next');
+  writingNextBtn.classList.add('hidden');
+  writingNextBtn.classList.remove('btn-timer-fill');
   const optionsDiv = document.getElementById('writing-options');
   optionsDiv.innerHTML = q.options.map(opt =>
     `<button class="quiz-option" style="font-size:1.3rem; font-weight:bold;" onclick="answerWriting('${opt}')">${opt}</button>`
@@ -2684,11 +2701,13 @@ function answerWriting(selected) {
   fb.textContent = correct ? '✅ נכון!' : `❌ התשובה הנכונה: ${q.answer}`;
   document.querySelectorAll('#writing-options .quiz-option').forEach(btn => {
     btn.disabled = true;
-    if (btn.textContent === q.answer) btn.classList.add(correct ? 'correct-timer' : 'correct');
+    if (btn.textContent === q.answer) btn.classList.add('correct');
     if (btn.textContent === selected && !correct) btn.classList.add('wrong');
   });
-  document.getElementById('writing-next').classList.remove('hidden');
-  if (correct) setTimeout(() => nextWritingQuestion(), 2000);
+  const writingNext = document.getElementById('writing-next');
+  writingNext.classList.remove('hidden');
+  writingNext.classList.add('btn-timer-fill');
+  setTimeout(() => nextWritingQuestion(), 2000);
 }
 
 function nextWritingQuestion() {

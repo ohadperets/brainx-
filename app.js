@@ -1242,6 +1242,7 @@ function selectAnswer(index) {
     quizState.score++;
     playSound('correct');
     showPointsPopup(10);
+    options[q.correct].classList.add('correct-timer');
     setTimeout(() => nextQuestion(), 2000);
   } else {
     options[index].classList.add('wrong');
@@ -2401,7 +2402,7 @@ function answerGeo(btn, isCorrect) {
   fb.textContent = isCorrect ? '✅ נכון!' : `❌ התשובה הנכונה: ${correctText}`;
   document.querySelectorAll('#geo-options .quiz-option').forEach(b => {
     b.disabled = true;
-    if (b.textContent === correctText) b.classList.add('correct');
+    if (b.textContent === correctText) b.classList.add(isCorrect ? 'correct-timer' : 'correct');
     if (b === btn && !isCorrect) b.classList.add('wrong');
   });
   document.getElementById('geo-next').classList.remove('hidden');
@@ -2471,7 +2472,7 @@ function answerMul(btn, isCorrect) {
   fb.textContent = isCorrect ? '✅ נכון!' : `❌ התשובה הנכונה: ${correctText}`;
   document.querySelectorAll('#mul-options .quiz-option').forEach(b => {
     b.disabled = true;
-    if (b.textContent === correctText) b.classList.add('correct');
+    if (b.textContent === correctText) b.classList.add(isCorrect ? 'correct-timer' : 'correct');
     if (b === btn && !isCorrect) b.classList.add('wrong');
   });
   document.getElementById('mul-next').classList.remove('hidden');
@@ -2547,7 +2548,7 @@ function answerGrammar(selected) {
   fb.textContent = correct ? '✅ נכון!' : `❌ התשובה הנכונה: ${q.answer}`;
   document.querySelectorAll('#grammar-options .quiz-option').forEach(btn => {
     btn.disabled = true;
-    if (btn.textContent === q.answer) btn.classList.add('correct');
+    if (btn.textContent === q.answer) btn.classList.add(correct ? 'correct-timer' : 'correct');
     if (btn.textContent === selected && !correct) btn.classList.add('wrong');
   });
   document.getElementById('grammar-next').classList.remove('hidden');
@@ -2683,7 +2684,7 @@ function answerWriting(selected) {
   fb.textContent = correct ? '✅ נכון!' : `❌ התשובה הנכונה: ${q.answer}`;
   document.querySelectorAll('#writing-options .quiz-option').forEach(btn => {
     btn.disabled = true;
-    if (btn.textContent === q.answer) btn.classList.add('correct');
+    if (btn.textContent === q.answer) btn.classList.add(correct ? 'correct-timer' : 'correct');
     if (btn.textContent === selected && !correct) btn.classList.add('wrong');
   });
   document.getElementById('writing-next').classList.remove('hidden');

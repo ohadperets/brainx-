@@ -539,6 +539,31 @@ html, body {
   animation: pop 0.3s ease;
 }
 
+.quiz-option.correct-timer {
+  position: relative;
+  overflow: hidden;
+  border-color: var(--success);
+  background: #c6f6d5;
+}
+
+.quiz-option.correct-timer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 0%;
+  background: rgba(72, 187, 120, 0.35);
+  animation: timerFill 2s linear forwards;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+@keyframes timerFill {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
 .quiz-option.wrong {
   border-color: var(--danger);
   background: #fed7d7;

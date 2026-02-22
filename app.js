@@ -2761,20 +2761,26 @@ function getDeviceId() {
 }
 
 async function syncUserToCloud(userData) {
-  console.log('🔄 syncUserToCloud called');
+  console.log('🔄 syncUserToCloud called, firebaseReady:', window.firebaseReady, 'firebaseDB:', !!window.firebaseDB);
+  if (!window.firebaseReady || !window.firebaseDB) {
+    console.log('⚠️ Firebase not ready, skipping sync');
+    return;
+  }
   
   try {
     const deviceId = getDeviceId();
     console.log('📤 Syncing user:', userData.name, 'deviceId:', deviceId);
+    const docRef = window.firebaseDoc(window.firebaseDB, 'users', deviceId + '_' + userData.id);
     
-    await window.API.syncUser({
-      deviceId,
+    await window.firebaseSetDoc(docRef, {
       userId: userData.id,
       name: userData.name,
       avatar: userData.avatar,
       grade: userData.grade || 5,
+      deviceId: deviceId,
+      lastSeen: window.firebaseServerTimestamp(),
       createdAt: userData.createdAt || new Date().toISOString()
-    });
+    }, { merge: true });
     
     console.log('✅ User synced to cloud:', userData.name);
   } catch (error) {
@@ -2784,15 +2790,20 @@ async function syncUserToCloud(userData) {
 
 async function syncProgressToCloud(userId, progressData) {
   console.log('🔄 syncProgressToCloud called');
+  if (!window.firebaseReady || !window.firebaseDB) {
+    console.log('⚠️ Firebase not ready, skipping progress sync');
+    return;
+  }
   
   try {
     const deviceId = getDeviceId();
     const userName = profile?.name || 'Unknown';
+    const docRef = window.firebaseDoc(window.firebaseDB, 'progress', deviceId + '_' + userId);
     
-    await window.API.syncProgress({
-      deviceId,
-      userId,
-      userName,
+    await window.firebaseSetDoc(docRef, {
+      userId: userId,
+      userName: userName,
+      deviceId: deviceId,
       stars: progressData.stars || 0,
       streak: progressData.streak || 0,
       achievements: progressData.unlockedAchievements || [],
@@ -2801,8 +2812,9 @@ async function syncProgressToCloud(userId, progressData) {
         hebrew: progressData.hebrew?.quizAttempts || 0,
         english: progressData.english?.quizAttempts || 0,
         math: progressData.math?.quizAttempts || 0
-      }
-    });
+      },
+      lastUpdated: window.firebaseServerTimestamp()
+    }, { merge: true });
     
     console.log('✅ Progress synced to cloud');
   } catch (error) {
@@ -2848,17 +2860,44 @@ async function loadAnalytics() {
   const tableEl = document.getElementById('analytics-table');
   const updateEl = document.getElementById('analytics-last-update');
   
+  if (!window.firebaseReady || !window.firebaseDB) {
+    tableEl.innerHTML = '<div style="text-align: center; padding: 30px; color: #e74c3c;">Firebase לא מחובר. נסה לרענן את הדף.</div>';
+    return;
+  }
+  
   tableEl.innerHTML = '<div style="text-align: center; padding: 30px; color: #666;">⏳ טוען נתונים...</div>';
   
   try {
-    // Fetch analytics from API
-    const { stats, users, progressList } = await window.API.getAnalytics();
+    // Get users
+    const usersSnapshot = await window.firebaseGetDocs(window.firebaseCollection(window.firebaseDB, 'users'));
+    const users = {};
+    usersSnapshot.forEach(doc => {
+      const data = doc.data();
+      users[data.userId] = data;
+    });
     
-    // Update stats
-    document.getElementById('stat-users').textContent = stats.totalUsers;
-    document.getElementById('stat-stars').textContent = stats.totalStars;
-    document.getElementById('stat-games').textContent = stats.totalGames;
-    document.getElementById('stat-quizzes').textContent = stats.totalQuizzes;
+    // Get progress
+    const progressSnapshot = await window.firebaseGetDocs(window.firebaseCollection(window.firebaseDB, 'progress'));
+    const progressList = [];
+    let totalStars = 0;
+    let totalGames = 0;
+    let totalQuizzes = 0;
+    
+    progressSnapshot.forEach(doc => {
+      const data = doc.data();
+      progressList.push(data);
+      totalStars += data.stars || 0;
+      totalGames += data.gamesPlayed || 0;
+      totalQuizzes += (data.quizAttempts?.hebrew || 0) + 
+                     (data.quizAttempts?.english || 0) + 
+                     (data.quizAttempts?.math || 0);
+    });
+    
+    // Update stats - use progressList.length as primary (reflects actual activity)
+    document.getElementById('stat-users').textContent = progressList.length || Object.keys(users).length;
+    document.getElementById('stat-stars').textContent = totalStars;
+    document.getElementById('stat-games').textContent = totalGames;
+    document.getElementById('stat-quizzes').textContent = totalQuizzes;
     updateEl.textContent = 'עודכן: ' + new Date().toLocaleString('he-IL');
     
     // Build table
@@ -2876,6 +2915,9 @@ async function loadAnalytics() {
         </thead>
         <tbody>
     `;
+    
+    // Sort by stars descending
+    progressList.sort((a, b) => (b.stars || 0) - (a.stars || 0));
     
     progressList.forEach((p, index) => {
       const user = users[p.userId] || {};

@@ -2749,9 +2749,6 @@ function selectMatchWord(el) {
     document.getElementById('match-score').textContent = matchState.matched;
     matchState.selected = null;
 
-    // Draw line
-    drawMatchLine(prev.element, el);
-
     // Check if done
     if (matchState.matched === matchState.total) {
       setTimeout(showMatchResults, 500);

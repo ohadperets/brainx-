@@ -435,6 +435,32 @@
         </div>
       </section>
 
+      <!-- Geometry Quiz -->
+      <section id="screen-geometry-quiz" class="screen">
+        <div class="game-container">
+          <div class="dictation-header">
+            <h2>📐 גאומטריה</h2>
+            <p style="color: #666; margin-bottom: 0.5rem;">צורות, זוויות ומרובעים</p>
+          </div>
+          <div class="quiz-header">
+            <div class="quiz-progress-bar">
+              <div id="geo-progress-fill" class="quiz-progress-fill"></div>
+            </div>
+            <div id="geo-counter" class="quiz-counter"></div>
+          </div>
+          <div id="geo-question" class="quiz-question"></div>
+          <div id="geo-options" class="quiz-options"></div>
+          <div id="geo-feedback" class="quiz-feedback hidden"></div>
+          <button id="geo-next" class="btn-primary hidden" onclick="nextGeoQuestion()">השאלה הבאה →</button>
+          <div id="geo-results" class="quiz-results hidden">
+            <h2 id="geo-results-title"></h2>
+            <p id="geo-results-text"></p>
+            <button class="btn-primary" onclick="startGeometryQuiz()">נסה שוב 🔄</button>
+            <button class="btn-secondary" onclick="navigate('subject', 'math')">חזרה למתמטיקה ←</button>
+          </div>
+        </div>
+      </section>
+
       <!-- Big Exam Grammar -->
       <section id="screen-big-exam-grammar" class="screen">
         <div class="game-container">

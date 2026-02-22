@@ -820,6 +820,12 @@ function navigate(screen, subject, skipHistory = false) {
       startBigExamVocab();
       break;
 
+    case 'geometry-quiz':
+      document.getElementById('screen-geometry-quiz').classList.add('active');
+      headerTitle.textContent = 'גאומטריה';
+      startGeometryQuiz();
+      break;
+
     case 'achievements':
       document.getElementById('screen-achievements').classList.add('active');
       headerTitle.textContent = 'הישגים';
@@ -934,6 +940,18 @@ function updateSubjectFeatures() {
       <div class="feature-name">משחקים</div>
       <div class="feature-desc">למד בכיף!</div>
     </button>`;
+
+  if (currentSubject === 'math') {
+    const grade = profile?.grade || 5;
+    if (grade === 5) {
+      html += `
+      <button class="feature-card" style="background:linear-gradient(135deg,#e8f5e9,#a5d6a7)" onclick="navigate('geometry-quiz')">
+        <div class="feature-icon">📐</div>
+        <div class="feature-name">גאומטריה</div>
+        <div class="feature-desc">צורות, זוויות ומרובעים</div>
+      </button>`;
+    }
+  }
 
   if (currentSubject === 'english') {
     html += `
@@ -2323,6 +2341,75 @@ document.addEventListener('keydown', (e) => {
     checkDictation();
   }
 });
+
+// ===== GEOMETRY QUIZ =====
+let geoState = {};
+
+function startGeometryQuiz() {
+  const data = getData();
+  const questions = [...(data.math?.geometryQuiz || [])];
+  shuffle(questions);
+  geoState = { questions, current: 0, score: 0, answered: false };
+  document.getElementById('geo-results').classList.add('hidden');
+  document.getElementById('geo-feedback').classList.add('hidden');
+  document.getElementById('geo-next').classList.add('hidden');
+  renderGeoQuestion();
+}
+
+function renderGeoQuestion() {
+  const s = geoState;
+  if (s.current >= s.questions.length) { showGeoResults(); return; }
+  const q = s.questions[s.current];
+  s.answered = false;
+  document.getElementById('geo-counter').textContent = `${s.current + 1} / ${s.questions.length}`;
+  document.getElementById('geo-progress-fill').style.width = `${((s.current) / s.questions.length) * 100}%`;
+  document.getElementById('geo-question').textContent = q.question;
+  document.getElementById('geo-feedback').classList.add('hidden');
+  document.getElementById('geo-next').classList.add('hidden');
+  const optionsDiv = document.getElementById('geo-options');
+  const shuffledOpts = q.options.map((opt, i) => ({ text: opt, isCorrect: i === q.correct }));
+  shuffle(shuffledOpts);
+  optionsDiv.innerHTML = shuffledOpts.map(opt =>
+    `<button class="quiz-option" onclick="answerGeo(this, ${opt.isCorrect})">${opt.text}</button>`
+  ).join('');
+}
+
+function answerGeo(btn, isCorrect) {
+  if (geoState.answered) return;
+  geoState.answered = true;
+  if (isCorrect) geoState.score++;
+  const q = geoState.questions[geoState.current];
+  const correctText = q.options[q.correct];
+  const fb = document.getElementById('geo-feedback');
+  fb.classList.remove('hidden');
+  fb.className = 'quiz-feedback ' + (isCorrect ? 'correct' : 'wrong');
+  fb.textContent = isCorrect ? '✅ נכון!' : `❌ התשובה הנכונה: ${correctText}`;
+  document.querySelectorAll('#geo-options .quiz-option').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === correctText) b.classList.add('correct');
+    if (b === btn && !isCorrect) b.classList.add('wrong');
+  });
+  document.getElementById('geo-next').classList.remove('hidden');
+}
+
+function nextGeoQuestion() {
+  geoState.current++;
+  renderGeoQuestion();
+}
+
+function showGeoResults() {
+  const s = geoState;
+  const pct = Math.round((s.score / s.questions.length) * 100);
+  document.getElementById('geo-question').textContent = '';
+  document.getElementById('geo-options').innerHTML = '';
+  document.getElementById('geo-feedback').classList.add('hidden');
+  document.getElementById('geo-next').classList.add('hidden');
+  document.getElementById('geo-progress-fill').style.width = '100%';
+  const results = document.getElementById('geo-results');
+  results.classList.remove('hidden');
+  document.getElementById('geo-results-title').textContent = pct >= 80 ? '🎉 כל הכבוד!' : pct >= 50 ? '👍 לא רע!' : '💪 תנסה שוב!';
+  document.getElementById('geo-results-text').textContent = `ענית נכון על ${s.score} מתוך ${s.questions.length} (${pct}%)`;
+}
 
 // ===== BIG EXAM PREP =====
 let grammarState = {};

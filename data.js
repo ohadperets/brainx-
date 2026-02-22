@@ -603,8 +603,11 @@ const APP_DATA = {
       { question: "מה צריך להוסיף ל-⅓ כדי לקבל 1?", options: ["⅓", "⅔", "½", "¼"], correct: 1 },
       { question: "איזה שבר קטן יותר?", options: ["½", "⅓", "¼", "⅕"], correct: 3 },
       { question: "15.0 - 7.5 = ?", options: ["7.5", "8.5", "6.5", "7.0"], correct: 0 },
-      { question: "שטח ריבוע עם צלע 12:", options: ["48", "24", "144", "120"], correct: 2 },
-      // Geometry - Shapes & Angles
+      { question: "שטח ריבוע עם צלע 12:", options: ["48", "24", "144", "120"], correct: 2 }
+    ],
+
+    // ========== GEOMETRY QUIZ (גאומטריה) ==========
+    geometryQuiz: [
       { question: "כמה מעלות בזווית ישרה?", options: ["45°", "90°", "180°", "360°"], correct: 1 },
       { question: "זווית של 120° היא:", options: ["חדה", "ישרה", "קהה", "שטוחה"], correct: 2 },
       { question: "זווית של 35° היא:", options: ["חדה", "ישרה", "קהה", "שטוחה"], correct: 0 },

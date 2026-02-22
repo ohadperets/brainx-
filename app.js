@@ -2400,7 +2400,12 @@ function renderGeoQuestion() {
 function answerGeo(btn, isCorrect) {
   if (geoState.answered) return;
   geoState.answered = true;
-  if (isCorrect) geoState.score++;
+  if (isCorrect) {
+    geoState.score++;
+    playSound('correct');
+  } else {
+    playSound('wrong');
+  }
   const q = geoState.questions[geoState.current];
   const correctText = q.options[q.correct];
   const fb = document.getElementById('geo-feedback');
@@ -2474,7 +2479,12 @@ function renderMulQuestion() {
 function answerMul(btn, isCorrect) {
   if (mulState.answered) return;
   mulState.answered = true;
-  if (isCorrect) mulState.score++;
+  if (isCorrect) {
+    mulState.score++;
+    playSound('correct');
+  } else {
+    playSound('wrong');
+  }
   const q = mulState.questions[mulState.current];
   const correctText = q.options[q.correct];
   const fb = document.getElementById('mul-feedback');
@@ -2556,7 +2566,12 @@ function answerGrammar(selected) {
   grammarState.answered = true;
   const q = grammarState.questions[grammarState.current];
   const correct = selected === q.answer;
-  if (correct) grammarState.score++;
+  if (correct) {
+    grammarState.score++;
+    playSound('correct');
+  } else {
+    playSound('wrong');
+  }
   const fb = document.getElementById('grammar-feedback');
   fb.classList.remove('hidden');
   fb.className = 'quiz-feedback ' + (correct ? 'correct' : 'wrong');
@@ -2631,7 +2646,12 @@ function answerReading(selected) {
   readingState.answered = true;
   const q = readingState.questions[readingState.current];
   const correct = selected === q.answer;
-  if (correct) readingState.score++;
+  if (correct) {
+    readingState.score++;
+    playSound('correct');
+  } else {
+    playSound('wrong');
+  }
   const fb = document.getElementById('reading-feedback');
   fb.classList.remove('hidden');
   fb.className = 'quiz-feedback ' + (correct ? 'correct' : 'wrong');
@@ -2701,7 +2721,12 @@ function answerWriting(selected) {
   writingState.answered = true;
   const q = writingState.questions[writingState.current];
   const correct = selected === q.answer;
-  if (correct) writingState.score++;
+  if (correct) {
+    writingState.score++;
+    playSound('correct');
+  } else {
+    playSound('wrong');
+  }
   const fb = document.getElementById('writing-feedback');
   fb.classList.remove('hidden');
   fb.className = 'quiz-feedback ' + (correct ? 'correct' : 'wrong');

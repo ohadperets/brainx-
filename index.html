@@ -386,19 +386,15 @@
         <div class="game-container">
           <div class="dictation-header">
             <h2>📖 הכתבה כללי</h2>
-            <div class="dictation-week-selector">
-              <label>בחר שבוע:</label>
-              <select id="dictation-week-select" class="admin-select" onchange="updateDictationWeekPreview()"></select>
-            </div>
-            <p class="dictation-week" id="dictation-menu-week"></p>
+            <p style="color: #666; margin-bottom: 1rem;">10 מילים אקראיות בכל סיבוב</p>
           </div>
           <div class="feature-grid">
-            <button class="feature-card" style="background:linear-gradient(135deg,#e0f2fe,#bae6fd)" onclick="navigate('word-match')">
+            <button class="feature-card" style="background:linear-gradient(135deg,#e0f2fe,#bae6fd)" onclick="startGeneralWordMatch()">
               <div class="feature-icon">🔗</div>
               <div class="feature-name">חבר מילים</div>
               <div class="feature-desc">חבר עברית לאנגלית</div>
             </button>
-            <button class="feature-card" style="background:linear-gradient(135deg,#fff3e0,#ffe0b2)" onclick="navigate('dictation-typing')">
+            <button class="feature-card" style="background:linear-gradient(135deg,#fff3e0,#ffe0b2)" onclick="startGeneralDictation()">
               <div class="feature-icon">⌨️</div>
               <div class="feature-name">הכתבה</div>
               <div class="feature-desc">כתוב את המילים</div>
@@ -411,7 +407,7 @@
       <section id="screen-dictation-typing" class="screen">
         <div class="game-container">
           <div class="dictation-header">
-            <h2>📝 הכתבה שבועית</h2>
+            <h2>📝 הכתבה</h2>
             <p class="dictation-week" id="dictation-week"></p>
           </div>
           <div class="dictation-word-area">

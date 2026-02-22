@@ -2077,29 +2077,46 @@ function startTestPrepDictation() {
 }
 
 function showDictationMenu() {
-  const data = getMergedDictation();
-  const selectEl = document.getElementById('dictation-week-select');
+  // No longer need week selection - just show the menu
+}
+
+function startGeneralDictation() {
+  dictationMode = 'general';
+  const data = getData();
+  const allWords = [...(data.generalDictation || [])];
   
-  // Populate week options
-  selectEl.innerHTML = data.map((week, i) => {
-    const dateRange = getWeekDateRange(i);
-    return `<option value="${i}">שבוע ${i + 1} (${dateRange})</option>`;
-  }).join('');
+  if (allWords.length === 0) {
+    alert('אין מילים להכתבה כללי');
+    return;
+  }
   
-  selectedDictationWeek = 0;
-  updateDictationWeekPreview();
+  // Pick 10 random words
+  shuffle(allWords);
+  const words = allWords.slice(0, 10);
+  
+  dictationState = { words, current: 0, score: 0, weekTitle: 'הכתבה כללי', answered: false, tries: 0, isGeneral: true };
+
+  document.getElementById('dictation-week').textContent = '📖 הכתבה כללי - 10 מילים';
+  document.getElementById('dictation-results').classList.add('hidden');
+  document.getElementById('dictation-feedback').classList.add('hidden');
+
+  // Show word area, hide results
+  const wordArea = document.querySelector('.dictation-word-area');
+  if (wordArea) wordArea.style.display = '';
+  const counter = document.querySelector('.dictation-progress');
+  if (counter) counter.style.display = '';
+
+  // Navigate to dictation typing screen
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-dictation-typing').classList.add('active');
+  document.getElementById('header-title').textContent = 'הכתבה כללי';
+  history.pushState({ screen: 'dictation-general-typing' }, '', '');
+
+  renderDictationWord();
 }
 
 function updateDictationWeekPreview() {
-  const selectEl = document.getElementById('dictation-week-select');
-  selectedDictationWeek = parseInt(selectEl.value);
-  const data = getMergedDictation();
-  const weekData = data[selectedDictationWeek];
-  
-  const weekTitle = document.getElementById('dictation-menu-week');
-  if (weekTitle) {
-    weekTitle.textContent = `${weekData.words.length} מילים`;
-  }
+  // Legacy function - no longer needed but kept for compatibility
 }
 
 function startDictation() {
@@ -2264,6 +2281,36 @@ document.addEventListener('keydown', (e) => {
 
 // ===== WORD MATCHING GAME =====
 let matchState = {};
+
+function startGeneralWordMatch() {
+  // Use words from generalDictation pool
+  const data = getData();
+  const generalWords = data.generalDictation || [];
+  const dictWords = generalWords.map(w => ({ hebrew: w.hebrewHint, english: w.word }));
+  
+  // Shuffle and take 10 random words
+  shuffle(dictWords);
+  const words = dictWords.slice(0, 10);
+  
+  const hebrewWords = words.map(w => ({ text: w.hebrew, pairId: w.english }));
+  const englishWords = words.map(w => ({ text: w.english, pairId: w.english }));
+  shuffle(englishWords);
+
+  matchState = {
+    hebrewWords,
+    englishWords,
+    selected: null,
+    matched: 0,
+    total: words.length
+  };
+
+  document.getElementById('match-score').textContent = '0';
+  document.getElementById('match-total').textContent = words.length;
+  document.getElementById('match-result').classList.add('hidden');
+  document.getElementById('match-lines').innerHTML = '';
+  renderMatchWords();
+  showScreen('word-match');
+}
 
 function startWordMatch() {
   // Use words from selected dictation week

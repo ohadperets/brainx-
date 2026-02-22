@@ -461,6 +461,32 @@
         </div>
       </section>
 
+      <!-- Multiplication Quiz -->
+      <section id="screen-multiplication-quiz" class="screen">
+        <div class="game-container">
+          <div class="dictation-header">
+            <h2>✖️ לוח הכפל</h2>
+            <p style="color: #666; margin-bottom: 0.5rem;">תרגול לוח הכפל 1-10</p>
+          </div>
+          <div class="quiz-header">
+            <div class="quiz-progress-bar">
+              <div id="mul-progress-fill" class="quiz-progress-fill"></div>
+            </div>
+            <div id="mul-counter" class="quiz-counter"></div>
+          </div>
+          <div id="mul-question" class="quiz-question"></div>
+          <div id="mul-options" class="quiz-options"></div>
+          <div id="mul-feedback" class="quiz-feedback hidden"></div>
+          <button id="mul-next" class="btn-primary hidden" onclick="nextMulQuestion()">השאלה הבאה →</button>
+          <div id="mul-results" class="quiz-results hidden">
+            <h2 id="mul-results-title"></h2>
+            <p id="mul-results-text"></p>
+            <button class="btn-primary" onclick="startMultiplicationQuiz()">נסה שוב 🔄</button>
+            <button class="btn-secondary" onclick="navigate('subject', 'math')">חזרה למתמטיקה ←</button>
+          </div>
+        </div>
+      </section>
+
       <!-- Big Exam Grammar -->
       <section id="screen-big-exam-grammar" class="screen">
         <div class="game-container">

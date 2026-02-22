@@ -826,6 +826,12 @@ function navigate(screen, subject, skipHistory = false) {
       startGeometryQuiz();
       break;
 
+    case 'multiplication-quiz':
+      document.getElementById('screen-multiplication-quiz').classList.add('active');
+      headerTitle.textContent = 'לוח הכפל';
+      startMultiplicationQuiz();
+      break;
+
     case 'achievements':
       document.getElementById('screen-achievements').classList.add('active');
       headerTitle.textContent = 'הישגים';
@@ -949,6 +955,14 @@ function updateSubjectFeatures() {
         <div class="feature-icon">📐</div>
         <div class="feature-name">גאומטריה</div>
         <div class="feature-desc">צורות, זוויות ומרובעים</div>
+      </button>`;
+    }
+    if (grade === 2) {
+      html += `
+      <button class="feature-card" style="background:linear-gradient(135deg,#fff9c4,#fff176)" onclick="navigate('multiplication-quiz')">
+        <div class="feature-icon">✖️</div>
+        <div class="feature-name">לוח הכפל</div>
+        <div class="feature-desc">תרגול לוח הכפל 1-10</div>
       </button>`;
     }
   }
@@ -2409,6 +2423,75 @@ function showGeoResults() {
   results.classList.remove('hidden');
   document.getElementById('geo-results-title').textContent = pct >= 80 ? '🎉 כל הכבוד!' : pct >= 50 ? '👍 לא רע!' : '💪 תנסה שוב!';
   document.getElementById('geo-results-text').textContent = `ענית נכון על ${s.score} מתוך ${s.questions.length} (${pct}%)`;
+}
+
+// ===== MULTIPLICATION QUIZ =====
+let mulState = {};
+
+function startMultiplicationQuiz() {
+  const data = getData();
+  const questions = [...(data.math?.multiplicationQuiz || [])];
+  shuffle(questions);
+  mulState = { questions, current: 0, score: 0, answered: false };
+  document.getElementById('mul-results').classList.add('hidden');
+  document.getElementById('mul-feedback').classList.add('hidden');
+  document.getElementById('mul-next').classList.add('hidden');
+  renderMulQuestion();
+}
+
+function renderMulQuestion() {
+  const s = mulState;
+  if (s.current >= s.questions.length) { showMulResults(); return; }
+  const q = s.questions[s.current];
+  s.answered = false;
+  document.getElementById('mul-counter').textContent = `${s.current + 1} / ${s.questions.length}`;
+  document.getElementById('mul-progress-fill').style.width = `${((s.current) / s.questions.length) * 100}%`;
+  document.getElementById('mul-question').textContent = q.question;
+  document.getElementById('mul-feedback').classList.add('hidden');
+  document.getElementById('mul-next').classList.add('hidden');
+  const optionsDiv = document.getElementById('mul-options');
+  const shuffledOpts = q.options.map((opt, i) => ({ text: opt, isCorrect: i === q.correct }));
+  shuffle(shuffledOpts);
+  optionsDiv.innerHTML = shuffledOpts.map(opt =>
+    `<button class="quiz-option" onclick="answerMul(this, ${opt.isCorrect})">${opt.text}</button>`
+  ).join('');
+}
+
+function answerMul(btn, isCorrect) {
+  if (mulState.answered) return;
+  mulState.answered = true;
+  if (isCorrect) mulState.score++;
+  const q = mulState.questions[mulState.current];
+  const correctText = q.options[q.correct];
+  const fb = document.getElementById('mul-feedback');
+  fb.classList.remove('hidden');
+  fb.className = 'quiz-feedback ' + (isCorrect ? 'correct' : 'wrong');
+  fb.textContent = isCorrect ? '✅ נכון!' : `❌ התשובה הנכונה: ${correctText}`;
+  document.querySelectorAll('#mul-options .quiz-option').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === correctText) b.classList.add('correct');
+    if (b === btn && !isCorrect) b.classList.add('wrong');
+  });
+  document.getElementById('mul-next').classList.remove('hidden');
+}
+
+function nextMulQuestion() {
+  mulState.current++;
+  renderMulQuestion();
+}
+
+function showMulResults() {
+  const s = mulState;
+  const pct = Math.round((s.score / s.questions.length) * 100);
+  document.getElementById('mul-question').textContent = '';
+  document.getElementById('mul-options').innerHTML = '';
+  document.getElementById('mul-feedback').classList.add('hidden');
+  document.getElementById('mul-next').classList.add('hidden');
+  document.getElementById('mul-progress-fill').style.width = '100%';
+  const results = document.getElementById('mul-results');
+  results.classList.remove('hidden');
+  document.getElementById('mul-results-title').textContent = pct >= 80 ? '🎉 כל הכבוד!' : pct >= 50 ? '👍 לא רע!' : '💪 תנסה שוב!';
+  document.getElementById('mul-results-text').textContent = `ענית נכון על ${s.score} מתוך ${s.questions.length} (${pct}%)`;
 }
 
 // ===== BIG EXAM PREP =====

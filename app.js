@@ -1242,6 +1242,7 @@ function selectAnswer(index) {
     quizState.score++;
     playSound('correct');
     showPointsPopup(10);
+    setTimeout(() => nextQuestion(), 2000);
   } else {
     options[index].classList.add('wrong');
     playSound('wrong');
@@ -2404,6 +2405,7 @@ function answerGeo(btn, isCorrect) {
     if (b === btn && !isCorrect) b.classList.add('wrong');
   });
   document.getElementById('geo-next').classList.remove('hidden');
+  if (isCorrect) setTimeout(() => nextGeoQuestion(), 2000);
 }
 
 function nextGeoQuestion() {
@@ -2473,6 +2475,7 @@ function answerMul(btn, isCorrect) {
     if (b === btn && !isCorrect) b.classList.add('wrong');
   });
   document.getElementById('mul-next').classList.remove('hidden');
+  if (isCorrect) setTimeout(() => nextMulQuestion(), 2000);
 }
 
 function nextMulQuestion() {
@@ -2548,6 +2551,7 @@ function answerGrammar(selected) {
     if (btn.textContent === selected && !correct) btn.classList.add('wrong');
   });
   document.getElementById('grammar-next').classList.remove('hidden');
+  if (correct) setTimeout(() => nextGrammarQuestion(), 2000);
 }
 
 function nextGrammarQuestion() {
@@ -2683,6 +2687,7 @@ function answerWriting(selected) {
     if (btn.textContent === selected && !correct) btn.classList.add('wrong');
   });
   document.getElementById('writing-next').classList.remove('hidden');
+  if (correct) setTimeout(() => nextWritingQuestion(), 2000);
 }
 
 function nextWritingQuestion() {

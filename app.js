@@ -2315,7 +2315,10 @@ function startGeneralWordMatch() {
   document.getElementById('match-result').classList.add('hidden');
   document.getElementById('match-lines').innerHTML = '';
   renderMatchWords();
-  navigate('word-match');
+  // Navigate manually without triggering startWordMatch()
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-word-match').classList.add('active');
+  document.querySelector('.app-header h1').textContent = 'חבר מילים';
 }
 
 function startWordMatch() {

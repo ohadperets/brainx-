@@ -765,6 +765,12 @@ function navigate(screen, subject, skipHistory = false) {
     case 'dictation':
       document.getElementById('screen-dictation').classList.add('active');
       headerTitle.textContent = 'הכתבה באנגלית';
+      // Hide general dictation for grade 2 (only available for grade 5)
+      const btnGeneralDictation = document.getElementById('btn-general-dictation');
+      if (btnGeneralDictation) {
+        const grade = profile?.grade || 5;
+        btnGeneralDictation.style.display = grade === 2 ? 'none' : '';
+      }
       break;
 
     case 'dictation-general':
@@ -2309,7 +2315,7 @@ function startGeneralWordMatch() {
   document.getElementById('match-result').classList.add('hidden');
   document.getElementById('match-lines').innerHTML = '';
   renderMatchWords();
-  showScreen('word-match');
+  navigate('word-match');
 }
 
 function startWordMatch() {

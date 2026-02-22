@@ -894,7 +894,112 @@ const APP_DATA = {
     { hebrew: 'שיעורי בית', english: 'homework' },
     { hebrew: 'מחק', english: 'eraser' },
     { hebrew: 'תיק גב', english: 'backpack' }
-  ]
+  ],
+
+  // ========== BIG EXAM PREP (הכנה למבחן הגדול) - Unit 3 ==========
+  bigExam: {
+    title: 'הכנה למבחן הגדול - Unit 3',
+
+    // --- VOCABULARY ---
+    vocabulary: [
+      { word: 'air', hebrew: 'אוויר' },
+      { word: 'ask', hebrew: 'לשאול' },
+      { word: 'at least', hebrew: 'לפחות' },
+      { word: 'autumn', hebrew: 'סתיו' },
+      { word: 'bee', hebrew: 'דבורה' },
+      { word: 'bottle', hebrew: 'בקבוק' },
+      { word: 'breathe', hebrew: 'לנשום' },
+      { word: 'build', hebrew: 'לבנות' },
+      { word: 'careful', hebrew: 'זהיר' },
+      { word: 'change', hebrew: 'להשתנות' },
+      { word: 'cook', hebrew: 'לבשל' },
+      { word: 'cucumber', hebrew: 'מלפפון' },
+      { word: 'cut down', hebrew: 'לכרות' },
+      { word: 'environment', hebrew: 'סביבה' },
+      { word: 'fix', hebrew: 'לתקן' },
+      { word: 'grass', hebrew: 'דשא' },
+      { word: 'honey', hebrew: 'דבש' },
+      { word: 'invent', hebrew: 'להמציא' },
+      { word: 'leaves', hebrew: 'עלים' },
+      { word: 'minute', hebrew: 'דקה' },
+      { word: 'pick up', hebrew: 'להרים' },
+      { word: 'plant', hebrew: 'צמח / לשתול' },
+      { word: 'remember', hebrew: 'לזכור' },
+      { word: 'rule', hebrew: 'כללי' },
+      { word: 'saw', hebrew: 'ראה' },
+      { word: 'scary', hebrew: 'מפחיד' },
+      { word: 'spring', hebrew: 'אביב' },
+      { word: 'stay', hebrew: 'להישאר' },
+      { word: 'storm', hebrew: 'סערה' },
+      { word: 'strong', hebrew: 'חזק' },
+      { word: 'throw away', hebrew: 'להשליך לפח' },
+      { word: 'was', hebrew: 'היה' },
+      { word: 'while', hebrew: 'בזמן ש-' },
+      { word: 'wise', hebrew: 'חכם' }
+    ],
+
+    // --- GRAMMAR: Present Progressive ---
+    grammar: [
+      // Positive
+      { question: 'The children ___ (play) in the park right now.', answer: 'are playing', options: ['is playing', 'are playing', 'plays', 'playing'], type: 'positive' },
+      { question: 'She ___ (cook) dinner at the moment.', answer: 'is cooking', options: ['is cooking', 'are cooking', 'cooks', 'cooking'], type: 'positive' },
+      { question: 'I ___ (build) a house from blocks.', answer: 'am building', options: ['am building', 'is building', 'are building', 'builds'], type: 'positive' },
+      { question: 'The bee ___ (fly) near the flowers.', answer: 'is flying', options: ['is flying', 'are flying', 'flies', 'am flying'], type: 'positive' },
+      { question: 'We ___ (breathe) fresh air outside.', answer: 'are breathing', options: ['is breathing', 'are breathing', 'breathes', 'am breathing'], type: 'positive' },
+      { question: 'He ___ (fix) his bicycle now.', answer: 'is fixing', options: ['are fixing', 'is fixing', 'fixes', 'am fixing'], type: 'positive' },
+      { question: 'The leaves ___ (change) color in autumn.', answer: 'are changing', options: ['is changing', 'are changing', 'changes', 'am changing'], type: 'positive' },
+      { question: 'Mom ___ (cut) the cucumber for the salad.', answer: 'is cutting', options: ['is cutting', 'are cutting', 'cuts', 'am cutting'], type: 'positive' },
+      // Negative
+      { question: 'They ___ (not/play) football today.', answer: 'are not playing', options: ['is not playing', 'are not playing', 'not playing', 'don\'t playing'], type: 'negative' },
+      { question: 'He ___ (not/cook) right now.', answer: 'is not cooking', options: ['is not cooking', 'are not cooking', 'not cooking', 'doesn\'t cooking'], type: 'negative' },
+      { question: 'I ___ (not/stay) home today.', answer: 'am not staying', options: ['am not staying', 'is not staying', 'are not staying', 'don\'t staying'], type: 'negative' },
+      { question: 'The storm ___ (not/come) this way.', answer: 'is not coming', options: ['are not coming', 'is not coming', 'not coming', 'doesn\'t coming'], type: 'negative' },
+      { question: 'We ___ (not/throw away) the bottles.', answer: 'are not throwing away', options: ['is not throwing away', 'are not throwing away', 'not throwing away', 'don\'t throwing away'], type: 'negative' },
+      { question: 'She ___ (not/pick up) the grass.', answer: 'is not picking up', options: ['is not picking up', 'are not picking up', 'not picking up', 'doesn\'t picking up'], type: 'negative' },
+      // Yes/No Questions
+      { question: '___ you building a new house?', answer: 'Are', options: ['Are', 'Is', 'Am', 'Do'], type: 'question' },
+      { question: '___ she cooking dinner now?', answer: 'Is', options: ['Is', 'Are', 'Am', 'Does'], type: 'question' },
+      { question: '___ the bees flying near the honey?', answer: 'Are', options: ['Are', 'Is', 'Am', 'Do'], type: 'question' },
+      { question: '___ he remembering the rules?', answer: 'Is', options: ['Is', 'Are', 'Am', 'Does'], type: 'question' },
+      { question: '___ they planting trees in spring?', answer: 'Are', options: ['Are', 'Is', 'Am', 'Do'], type: 'question' },
+      { question: '___ it raining outside?', answer: 'Is', options: ['Is', 'Are', 'Am', 'Does'], type: 'question' }
+    ],
+
+    // --- READING: Unseen passage ---
+    reading: {
+      title: 'The Wise Bee',
+      text: `It is a beautiful spring morning. The sun is shining and the birds are singing. A little bee is flying over the green grass. The bee is looking for flowers.\n\n"I need to find flowers," the bee says. "I want to make honey for my family."\n\nWhile the bee is flying, it sees a big storm coming. The sky is changing color. The wind is getting strong and scary.\n\n"I need to be careful," the bee thinks. "I must stay near the trees. I can breathe and wait at least a few minutes."\n\nThe bee finds a bottle near the grass and hides inside. After ten minutes, the storm goes away. The air is fresh and clean. The bee picks up and flies again.\n\n"I am wise," says the bee. "I did not throw away my chance. I was careful and now I can build my home and cook honey for everyone!"`,
+      questions: [
+        { question: 'What season is it in the story?', options: ['Autumn', 'Spring', 'Summer', 'Winter'], answer: 'Spring' },
+        { question: 'What is the bee looking for?', options: ['Honey', 'Water', 'Flowers', 'Grass'], answer: 'Flowers' },
+        { question: 'What does the bee see coming?', options: ['A bird', 'A storm', 'A boy', 'A bottle'], answer: 'A storm' },
+        { question: 'Where does the bee hide?', options: ['Under a tree', 'In a flower', 'Inside a bottle', 'In the grass'], answer: 'Inside a bottle' },
+        { question: 'How long does the storm last?', options: ['One minute', 'Five minutes', 'Ten minutes', 'One hour'], answer: 'Ten minutes' },
+        { question: 'How is the air after the storm?', options: ['Hot and dry', 'Fresh and clean', 'Cold and scary', 'Strong and dark'], answer: 'Fresh and clean' },
+        { question: 'What does the bee want to do at the end?', options: ['Sleep', 'Build home and cook honey', 'Fly away', 'Cut down trees'], answer: 'Build home and cook honey' },
+        { question: 'The bee is ___', options: ['scary', 'strong', 'wise', 'sad'], answer: 'wise' }
+      ]
+    },
+
+    // --- WRITING: a/an exercises ---
+    writing: [
+      { sentence: 'I see ___ bee in the garden.', answer: 'a', options: ['a', 'an'] },
+      { sentence: 'She is eating ___ apple.', answer: 'an', options: ['a', 'an'] },
+      { sentence: 'He has ___ bottle of water.', answer: 'a', options: ['a', 'an'] },
+      { sentence: 'There is ___ old tree in the park.', answer: 'an', options: ['a', 'an'] },
+      { sentence: 'We saw ___ scary storm yesterday.', answer: 'a', options: ['a', 'an'] },
+      { sentence: 'She is ___ important person.', answer: 'an', options: ['a', 'an'] },
+      { sentence: 'He found ___ cucumber in the garden.', answer: 'a', options: ['a', 'an'] },
+      { sentence: 'It was ___ interesting rule.', answer: 'an', options: ['a', 'an'] },
+      { sentence: 'I want ___ strong environment.', answer: 'a', options: ['a', 'an'] },
+      { sentence: 'That is ___ easy question.', answer: 'an', options: ['a', 'an'] },
+      { sentence: 'We need ___ wise teacher.', answer: 'a', options: ['a', 'an'] },
+      { sentence: 'He is building ___ enormous house.', answer: 'an', options: ['a', 'an'] },
+      { sentence: 'She picked up ___ orange leaf.', answer: 'an', options: ['a', 'an'] },
+      { sentence: 'There is ___ plant in the classroom.', answer: 'a', options: ['a', 'an'] },
+      { sentence: 'I ate ___ honey sandwich.', answer: 'a', options: ['a', 'an'] }
+    ]
+  }
 };
 
 // ===== GRADE 2 DATA (כיתה ב׳) =====

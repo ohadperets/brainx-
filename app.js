@@ -791,6 +791,35 @@ function navigate(screen, subject, skipHistory = false) {
       startWordMatch();
       break;
 
+    case 'big-exam':
+      document.getElementById('screen-big-exam').classList.add('active');
+      headerTitle.textContent = 'הכנה למבחן הגדול';
+      break;
+
+    case 'big-exam-grammar':
+      document.getElementById('screen-big-exam-grammar').classList.add('active');
+      headerTitle.textContent = 'Grammar';
+      startBigExamGrammar();
+      break;
+
+    case 'big-exam-reading':
+      document.getElementById('screen-big-exam-reading').classList.add('active');
+      headerTitle.textContent = 'Reading';
+      startBigExamReading();
+      break;
+
+    case 'big-exam-writing':
+      document.getElementById('screen-big-exam-writing').classList.add('active');
+      headerTitle.textContent = 'Writing';
+      startBigExamWriting();
+      break;
+
+    case 'big-exam-vocab':
+      document.getElementById('screen-big-exam-vocab').classList.add('active');
+      headerTitle.textContent = 'Vocabulary';
+      startBigExamVocab();
+      break;
+
     case 'achievements':
       document.getElementById('screen-achievements').classList.add('active');
       headerTitle.textContent = 'הישגים';
@@ -2294,6 +2323,308 @@ document.addEventListener('keydown', (e) => {
     checkDictation();
   }
 });
+
+// ===== BIG EXAM PREP =====
+let grammarState = {};
+let readingState = {};
+let writingState = {};
+let vocabMatchState = {};
+
+// --- GRAMMAR ---
+function startBigExamGrammar() {
+  const data = getData();
+  const questions = [...(data.bigExam?.grammar || [])];
+  shuffle(questions);
+  grammarState = { questions, current: 0, score: 0, answered: false };
+  document.getElementById('grammar-results').classList.add('hidden');
+  document.getElementById('grammar-feedback').classList.add('hidden');
+  document.getElementById('grammar-next').classList.add('hidden');
+  renderGrammarQuestion();
+}
+
+function renderGrammarQuestion() {
+  const s = grammarState;
+  if (s.current >= s.questions.length) { showGrammarResults(); return; }
+  const q = s.questions[s.current];
+  s.answered = false;
+  const typeLabels = { positive: 'Positive ✅', negative: 'Negative ❌', question: 'Yes/No Question ❓' };
+  document.getElementById('grammar-type-label').textContent = typeLabels[q.type] || '';
+  document.getElementById('grammar-counter').textContent = `${s.current + 1} / ${s.questions.length}`;
+  document.getElementById('grammar-progress-fill').style.width = `${((s.current) / s.questions.length) * 100}%`;
+  document.getElementById('grammar-question').textContent = q.question;
+  document.getElementById('grammar-feedback').classList.add('hidden');
+  document.getElementById('grammar-next').classList.add('hidden');
+  const optionsDiv = document.getElementById('grammar-options');
+  const shuffled = [...q.options];
+  shuffle(shuffled);
+  optionsDiv.innerHTML = shuffled.map(opt =>
+    `<button class="quiz-option" onclick="answerGrammar('${opt.replace(/'/g, "\\'")}')">${opt}</button>`
+  ).join('');
+}
+
+function answerGrammar(selected) {
+  if (grammarState.answered) return;
+  grammarState.answered = true;
+  const q = grammarState.questions[grammarState.current];
+  const correct = selected === q.answer;
+  if (correct) grammarState.score++;
+  const fb = document.getElementById('grammar-feedback');
+  fb.classList.remove('hidden');
+  fb.className = 'quiz-feedback ' + (correct ? 'correct' : 'wrong');
+  fb.textContent = correct ? '✅ נכון!' : `❌ התשובה הנכונה: ${q.answer}`;
+  document.querySelectorAll('#grammar-options .quiz-option').forEach(btn => {
+    btn.disabled = true;
+    if (btn.textContent === q.answer) btn.classList.add('correct');
+    if (btn.textContent === selected && !correct) btn.classList.add('wrong');
+  });
+  document.getElementById('grammar-next').classList.remove('hidden');
+}
+
+function nextGrammarQuestion() {
+  grammarState.current++;
+  renderGrammarQuestion();
+}
+
+function showGrammarResults() {
+  const s = grammarState;
+  const pct = Math.round((s.score / s.questions.length) * 100);
+  document.getElementById('grammar-question').textContent = '';
+  document.getElementById('grammar-options').innerHTML = '';
+  document.getElementById('grammar-type-label').textContent = '';
+  document.getElementById('grammar-feedback').classList.add('hidden');
+  document.getElementById('grammar-next').classList.add('hidden');
+  document.getElementById('grammar-progress-fill').style.width = '100%';
+  const results = document.getElementById('grammar-results');
+  results.classList.remove('hidden');
+  document.getElementById('grammar-results-title').textContent = pct >= 80 ? '🎉 כל הכבוד!' : pct >= 50 ? '👍 לא רע!' : '💪 תנסה שוב!';
+  document.getElementById('grammar-results-text').textContent = `ענית נכון על ${s.score} מתוך ${s.questions.length} (${pct}%)`;
+}
+
+// --- READING ---
+function startBigExamReading() {
+  const data = getData();
+  const reading = data.bigExam?.reading;
+  if (!reading) return;
+  document.getElementById('reading-passage').textContent = reading.text;
+  const questions = [...reading.questions];
+  readingState = { questions, current: 0, score: 0, answered: false };
+  document.getElementById('reading-results').classList.add('hidden');
+  document.getElementById('reading-feedback').classList.add('hidden');
+  document.getElementById('reading-next').classList.add('hidden');
+  renderReadingQuestion();
+}
+
+function renderReadingQuestion() {
+  const s = readingState;
+  if (s.current >= s.questions.length) { showReadingResults(); return; }
+  const q = s.questions[s.current];
+  s.answered = false;
+  document.getElementById('reading-counter').textContent = `${s.current + 1} / ${s.questions.length}`;
+  document.getElementById('reading-progress-fill').style.width = `${((s.current) / s.questions.length) * 100}%`;
+  document.getElementById('reading-question').textContent = q.question;
+  document.getElementById('reading-feedback').classList.add('hidden');
+  document.getElementById('reading-next').classList.add('hidden');
+  const optionsDiv = document.getElementById('reading-options');
+  const shuffled = [...q.options];
+  shuffle(shuffled);
+  optionsDiv.innerHTML = shuffled.map(opt =>
+    `<button class="quiz-option" onclick="answerReading('${opt.replace(/'/g, "\\'")}')">${opt}</button>`
+  ).join('');
+}
+
+function answerReading(selected) {
+  if (readingState.answered) return;
+  readingState.answered = true;
+  const q = readingState.questions[readingState.current];
+  const correct = selected === q.answer;
+  if (correct) readingState.score++;
+  const fb = document.getElementById('reading-feedback');
+  fb.classList.remove('hidden');
+  fb.className = 'quiz-feedback ' + (correct ? 'correct' : 'wrong');
+  fb.textContent = correct ? '✅ נכון!' : `❌ התשובה הנכונה: ${q.answer}`;
+  document.querySelectorAll('#reading-options .quiz-option').forEach(btn => {
+    btn.disabled = true;
+    if (btn.textContent === q.answer) btn.classList.add('correct');
+    if (btn.textContent === selected && !correct) btn.classList.add('wrong');
+  });
+  document.getElementById('reading-next').classList.remove('hidden');
+}
+
+function nextReadingQuestion() {
+  readingState.current++;
+  renderReadingQuestion();
+}
+
+function showReadingResults() {
+  const s = readingState;
+  const pct = Math.round((s.score / s.questions.length) * 100);
+  document.getElementById('reading-question').textContent = '';
+  document.getElementById('reading-options').innerHTML = '';
+  document.getElementById('reading-feedback').classList.add('hidden');
+  document.getElementById('reading-next').classList.add('hidden');
+  document.getElementById('reading-progress-fill').style.width = '100%';
+  const results = document.getElementById('reading-results');
+  results.classList.remove('hidden');
+  document.getElementById('reading-results-title').textContent = pct >= 80 ? '🎉 כל הכבוד!' : pct >= 50 ? '👍 לא רע!' : '💪 תנסה שוב!';
+  document.getElementById('reading-results-text').textContent = `ענית נכון על ${s.score} מתוך ${s.questions.length} (${pct}%)`;
+}
+
+// --- WRITING (a/an) ---
+function startBigExamWriting() {
+  const data = getData();
+  const questions = [...(data.bigExam?.writing || [])];
+  shuffle(questions);
+  writingState = { questions, current: 0, score: 0, answered: false };
+  document.getElementById('writing-results').classList.add('hidden');
+  document.getElementById('writing-feedback').classList.add('hidden');
+  document.getElementById('writing-next').classList.add('hidden');
+  renderWritingQuestion();
+}
+
+function renderWritingQuestion() {
+  const s = writingState;
+  if (s.current >= s.questions.length) { showWritingResults(); return; }
+  const q = s.questions[s.current];
+  s.answered = false;
+  document.getElementById('writing-counter').textContent = `${s.current + 1} / ${s.questions.length}`;
+  document.getElementById('writing-progress-fill').style.width = `${((s.current) / s.questions.length) * 100}%`;
+  document.getElementById('writing-sentence').innerHTML = q.sentence.replace('___', '<span style="border-bottom:2px solid #333; padding:0 12px; font-weight:bold;">___</span>');
+  document.getElementById('writing-feedback').classList.add('hidden');
+  document.getElementById('writing-next').classList.add('hidden');
+  const optionsDiv = document.getElementById('writing-options');
+  optionsDiv.innerHTML = q.options.map(opt =>
+    `<button class="quiz-option" style="font-size:1.3rem; font-weight:bold;" onclick="answerWriting('${opt}')">${opt}</button>`
+  ).join('');
+}
+
+function answerWriting(selected) {
+  if (writingState.answered) return;
+  writingState.answered = true;
+  const q = writingState.questions[writingState.current];
+  const correct = selected === q.answer;
+  if (correct) writingState.score++;
+  const fb = document.getElementById('writing-feedback');
+  fb.classList.remove('hidden');
+  fb.className = 'quiz-feedback ' + (correct ? 'correct' : 'wrong');
+  fb.textContent = correct ? '✅ נכון!' : `❌ התשובה הנכונה: ${q.answer}`;
+  document.querySelectorAll('#writing-options .quiz-option').forEach(btn => {
+    btn.disabled = true;
+    if (btn.textContent === q.answer) btn.classList.add('correct');
+    if (btn.textContent === selected && !correct) btn.classList.add('wrong');
+  });
+  document.getElementById('writing-next').classList.remove('hidden');
+}
+
+function nextWritingQuestion() {
+  writingState.current++;
+  renderWritingQuestion();
+}
+
+function showWritingResults() {
+  const s = writingState;
+  const pct = Math.round((s.score / s.questions.length) * 100);
+  document.getElementById('writing-sentence').textContent = '';
+  document.getElementById('writing-options').innerHTML = '';
+  document.getElementById('writing-feedback').classList.add('hidden');
+  document.getElementById('writing-next').classList.add('hidden');
+  document.getElementById('writing-progress-fill').style.width = '100%';
+  const results = document.getElementById('writing-results');
+  results.classList.remove('hidden');
+  document.getElementById('writing-results-title').textContent = pct >= 80 ? '🎉 כל הכבוד!' : pct >= 50 ? '👍 לא רע!' : '💪 תנסה שוב!';
+  document.getElementById('writing-results-text').textContent = `ענית נכון על ${s.score} מתוך ${s.questions.length} (${pct}%)`;
+}
+
+// --- VOCABULARY (word match for exam) ---
+function startBigExamVocab() {
+  const data = getData();
+  const vocab = [...(data.bigExam?.vocabulary || [])];
+  shuffle(vocab);
+  const words = vocab.slice(0, 10);
+  const hebrewWords = words.map(w => ({ text: w.hebrew, pairId: w.word }));
+  const englishWords = words.map(w => ({ text: w.word, pairId: w.word }));
+  shuffle(englishWords);
+
+  vocabMatchState = {
+    hebrewWords,
+    englishWords,
+    selected: null,
+    matched: 0,
+    total: words.length
+  };
+
+  document.getElementById('vocab-match-score').textContent = '0';
+  document.getElementById('vocab-match-total').textContent = words.length;
+  document.getElementById('vocab-match-result').classList.add('hidden');
+  document.getElementById('vocab-match-lines').innerHTML = '';
+  renderVocabMatchWords();
+}
+
+function renderVocabMatchWords() {
+  const hebrewCol = document.getElementById('vocab-match-hebrew');
+  const englishCol = document.getElementById('vocab-match-english');
+
+  hebrewCol.innerHTML = vocabMatchState.hebrewWords.map((w, i) => {
+    const matched = vocabMatchState.hebrewWords[i].matched;
+    return `<div class="match-word hebrew ${matched ? 'matched' : ''}" 
+                 data-type="hebrew" data-index="${i}" data-pair="${w.pairId}"
+                 onclick="selectVocabMatch(this)">${w.text}</div>`;
+  }).join('');
+
+  englishCol.innerHTML = vocabMatchState.englishWords.map((w, i) => {
+    const matched = vocabMatchState.englishWords[i].matched;
+    return `<div class="match-word english ${matched ? 'matched' : ''}" 
+                 data-type="english" data-index="${i}" data-pair="${w.pairId}"
+                 onclick="selectVocabMatch(this)">${w.text}</div>`;
+  }).join('');
+}
+
+function selectVocabMatch(el) {
+  const type = el.dataset.type;
+  const index = parseInt(el.dataset.index);
+  const pair = el.dataset.pair;
+  if (el.classList.contains('matched')) return;
+
+  if (!vocabMatchState.selected) {
+    vocabMatchState.selected = { type, index, pair, el };
+    el.classList.add('selected');
+  } else {
+    const prev = vocabMatchState.selected;
+    if (prev.type === type) {
+      prev.el.classList.remove('selected');
+      vocabMatchState.selected = { type, index, pair, el };
+      el.classList.add('selected');
+      return;
+    }
+    if (prev.pair === pair) {
+      // Match!
+      prev.el.classList.remove('selected');
+      prev.el.classList.add('matched');
+      el.classList.add('matched');
+      vocabMatchState.hebrewWords[type === 'hebrew' ? index : prev.index].matched = true;
+      vocabMatchState.englishWords[type === 'english' ? index : prev.index].matched = true;
+      vocabMatchState.matched++;
+      document.getElementById('vocab-match-score').textContent = vocabMatchState.matched;
+      vocabMatchState.selected = null;
+      if (vocabMatchState.matched === vocabMatchState.total) {
+        const result = document.getElementById('vocab-match-result');
+        result.classList.remove('hidden');
+        result.innerHTML = `<h3>🎉 כל הכבוד!</h3><p>חיברת את כל ${vocabMatchState.total} המילים!</p>
+          <button class="btn-primary" onclick="startBigExamVocab()" style="margin-top:8px">שחק שוב 🔄</button>
+          <button class="btn-secondary" onclick="navigate('big-exam')" style="margin-top:8px">חזרה לתפריט ←</button>`;
+      }
+    } else {
+      // No match
+      prev.el.classList.remove('selected');
+      el.classList.add('wrong');
+      prev.el.classList.add('wrong');
+      setTimeout(() => {
+        el.classList.remove('wrong');
+        prev.el.classList.remove('wrong');
+      }, 600);
+      vocabMatchState.selected = null;
+    }
+  }
+}
 
 // ===== WORD MATCHING GAME =====
 let matchState = {};

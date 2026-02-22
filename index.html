@@ -403,6 +403,136 @@
         </div>
       </section>
 
+      <!-- Big Exam Menu -->
+      <section id="screen-big-exam" class="screen">
+        <div class="game-container">
+          <div class="dictation-header">
+            <h2>🏆 הכנה למבחן הגדול</h2>
+            <p style="color: #666; margin-bottom: 1rem;">Unit 3 - Present Progressive</p>
+          </div>
+          <div class="feature-grid">
+            <button class="feature-card" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9)" onclick="navigate('big-exam-grammar')">
+              <div class="feature-icon">📐</div>
+              <div class="feature-name">Grammar</div>
+              <div class="feature-desc">Present Progressive</div>
+            </button>
+            <button class="feature-card" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb)" onclick="navigate('big-exam-reading')">
+              <div class="feature-icon">📖</div>
+              <div class="feature-name">Reading</div>
+              <div class="feature-desc">Unseen + שאלות</div>
+            </button>
+            <button class="feature-card" style="background:linear-gradient(135deg,#fff3e0,#ffe0b2)" onclick="navigate('big-exam-writing')">
+              <div class="feature-icon">✏️</div>
+              <div class="feature-name">Writing</div>
+              <div class="feature-desc">a/an + משפטים</div>
+            </button>
+            <button class="feature-card" style="background:linear-gradient(135deg,#fce4ec,#f8bbd0)" onclick="navigate('big-exam-vocab')">
+              <div class="feature-icon">📚</div>
+              <div class="feature-name">Vocabulary</div>
+              <div class="feature-desc">אוצר מילים Unit 3</div>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Big Exam Grammar -->
+      <section id="screen-big-exam-grammar" class="screen">
+        <div class="game-container">
+          <div class="dictation-header">
+            <h2>📐 Grammar - Present Progressive</h2>
+            <p id="grammar-type-label" style="color: #666; margin-bottom: 0.5rem;"></p>
+          </div>
+          <div class="quiz-header">
+            <div class="quiz-progress-bar">
+              <div id="grammar-progress-fill" class="quiz-progress-fill"></div>
+            </div>
+            <div id="grammar-counter" class="quiz-counter"></div>
+          </div>
+          <div id="grammar-question" class="quiz-question" style="direction:ltr; text-align:left;"></div>
+          <div id="grammar-options" class="quiz-options"></div>
+          <div id="grammar-feedback" class="quiz-feedback hidden"></div>
+          <button id="grammar-next" class="btn-primary hidden" onclick="nextGrammarQuestion()">השאלה הבאה →</button>
+          <div id="grammar-results" class="quiz-results hidden">
+            <h2 id="grammar-results-title"></h2>
+            <p id="grammar-results-text"></p>
+            <button class="btn-primary" onclick="startBigExamGrammar()">נסה שוב 🔄</button>
+            <button class="btn-secondary" onclick="navigate('big-exam')">חזרה לתפריט ←</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Big Exam Reading -->
+      <section id="screen-big-exam-reading" class="screen">
+        <div class="game-container">
+          <div class="dictation-header">
+            <h2>📖 Reading - Unseen</h2>
+          </div>
+          <div id="reading-passage" style="background:#f9f9f9; border-radius:12px; padding:16px; margin-bottom:16px; direction:ltr; text-align:left; line-height:1.8; font-size:1.05rem; white-space:pre-line;"></div>
+          <div id="reading-quiz-area">
+            <div class="quiz-header">
+              <div class="quiz-progress-bar">
+                <div id="reading-progress-fill" class="quiz-progress-fill"></div>
+              </div>
+              <div id="reading-counter" class="quiz-counter"></div>
+            </div>
+            <div id="reading-question" class="quiz-question" style="direction:ltr; text-align:left;"></div>
+            <div id="reading-options" class="quiz-options"></div>
+            <div id="reading-feedback" class="quiz-feedback hidden"></div>
+            <button id="reading-next" class="btn-primary hidden" onclick="nextReadingQuestion()">השאלה הבאה →</button>
+            <div id="reading-results" class="quiz-results hidden">
+              <h2 id="reading-results-title"></h2>
+              <p id="reading-results-text"></p>
+              <button class="btn-primary" onclick="startBigExamReading()">נסה שוב 🔄</button>
+              <button class="btn-secondary" onclick="navigate('big-exam')">חזרה לתפריט ←</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Big Exam Writing -->
+      <section id="screen-big-exam-writing" class="screen">
+        <div class="game-container">
+          <div class="dictation-header">
+            <h2>✏️ Writing - a / an</h2>
+          </div>
+          <div class="quiz-header">
+            <div class="quiz-progress-bar">
+              <div id="writing-progress-fill" class="quiz-progress-fill"></div>
+            </div>
+            <div id="writing-counter" class="quiz-counter"></div>
+          </div>
+          <div id="writing-sentence" class="quiz-question" style="direction:ltr; text-align:left; font-size:1.2rem;"></div>
+          <div id="writing-options" class="quiz-options"></div>
+          <div id="writing-feedback" class="quiz-feedback hidden"></div>
+          <button id="writing-next" class="btn-primary hidden" onclick="nextWritingQuestion()">השאלה הבאה →</button>
+          <div id="writing-results" class="quiz-results hidden">
+            <h2 id="writing-results-title"></h2>
+            <p id="writing-results-text"></p>
+            <button class="btn-primary" onclick="startBigExamWriting()">נסה שוב 🔄</button>
+            <button class="btn-secondary" onclick="navigate('big-exam')">חזרה לתפריט ←</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Big Exam Vocabulary -->
+      <section id="screen-big-exam-vocab" class="screen">
+        <div class="game-container">
+          <div class="dictation-header">
+            <h2>📚 Vocabulary - Unit 3</h2>
+            <p style="color: #666; margin-bottom: 1rem;">חבר את המילה לתרגום הנכון</p>
+          </div>
+          <div class="match-score-area">
+            <span>✅ <span id="vocab-match-score">0</span> / <span id="vocab-match-total">0</span></span>
+          </div>
+          <div id="vocab-match-result" class="match-result hidden"></div>
+          <div class="match-container">
+            <div id="vocab-match-hebrew" class="match-column"></div>
+            <svg id="vocab-match-lines" class="match-lines"></svg>
+            <div id="vocab-match-english" class="match-column"></div>
+          </div>
+        </div>
+      </section>
+
       <!-- Dictation Typing Screen (English) -->
       <section id="screen-dictation-typing" class="screen">
         <div class="game-container">

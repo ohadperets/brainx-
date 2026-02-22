@@ -2081,6 +2081,8 @@ function dailyChallengeAnswer(index) {
 
   const nextBtn = document.getElementById('dc-next');
   nextBtn.classList.remove('hidden');
+  nextBtn.classList.add('btn-timer-fill');
+  setTimeout(() => nextDailyChallenge(), 2000);
   if (dailyChallengeState.current === dailyChallengeState.questions.length - 1) {
     nextBtn.textContent = 'סיום ←';
   }
@@ -2613,7 +2615,9 @@ function renderReadingQuestion() {
   document.getElementById('reading-progress-fill').style.width = `${((s.current) / s.questions.length) * 100}%`;
   document.getElementById('reading-question').textContent = q.question;
   document.getElementById('reading-feedback').classList.add('hidden');
-  document.getElementById('reading-next').classList.add('hidden');
+  const readingNextBtn = document.getElementById('reading-next');
+  readingNextBtn.classList.add('hidden');
+  readingNextBtn.classList.remove('btn-timer-fill');
   const optionsDiv = document.getElementById('reading-options');
   const shuffled = [...q.options];
   shuffle(shuffled);
@@ -2637,7 +2641,10 @@ function answerReading(selected) {
     if (btn.textContent === q.answer) btn.classList.add('correct');
     if (btn.textContent === selected && !correct) btn.classList.add('wrong');
   });
-  document.getElementById('reading-next').classList.remove('hidden');
+  const readingNext = document.getElementById('reading-next');
+  readingNext.classList.remove('hidden');
+  readingNext.classList.add('btn-timer-fill');
+  setTimeout(() => nextReadingQuestion(), 2000);
 }
 
 function nextReadingQuestion() {

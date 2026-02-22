@@ -913,6 +913,16 @@ function updateSubjectFeatures() {
       <div class="feature-name">הכתבה באנגלית</div>
       <div class="feature-desc">הכנה למבחן והכתבה כללי</div>
     </button>`;
+
+    const grade = profile?.grade || 5;
+    if (grade === 5) {
+      html += `
+      <button class="feature-card big-exam-card" style="grid-column: 1 / -1; background:linear-gradient(135deg,#ffd54f,#ffb300); padding: 32px 16px;" onclick="navigate('big-exam')">
+        <div class="feature-icon" style="font-size:2.5rem">🏆</div>
+        <div class="feature-name" style="font-size:1.3rem; font-weight:800">הכנה למבחן הגדול</div>
+        <div class="feature-desc" style="font-size:0.95rem">התכונן למבחן באנגלית</div>
+      </button>`;
+    }
   }
 
   grid.innerHTML = html;

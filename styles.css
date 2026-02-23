@@ -1660,6 +1660,118 @@ body.theme-pink .app-header {
   }
 }
 
+/* ===== TABLET / SMALL DESKTOP (768px+) ===== */
+@media (min-width: 768px) {
+  .screen {
+    padding: 24px;
+  }
+  
+  .welcome-banner {
+    padding: 20px;
+  }
+  
+  .quiz-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  
+  .quiz-question {
+    font-size: 1.3rem;
+  }
+  
+  .lesson-content {
+    font-size: 1.1rem;
+    line-height: 1.8;
+  }
+  
+  .flashcard {
+    min-height: 220px;
+  }
+  
+  .game-container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}
+
+/* ===== DESKTOP (1024px+) ===== */
+@media (min-width: 1024px) {
+  /* Desktop background */
+  html {
+    background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 50%, #ddd6fe 100%);
+  }
+  
+  body {
+    background: transparent;
+  }
+  
+  /* Center app in phone-like container */
+  .app {
+    max-width: 480px;
+    margin: 0 auto;
+    background: var(--bg);
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.15);
+    border-radius: 0;
+    position: relative;
+  }
+  
+  /* Adjust header for desktop view */
+  .app-header {
+    border-radius: 0;
+  }
+  
+  /* Hide bottom nav shadow bleed */
+  .bottom-nav {
+    border-radius: 0;
+  }
+  
+  .screen {
+    padding: 24px 20px;
+  }
+  
+  /* Wider quiz options */
+  .quiz-options {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .subjects-grid {
+    flex-direction: column;
+  }
+  
+  .subject-card {
+    flex-direction: row;
+    text-align: right;
+  }
+}
+
+/* ===== LARGE DESKTOP (1200px+) ===== */
+@media (min-width: 1200px) {
+  .app {
+    max-width: 500px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    height: calc(100vh - 40px);
+    border-radius: 24px;
+    overflow: hidden;
+  }
+  
+  .app-header {
+    border-radius: 24px 24px 0 0;
+  }
+  
+  .bottom-nav {
+    border-radius: 0 0 24px 24px;
+  }
+}
+
+/* ===== EXTRA LARGE DESKTOP (1400px+) ===== */
+@media (min-width: 1400px) {
+  .app {
+    max-width: 520px;
+  }
+}
+
 /* ===== ACHIEVEMENT TOAST ===== */
 .achievement-toast {
   position: fixed;

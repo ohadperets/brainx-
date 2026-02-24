@@ -752,22 +752,9 @@
       <!-- Admin Dictation Screen -->
       <section id="screen-admin-dictation" class="screen">
         <div class="admin-container">
-          <h2>📝 ניהול הכתבות</h2>
+          <h2>📝 ניהול הכתבה שבועית</h2>
           <div class="admin-section">
-            <label>בחר שבוע:</label>
-            <select id="admin-week-select" class="admin-select" onchange="loadWeekWords()">
-              <option value="0">שבוע 1</option>
-              <option value="1">שבוע 2</option>
-              <option value="2">שבוע 3</option>
-              <option value="3">שבוע 4</option>
-              <option value="4">שבוע 5</option>
-              <option value="5">שבוע 6</option>
-              <option value="6">שבוע 7</option>
-              <option value="7">שבוע 8</option>
-            </select>
-          </div>
-          <div class="admin-section">
-            <h3>מילים בשבוע הנבחר:</h3>
+            <h3>מילים נוכחיות:</h3>
             <div id="admin-word-list" class="admin-word-list"></div>
           </div>
           <div class="admin-section">
@@ -777,6 +764,9 @@
               <input type="text" id="admin-word-hebrew" class="text-input" placeholder="רמז בעברית" autocomplete="off">
               <button class="btn-primary" onclick="addDictationWord()">➕ הוסף</button>
             </div>
+          </div>
+          <div class="admin-section" style="margin-top:20px;">
+            <button class="btn-secondary" onclick="clearAllDictationWords()" style="background:#fed7d7;color:#c53030;border-color:#fc8181;">🗑️ מחק הכל והתחל מחדש</button>
           </div>
           <button class="btn-secondary" onclick="navigate('admin-dashboard')" style="margin-top:20px">חזרה</button>
         </div>

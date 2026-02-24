@@ -2204,15 +2204,16 @@ function updateDictationWeekPreview() {
 }
 
 function startDictation() {
-  const data = getMergedDictation();
-  const weekData = data[selectedDictationWeek];
-  const words = [...weekData.words];
+  const words = [...getWeeklyDictationWords()];
+  if (!words.length) {
+    alert('אין מילים להכתבה. בקש מהמורה להוסיף מילים.');
+    return;
+  }
   shuffle(words);
 
-  const weekDateRange = getWeekDateRange(selectedDictationWeek);
-  dictationState = { words, current: 0, score: 0, weekTitle: weekDateRange, answered: false, tries: 0 };
+  dictationState = { words, current: 0, score: 0, weekTitle: 'הכתבה שבועית', answered: false, tries: 0 };
 
-  document.getElementById('dictation-week').textContent = `שבוע ${selectedDictationWeek + 1} (${weekDateRange})`;
+  document.getElementById('dictation-week').textContent = 'הכתבה שבועית';
   document.getElementById('dictation-results').classList.add('hidden');
   document.getElementById('dictation-feedback').classList.add('hidden');
 
@@ -3316,61 +3317,43 @@ function adminLogout() {
 
 // ===== ADMIN DICTATION MANAGEMENT =====
 function getCustomDictation() {
-  const stored = localStorage.getItem('brainx-dictation');
+  const stored = localStorage.getItem('brainx-weekly-dictation');
   return stored ? JSON.parse(stored) : null;
 }
 
-function saveCustomDictation(data) {
-  localStorage.setItem('brainx-dictation', JSON.stringify(data));
+function saveCustomDictation(words) {
+  localStorage.setItem('brainx-weekly-dictation', JSON.stringify(words));
 }
 
-function getMergedDictation() {
+function getWeeklyDictationWords() {
   const custom = getCustomDictation();
-  if (!custom) return getData().dictation;
-  
-  // Merge custom words with original data
-  return getData().dictation.map((week, index) => {
-    if (custom[index] && custom[index].words) {
-      return { ...week, words: custom[index].words };
-    }
-    return week;
-  });
+  if (custom) return custom;
+  // Return default from data.js
+  const data = getData();
+  return data.dictation && data.dictation[0] ? data.dictation[0].words : [];
 }
 
 function loadWeekWords() {
-  const selectEl = document.getElementById('admin-week-select');
-  const merged = getMergedDictation();
-  
-  // Populate select options with dates
-  if (selectEl.options.length !== merged.length) {
-    selectEl.innerHTML = merged.map((week, i) => {
-      const dateRange = getWeekDateRange(i);
-      return `<option value="${i}">שבוע ${i + 1} (${dateRange})</option>`;
-    }).join('');
-  }
-  
-  const weekIndex = parseInt(selectEl.value);
-  const weekData = merged[weekIndex];
-  
+  const words = getWeeklyDictationWords();
   const listEl = document.getElementById('admin-word-list');
-  if (!weekData || !weekData.words.length) {
-    listEl.innerHTML = '<p style="color:#999;text-align:center">אין מילים בשבוע זה</p>';
+  
+  if (!words || !words.length) {
+    listEl.innerHTML = '<p style="color:#999;text-align:center">אין מילים להכתבה</p>';
     return;
   }
   
-  listEl.innerHTML = weekData.words.map((w, i) => `
+  listEl.innerHTML = words.map((w, i) => `
     <div class="admin-word-item">
       <div class="word-text">
         <span class="english">${w.word}</span>
         <span class="hebrew">${w.hebrewHint}</span>
       </div>
-      <button class="admin-word-delete" onclick="deleteWord(${weekIndex}, ${i})">✕</button>
+      <button class="admin-word-delete" onclick="deleteWord(${i})">✕</button>
     </div>
   `).join('');
 }
 
 function addDictationWord() {
-  const weekIndex = parseInt(document.getElementById('admin-week-select').value);
   const english = document.getElementById('admin-word-english').value.trim();
   const hebrew = document.getElementById('admin-word-hebrew').value.trim();
   
@@ -3379,36 +3362,28 @@ function addDictationWord() {
     return;
   }
   
-  let custom = getCustomDictation();
-  if (!custom) {
-    // Initialize with current data
-    custom = getData().dictation.map(week => ({
-      week: week.week,
-      words: [...week.words]
-    }));
-  }
-  
-  custom[weekIndex].words.push({ word: english, hebrewHint: hebrew });
-  saveCustomDictation(custom);
+  let words = getWeeklyDictationWords();
+  words = [...words, { word: english, hebrewHint: hebrew }];
+  saveCustomDictation(words);
   
   document.getElementById('admin-word-english').value = '';
   document.getElementById('admin-word-hebrew').value = '';
   loadWeekWords();
 }
 
-function deleteWord(weekIndex, wordIndex) {
+function deleteWord(wordIndex) {
   if (!confirm('למחוק מילה זו?')) return;
   
-  let custom = getCustomDictation();
-  if (!custom) {
-    custom = getData().dictation.map(week => ({
-      week: week.week,
-      words: [...week.words]
-    }));
-  }
+  let words = getWeeklyDictationWords();
+  words = words.filter((_, i) => i !== wordIndex);
+  saveCustomDictation(words);
+  loadWeekWords();
+}
+
+function clearAllDictationWords() {
+  if (!confirm('למחוק את כל המילים? תוכל להוסיף מילים חדשות אחר כך.')) return;
   
-  custom[weekIndex].words.splice(wordIndex, 1);
-  saveCustomDictation(custom);
+  saveCustomDictation([]);
   loadWeekWords();
 }
 

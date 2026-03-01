@@ -585,6 +585,146 @@
         </div>
       </section>
 
+      <!-- Math Big Exam Main Screen -->
+      <section id="screen-math-big-exam" class="screen">
+        <div class="game-container">
+          <div class="dictation-header">
+            <h2>🏆 הכנה למבחן הגדול - מתמטיקה</h2>
+            <p style="color: #666; margin-bottom: 1rem;">כיתה ה' - 15.3.2026</p>
+          </div>
+          <div class="feature-grid">
+            <button class="feature-card" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9)" onclick="navigate('math-big-natural')">
+              <div class="feature-icon">🔢</div>
+              <div class="feature-name">מספרים טבעיים</div>
+              <div class="feature-desc">סדר פעולות, משוואות, בעיות</div>
+            </button>
+            <button class="feature-card" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb)" onclick="navigate('math-big-fractions')">
+              <div class="feature-icon">🥧</div>
+              <div class="feature-name">שברים פשוטים</div>
+              <div class="feature-desc">חיבור, חיסור, השוואה</div>
+            </button>
+            <button class="feature-card" style="background:linear-gradient(135deg,#fff3e0,#ffe0b2)" onclick="navigate('math-big-decimals')">
+              <div class="feature-icon">🔸</div>
+              <div class="feature-name">מספרים עשרוניים</div>
+              <div class="feature-desc">עשיריות, מאיות, חישובים</div>
+            </button>
+            <button class="feature-card" style="background:linear-gradient(135deg,#fce4ec,#f8bbd0)" onclick="navigate('math-big-geometry')">
+              <div class="feature-icon">📐</div>
+              <div class="feature-name">גאומטריה</div>
+              <div class="feature-desc">שטח, היקף, מרובעים</div>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Math Big Exam - Natural Numbers -->
+      <section id="screen-math-big-natural" class="screen">
+        <div class="game-container">
+          <div class="dictation-header">
+            <h2>🔢 מספרים טבעיים</h2>
+            <p style="color: #666; margin-bottom: 0.5rem;">סדר פעולות, משוואות, בעיות מילוליות</p>
+          </div>
+          <div class="quiz-header">
+            <div class="quiz-progress-bar">
+              <div id="math-natural-progress-fill" class="quiz-progress-fill"></div>
+            </div>
+            <div id="math-natural-counter" class="quiz-counter"></div>
+          </div>
+          <div id="math-natural-question" class="quiz-question"></div>
+          <div id="math-natural-hint" style="color:#888; font-size:0.9rem; margin-bottom:0.5rem;"></div>
+          <div id="math-natural-options" class="quiz-options"></div>
+          <div id="math-natural-feedback" class="quiz-feedback hidden"></div>
+          <button id="math-natural-next" class="btn-primary hidden" onclick="nextMathNaturalQuestion()">השאלה הבאה →</button>
+          <div id="math-natural-results" class="quiz-results hidden">
+            <h2 id="math-natural-results-title"></h2>
+            <p id="math-natural-results-text"></p>
+            <button class="btn-primary" onclick="startMathBigNatural()">נסה שוב 🔄</button>
+            <button class="btn-secondary" onclick="navigate('math-big-exam')">חזרה לתפריט ←</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Math Big Exam - Fractions -->
+      <section id="screen-math-big-fractions" class="screen">
+        <div class="game-container">
+          <div class="dictation-header">
+            <h2>🥧 שברים פשוטים</h2>
+            <p style="color: #666; margin-bottom: 0.5rem;">חיבור, חיסור, השוואה, חלק מכמות</p>
+          </div>
+          <div class="quiz-header">
+            <div class="quiz-progress-bar">
+              <div id="math-fractions-progress-fill" class="quiz-progress-fill"></div>
+            </div>
+            <div id="math-fractions-counter" class="quiz-counter"></div>
+          </div>
+          <div id="math-fractions-question" class="quiz-question"></div>
+          <div id="math-fractions-hint" style="color:#888; font-size:0.9rem; margin-bottom:0.5rem;"></div>
+          <div id="math-fractions-options" class="quiz-options"></div>
+          <div id="math-fractions-feedback" class="quiz-feedback hidden"></div>
+          <button id="math-fractions-next" class="btn-primary hidden" onclick="nextMathFractionsQuestion()">השאלה הבאה →</button>
+          <div id="math-fractions-results" class="quiz-results hidden">
+            <h2 id="math-fractions-results-title"></h2>
+            <p id="math-fractions-results-text"></p>
+            <button class="btn-primary" onclick="startMathBigFractions()">נסה שוב 🔄</button>
+            <button class="btn-secondary" onclick="navigate('math-big-exam')">חזרה לתפריט ←</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Math Big Exam - Decimals -->
+      <section id="screen-math-big-decimals" class="screen">
+        <div class="game-container">
+          <div class="dictation-header">
+            <h2>🔸 מספרים עשרוניים</h2>
+            <p style="color: #666; margin-bottom: 0.5rem;">עשיריות, מאיות, חיבור וחיסור</p>
+          </div>
+          <div class="quiz-header">
+            <div class="quiz-progress-bar">
+              <div id="math-decimals-progress-fill" class="quiz-progress-fill"></div>
+            </div>
+            <div id="math-decimals-counter" class="quiz-counter"></div>
+          </div>
+          <div id="math-decimals-question" class="quiz-question"></div>
+          <div id="math-decimals-hint" style="color:#888; font-size:0.9rem; margin-bottom:0.5rem;"></div>
+          <div id="math-decimals-options" class="quiz-options"></div>
+          <div id="math-decimals-feedback" class="quiz-feedback hidden"></div>
+          <button id="math-decimals-next" class="btn-primary hidden" onclick="nextMathDecimalsQuestion()">השאלה הבאה →</button>
+          <div id="math-decimals-results" class="quiz-results hidden">
+            <h2 id="math-decimals-results-title"></h2>
+            <p id="math-decimals-results-text"></p>
+            <button class="btn-primary" onclick="startMathBigDecimals()">נסה שוב 🔄</button>
+            <button class="btn-secondary" onclick="navigate('math-big-exam')">חזרה לתפריט ←</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Math Big Exam - Geometry -->
+      <section id="screen-math-big-geometry" class="screen">
+        <div class="game-container">
+          <div class="dictation-header">
+            <h2>📐 גאומטריה</h2>
+            <p style="color: #666; margin-bottom: 0.5rem;">שטח, היקף, אלכסונים, מרובעים</p>
+          </div>
+          <div class="quiz-header">
+            <div class="quiz-progress-bar">
+              <div id="math-geometry-progress-fill" class="quiz-progress-fill"></div>
+            </div>
+            <div id="math-geometry-counter" class="quiz-counter"></div>
+          </div>
+          <div id="math-geometry-question" class="quiz-question"></div>
+          <div id="math-geometry-hint" style="color:#888; font-size:0.9rem; margin-bottom:0.5rem;"></div>
+          <div id="math-geometry-options" class="quiz-options"></div>
+          <div id="math-geometry-feedback" class="quiz-feedback hidden"></div>
+          <button id="math-geometry-next" class="btn-primary hidden" onclick="nextMathGeometryQuestion()">השאלה הבאה →</button>
+          <div id="math-geometry-results" class="quiz-results hidden">
+            <h2 id="math-geometry-results-title"></h2>
+            <p id="math-geometry-results-text"></p>
+            <button class="btn-primary" onclick="startMathBigGeometry()">נסה שוב 🔄</button>
+            <button class="btn-secondary" onclick="navigate('math-big-exam')">חזרה לתפריט ←</button>
+          </div>
+        </div>
+      </section>
+
       <!-- Dictation Typing Screen (English) -->
       <section id="screen-dictation-typing" class="screen">
         <div class="game-container">

@@ -820,6 +820,35 @@ function navigate(screen, subject, skipHistory = false) {
       startBigExamVocab();
       break;
 
+    case 'math-big-exam':
+      document.getElementById('screen-math-big-exam').classList.add('active');
+      headerTitle.textContent = 'הכנה למבחן הגדול - מתמטיקה';
+      break;
+
+    case 'math-big-natural':
+      document.getElementById('screen-math-big-natural').classList.add('active');
+      headerTitle.textContent = 'מספרים טבעיים';
+      startMathBigNatural();
+      break;
+
+    case 'math-big-fractions':
+      document.getElementById('screen-math-big-fractions').classList.add('active');
+      headerTitle.textContent = 'שברים פשוטים';
+      startMathBigFractions();
+      break;
+
+    case 'math-big-decimals':
+      document.getElementById('screen-math-big-decimals').classList.add('active');
+      headerTitle.textContent = 'מספרים עשרוניים';
+      startMathBigDecimals();
+      break;
+
+    case 'math-big-geometry':
+      document.getElementById('screen-math-big-geometry').classList.add('active');
+      headerTitle.textContent = 'גאומטריה';
+      startMathBigGeometry();
+      break;
+
     case 'geometry-quiz':
       document.getElementById('screen-geometry-quiz').classList.add('active');
       headerTitle.textContent = 'גאומטריה';
@@ -955,6 +984,12 @@ function updateSubjectFeatures() {
         <div class="feature-icon">📐</div>
         <div class="feature-name">גאומטריה</div>
         <div class="feature-desc">צורות, זוויות ומרובעים</div>
+      </button>`;
+      html += `
+      <button class="feature-card big-exam-card" style="grid-column: 1 / -1; background:linear-gradient(135deg,#ffd54f,#ffb300); padding: 32px 16px;" onclick="navigate('math-big-exam')">
+        <div class="feature-icon" style="font-size:2.5rem">🏆</div>
+        <div class="feature-name" style="font-size:1.3rem; font-weight:800">הכנה למבחן הגדול - מתמטיקה</div>
+        <div class="feature-desc" style="font-size:0.95rem">15.3.2026 - התכונן למבחן!</div>
       </button>`;
     }
     if (grade === 2) {
@@ -2852,6 +2887,344 @@ function selectVocabMatch(el) {
       vocabMatchState.selected = null;
     }
   }
+}
+
+// ===== MATH BIG EXAM QUIZZES =====
+
+// Natural Numbers Quiz
+let mathNaturalState = {};
+
+function startMathBigNatural() {
+  const data = getData();
+  const questions = [...(data.mathBigExam?.naturalNumbers || [])];
+  shuffle(questions);
+  mathNaturalState = { questions, current: 0, score: 0, answered: false };
+  document.getElementById('math-natural-results').classList.add('hidden');
+  document.getElementById('math-natural-feedback').classList.add('hidden');
+  document.getElementById('math-natural-next').classList.add('hidden');
+  renderMathNaturalQuestion();
+}
+
+function renderMathNaturalQuestion() {
+  const s = mathNaturalState;
+  if (s.current >= s.questions.length) { showMathNaturalResults(); return; }
+  const q = s.questions[s.current];
+  s.answered = false;
+  document.getElementById('math-natural-counter').textContent = `${s.current + 1} / ${s.questions.length}`;
+  document.getElementById('math-natural-progress-fill').style.width = `${((s.current) / s.questions.length) * 100}%`;
+  document.getElementById('math-natural-question').textContent = q.question;
+  document.getElementById('math-natural-hint').textContent = '';
+  document.getElementById('math-natural-feedback').classList.add('hidden');
+  const nextBtn = document.getElementById('math-natural-next');
+  nextBtn.classList.add('hidden');
+  nextBtn.classList.remove('btn-timer-fill');
+  const optionsDiv = document.getElementById('math-natural-options');
+  const shuffledOpts = q.options.map((opt, i) => ({ text: opt, isCorrect: i === q.correct, hint: q.hint }));
+  shuffle(shuffledOpts);
+  optionsDiv.innerHTML = shuffledOpts.map(opt =>
+    `<button class="quiz-option" onclick="answerMathNatural(this, ${opt.isCorrect})">${opt.text}</button>`
+  ).join('');
+}
+
+function answerMathNatural(btn, isCorrect) {
+  if (mathNaturalState.answered) return;
+  mathNaturalState.answered = true;
+  if (isCorrect) {
+    mathNaturalState.score++;
+    playSound('correct');
+  } else {
+    playSound('wrong');
+  }
+  const q = mathNaturalState.questions[mathNaturalState.current];
+  const correctText = q.options[q.correct];
+  const fb = document.getElementById('math-natural-feedback');
+  fb.classList.remove('hidden');
+  fb.className = 'quiz-feedback ' + (isCorrect ? 'correct' : 'wrong');
+  fb.textContent = isCorrect ? '✅ נכון!' : `❌ התשובה הנכונה: ${correctText}`;
+  if (!isCorrect && q.hint) {
+    document.getElementById('math-natural-hint').textContent = `💡 ${q.hint}`;
+  }
+  document.querySelectorAll('#math-natural-options .quiz-option').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === correctText) b.classList.add('correct');
+    if (b === btn && !isCorrect) b.classList.add('wrong');
+  });
+  const nextBtn = document.getElementById('math-natural-next');
+  nextBtn.classList.remove('hidden');
+  nextBtn.classList.add('btn-timer-fill');
+  setTimeout(() => nextMathNaturalQuestion(), 2000);
+}
+
+function nextMathNaturalQuestion() {
+  mathNaturalState.current++;
+  renderMathNaturalQuestion();
+}
+
+function showMathNaturalResults() {
+  const s = mathNaturalState;
+  const pct = Math.round((s.score / s.questions.length) * 100);
+  document.getElementById('math-natural-question').textContent = '';
+  document.getElementById('math-natural-hint').textContent = '';
+  document.getElementById('math-natural-options').innerHTML = '';
+  document.getElementById('math-natural-feedback').classList.add('hidden');
+  document.getElementById('math-natural-next').classList.add('hidden');
+  document.getElementById('math-natural-progress-fill').style.width = '100%';
+  const results = document.getElementById('math-natural-results');
+  results.classList.remove('hidden');
+  document.getElementById('math-natural-results-title').textContent = pct >= 80 ? '🎉 כל הכבוד!' : pct >= 50 ? '👍 לא רע!' : '💪 תנסה שוב!';
+  document.getElementById('math-natural-results-text').textContent = `ענית נכון על ${s.score} מתוך ${s.questions.length} (${pct}%)`;
+}
+
+// Fractions Quiz
+let mathFractionsState = {};
+
+function startMathBigFractions() {
+  const data = getData();
+  const questions = [...(data.mathBigExam?.fractions || [])];
+  shuffle(questions);
+  mathFractionsState = { questions, current: 0, score: 0, answered: false };
+  document.getElementById('math-fractions-results').classList.add('hidden');
+  document.getElementById('math-fractions-feedback').classList.add('hidden');
+  document.getElementById('math-fractions-next').classList.add('hidden');
+  renderMathFractionsQuestion();
+}
+
+function renderMathFractionsQuestion() {
+  const s = mathFractionsState;
+  if (s.current >= s.questions.length) { showMathFractionsResults(); return; }
+  const q = s.questions[s.current];
+  s.answered = false;
+  document.getElementById('math-fractions-counter').textContent = `${s.current + 1} / ${s.questions.length}`;
+  document.getElementById('math-fractions-progress-fill').style.width = `${((s.current) / s.questions.length) * 100}%`;
+  document.getElementById('math-fractions-question').textContent = q.question;
+  document.getElementById('math-fractions-hint').textContent = '';
+  document.getElementById('math-fractions-feedback').classList.add('hidden');
+  const nextBtn = document.getElementById('math-fractions-next');
+  nextBtn.classList.add('hidden');
+  nextBtn.classList.remove('btn-timer-fill');
+  const optionsDiv = document.getElementById('math-fractions-options');
+  const shuffledOpts = q.options.map((opt, i) => ({ text: opt, isCorrect: i === q.correct, hint: q.hint }));
+  shuffle(shuffledOpts);
+  optionsDiv.innerHTML = shuffledOpts.map(opt =>
+    `<button class="quiz-option" onclick="answerMathFractions(this, ${opt.isCorrect})">${opt.text}</button>`
+  ).join('');
+}
+
+function answerMathFractions(btn, isCorrect) {
+  if (mathFractionsState.answered) return;
+  mathFractionsState.answered = true;
+  if (isCorrect) {
+    mathFractionsState.score++;
+    playSound('correct');
+  } else {
+    playSound('wrong');
+  }
+  const q = mathFractionsState.questions[mathFractionsState.current];
+  const correctText = q.options[q.correct];
+  const fb = document.getElementById('math-fractions-feedback');
+  fb.classList.remove('hidden');
+  fb.className = 'quiz-feedback ' + (isCorrect ? 'correct' : 'wrong');
+  fb.textContent = isCorrect ? '✅ נכון!' : `❌ התשובה הנכונה: ${correctText}`;
+  if (!isCorrect && q.hint) {
+    document.getElementById('math-fractions-hint').textContent = `💡 ${q.hint}`;
+  }
+  document.querySelectorAll('#math-fractions-options .quiz-option').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === correctText) b.classList.add('correct');
+    if (b === btn && !isCorrect) b.classList.add('wrong');
+  });
+  const nextBtn = document.getElementById('math-fractions-next');
+  nextBtn.classList.remove('hidden');
+  nextBtn.classList.add('btn-timer-fill');
+  setTimeout(() => nextMathFractionsQuestion(), 2000);
+}
+
+function nextMathFractionsQuestion() {
+  mathFractionsState.current++;
+  renderMathFractionsQuestion();
+}
+
+function showMathFractionsResults() {
+  const s = mathFractionsState;
+  const pct = Math.round((s.score / s.questions.length) * 100);
+  document.getElementById('math-fractions-question').textContent = '';
+  document.getElementById('math-fractions-hint').textContent = '';
+  document.getElementById('math-fractions-options').innerHTML = '';
+  document.getElementById('math-fractions-feedback').classList.add('hidden');
+  document.getElementById('math-fractions-next').classList.add('hidden');
+  document.getElementById('math-fractions-progress-fill').style.width = '100%';
+  const results = document.getElementById('math-fractions-results');
+  results.classList.remove('hidden');
+  document.getElementById('math-fractions-results-title').textContent = pct >= 80 ? '🎉 כל הכבוד!' : pct >= 50 ? '👍 לא רע!' : '💪 תנסה שוב!';
+  document.getElementById('math-fractions-results-text').textContent = `ענית נכון על ${s.score} מתוך ${s.questions.length} (${pct}%)`;
+}
+
+// Decimals Quiz
+let mathDecimalsState = {};
+
+function startMathBigDecimals() {
+  const data = getData();
+  const questions = [...(data.mathBigExam?.decimals || [])];
+  shuffle(questions);
+  mathDecimalsState = { questions, current: 0, score: 0, answered: false };
+  document.getElementById('math-decimals-results').classList.add('hidden');
+  document.getElementById('math-decimals-feedback').classList.add('hidden');
+  document.getElementById('math-decimals-next').classList.add('hidden');
+  renderMathDecimalsQuestion();
+}
+
+function renderMathDecimalsQuestion() {
+  const s = mathDecimalsState;
+  if (s.current >= s.questions.length) { showMathDecimalsResults(); return; }
+  const q = s.questions[s.current];
+  s.answered = false;
+  document.getElementById('math-decimals-counter').textContent = `${s.current + 1} / ${s.questions.length}`;
+  document.getElementById('math-decimals-progress-fill').style.width = `${((s.current) / s.questions.length) * 100}%`;
+  document.getElementById('math-decimals-question').textContent = q.question;
+  document.getElementById('math-decimals-hint').textContent = '';
+  document.getElementById('math-decimals-feedback').classList.add('hidden');
+  const nextBtn = document.getElementById('math-decimals-next');
+  nextBtn.classList.add('hidden');
+  nextBtn.classList.remove('btn-timer-fill');
+  const optionsDiv = document.getElementById('math-decimals-options');
+  const shuffledOpts = q.options.map((opt, i) => ({ text: opt, isCorrect: i === q.correct, hint: q.hint }));
+  shuffle(shuffledOpts);
+  optionsDiv.innerHTML = shuffledOpts.map(opt =>
+    `<button class="quiz-option" onclick="answerMathDecimals(this, ${opt.isCorrect})">${opt.text}</button>`
+  ).join('');
+}
+
+function answerMathDecimals(btn, isCorrect) {
+  if (mathDecimalsState.answered) return;
+  mathDecimalsState.answered = true;
+  if (isCorrect) {
+    mathDecimalsState.score++;
+    playSound('correct');
+  } else {
+    playSound('wrong');
+  }
+  const q = mathDecimalsState.questions[mathDecimalsState.current];
+  const correctText = q.options[q.correct];
+  const fb = document.getElementById('math-decimals-feedback');
+  fb.classList.remove('hidden');
+  fb.className = 'quiz-feedback ' + (isCorrect ? 'correct' : 'wrong');
+  fb.textContent = isCorrect ? '✅ נכון!' : `❌ התשובה הנכונה: ${correctText}`;
+  if (!isCorrect && q.hint) {
+    document.getElementById('math-decimals-hint').textContent = `💡 ${q.hint}`;
+  }
+  document.querySelectorAll('#math-decimals-options .quiz-option').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === correctText) b.classList.add('correct');
+    if (b === btn && !isCorrect) b.classList.add('wrong');
+  });
+  const nextBtn = document.getElementById('math-decimals-next');
+  nextBtn.classList.remove('hidden');
+  nextBtn.classList.add('btn-timer-fill');
+  setTimeout(() => nextMathDecimalsQuestion(), 2000);
+}
+
+function nextMathDecimalsQuestion() {
+  mathDecimalsState.current++;
+  renderMathDecimalsQuestion();
+}
+
+function showMathDecimalsResults() {
+  const s = mathDecimalsState;
+  const pct = Math.round((s.score / s.questions.length) * 100);
+  document.getElementById('math-decimals-question').textContent = '';
+  document.getElementById('math-decimals-hint').textContent = '';
+  document.getElementById('math-decimals-options').innerHTML = '';
+  document.getElementById('math-decimals-feedback').classList.add('hidden');
+  document.getElementById('math-decimals-next').classList.add('hidden');
+  document.getElementById('math-decimals-progress-fill').style.width = '100%';
+  const results = document.getElementById('math-decimals-results');
+  results.classList.remove('hidden');
+  document.getElementById('math-decimals-results-title').textContent = pct >= 80 ? '🎉 כל הכבוד!' : pct >= 50 ? '👍 לא רע!' : '💪 תנסה שוב!';
+  document.getElementById('math-decimals-results-text').textContent = `ענית נכון על ${s.score} מתוך ${s.questions.length} (${pct}%)`;
+}
+
+// Geometry Quiz (Math Big Exam)
+let mathGeometryState = {};
+
+function startMathBigGeometry() {
+  const data = getData();
+  const questions = [...(data.mathBigExam?.geometry || [])];
+  shuffle(questions);
+  mathGeometryState = { questions, current: 0, score: 0, answered: false };
+  document.getElementById('math-geometry-results').classList.add('hidden');
+  document.getElementById('math-geometry-feedback').classList.add('hidden');
+  document.getElementById('math-geometry-next').classList.add('hidden');
+  renderMathGeometryQuestion();
+}
+
+function renderMathGeometryQuestion() {
+  const s = mathGeometryState;
+  if (s.current >= s.questions.length) { showMathGeometryResults(); return; }
+  const q = s.questions[s.current];
+  s.answered = false;
+  document.getElementById('math-geometry-counter').textContent = `${s.current + 1} / ${s.questions.length}`;
+  document.getElementById('math-geometry-progress-fill').style.width = `${((s.current) / s.questions.length) * 100}%`;
+  document.getElementById('math-geometry-question').textContent = q.question;
+  document.getElementById('math-geometry-hint').textContent = '';
+  document.getElementById('math-geometry-feedback').classList.add('hidden');
+  const nextBtn = document.getElementById('math-geometry-next');
+  nextBtn.classList.add('hidden');
+  nextBtn.classList.remove('btn-timer-fill');
+  const optionsDiv = document.getElementById('math-geometry-options');
+  const shuffledOpts = q.options.map((opt, i) => ({ text: opt, isCorrect: i === q.correct, hint: q.hint }));
+  shuffle(shuffledOpts);
+  optionsDiv.innerHTML = shuffledOpts.map(opt =>
+    `<button class="quiz-option" onclick="answerMathGeometry(this, ${opt.isCorrect})">${opt.text}</button>`
+  ).join('');
+}
+
+function answerMathGeometry(btn, isCorrect) {
+  if (mathGeometryState.answered) return;
+  mathGeometryState.answered = true;
+  if (isCorrect) {
+    mathGeometryState.score++;
+    playSound('correct');
+  } else {
+    playSound('wrong');
+  }
+  const q = mathGeometryState.questions[mathGeometryState.current];
+  const correctText = q.options[q.correct];
+  const fb = document.getElementById('math-geometry-feedback');
+  fb.classList.remove('hidden');
+  fb.className = 'quiz-feedback ' + (isCorrect ? 'correct' : 'wrong');
+  fb.textContent = isCorrect ? '✅ נכון!' : `❌ התשובה הנכונה: ${correctText}`;
+  if (!isCorrect && q.hint) {
+    document.getElementById('math-geometry-hint').textContent = `💡 ${q.hint}`;
+  }
+  document.querySelectorAll('#math-geometry-options .quiz-option').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === correctText) b.classList.add('correct');
+    if (b === btn && !isCorrect) b.classList.add('wrong');
+  });
+  const nextBtn = document.getElementById('math-geometry-next');
+  nextBtn.classList.remove('hidden');
+  nextBtn.classList.add('btn-timer-fill');
+  setTimeout(() => nextMathGeometryQuestion(), 2000);
+}
+
+function nextMathGeometryQuestion() {
+  mathGeometryState.current++;
+  renderMathGeometryQuestion();
+}
+
+function showMathGeometryResults() {
+  const s = mathGeometryState;
+  const pct = Math.round((s.score / s.questions.length) * 100);
+  document.getElementById('math-geometry-question').textContent = '';
+  document.getElementById('math-geometry-hint').textContent = '';
+  document.getElementById('math-geometry-options').innerHTML = '';
+  document.getElementById('math-geometry-feedback').classList.add('hidden');
+  document.getElementById('math-geometry-next').classList.add('hidden');
+  document.getElementById('math-geometry-progress-fill').style.width = '100%';
+  const results = document.getElementById('math-geometry-results');
+  results.classList.remove('hidden');
+  document.getElementById('math-geometry-results-title').textContent = pct >= 80 ? '🎉 כל הכבוד!' : pct >= 50 ? '👍 לא רע!' : '💪 תנסה שוב!';
+  document.getElementById('math-geometry-results-text').textContent = `ענית נכון על ${s.score} מתוך ${s.questions.length} (${pct}%)`;
 }
 
 // ===== WORD MATCHING GAME =====

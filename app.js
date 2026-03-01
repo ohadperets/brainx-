@@ -2897,6 +2897,10 @@ function formatMathQuestion(questionText) {
     const [line1, line2] = questionText.split('\n');
     return `<div>${line1}</div><div class="math-equation">${line2}</div>`;
   }
+  // Pure math expression (no Hebrew letters - check for Hebrew Unicode range)
+  if (!/[\u0590-\u05FF]/.test(questionText)) {
+    return `<div class="math-equation">${questionText}</div>`;
+  }
   return questionText;
 }
 

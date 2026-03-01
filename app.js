@@ -2895,7 +2895,7 @@ function selectVocabMatch(el) {
 function formatMathQuestion(questionText) {
   if (questionText.includes('\n')) {
     const [line1, line2] = questionText.split('\n');
-    return `${line1}<br><span dir="ltr" style="display:inline-block">${line2}</span>`;
+    return `<div>${line1}</div><div class="math-equation">${line2}</div>`;
   }
   return questionText;
 }

@@ -500,10 +500,19 @@ html, body {
   margin-bottom: 12px;
   min-height: 60px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   line-height: 1.5;
-  white-space: pre-line;
+  gap: 8px;
+}
+
+.quiz-question .math-equation {
+  direction: ltr;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #333;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
 }
 
 .quiz-options {

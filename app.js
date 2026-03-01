@@ -2891,6 +2891,15 @@ function selectVocabMatch(el) {
 
 // ===== MATH BIG EXAM QUIZZES =====
 
+// Helper: format math question with LTR equation line
+function formatMathQuestion(questionText) {
+  if (questionText.includes('\n')) {
+    const [line1, line2] = questionText.split('\n');
+    return `${line1}<br><span dir="ltr" style="display:inline-block">${line2}</span>`;
+  }
+  return questionText;
+}
+
 // Natural Numbers Quiz
 let mathNaturalState = {};
 
@@ -2912,7 +2921,7 @@ function renderMathNaturalQuestion() {
   s.answered = false;
   document.getElementById('math-natural-counter').textContent = `${s.current + 1} / ${s.questions.length}`;
   document.getElementById('math-natural-progress-fill').style.width = `${((s.current) / s.questions.length) * 100}%`;
-  document.getElementById('math-natural-question').textContent = q.question;
+  document.getElementById('math-natural-question').innerHTML = formatMathQuestion(q.question);
   document.getElementById('math-natural-hint').textContent = '';
   document.getElementById('math-natural-feedback').classList.add('hidden');
   const nextBtn = document.getElementById('math-natural-next');
@@ -2996,7 +3005,7 @@ function renderMathFractionsQuestion() {
   s.answered = false;
   document.getElementById('math-fractions-counter').textContent = `${s.current + 1} / ${s.questions.length}`;
   document.getElementById('math-fractions-progress-fill').style.width = `${((s.current) / s.questions.length) * 100}%`;
-  document.getElementById('math-fractions-question').textContent = q.question;
+  document.getElementById('math-fractions-question').innerHTML = formatMathQuestion(q.question);
   document.getElementById('math-fractions-hint').textContent = '';
   document.getElementById('math-fractions-feedback').classList.add('hidden');
   const nextBtn = document.getElementById('math-fractions-next');
@@ -3080,7 +3089,7 @@ function renderMathDecimalsQuestion() {
   s.answered = false;
   document.getElementById('math-decimals-counter').textContent = `${s.current + 1} / ${s.questions.length}`;
   document.getElementById('math-decimals-progress-fill').style.width = `${((s.current) / s.questions.length) * 100}%`;
-  document.getElementById('math-decimals-question').textContent = q.question;
+  document.getElementById('math-decimals-question').innerHTML = formatMathQuestion(q.question);
   document.getElementById('math-decimals-hint').textContent = '';
   document.getElementById('math-decimals-feedback').classList.add('hidden');
   const nextBtn = document.getElementById('math-decimals-next');
@@ -3164,7 +3173,7 @@ function renderMathGeometryQuestion() {
   s.answered = false;
   document.getElementById('math-geometry-counter').textContent = `${s.current + 1} / ${s.questions.length}`;
   document.getElementById('math-geometry-progress-fill').style.width = `${((s.current) / s.questions.length) * 100}%`;
-  document.getElementById('math-geometry-question').textContent = q.question;
+  document.getElementById('math-geometry-question').innerHTML = formatMathQuestion(q.question);
   document.getElementById('math-geometry-hint').textContent = '';
   document.getElementById('math-geometry-feedback').classList.add('hidden');
   const nextBtn = document.getElementById('math-geometry-next');

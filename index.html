@@ -314,6 +314,37 @@
             <div class="feature-name" id="game-race-name">מרוץ ידע</div>
             <div class="feature-desc">ענה מהר!</div>
           </button>
+          <!-- New Games -->
+          <button id="game-scramble-btn" class="feature-card" style="background:linear-gradient(135deg,#fff3e0,#ffe0b2)" onclick="navigate('game-scramble')">
+            <div class="feature-icon">🔀</div>
+            <div class="feature-name">ערבוב מילים</div>
+            <div class="feature-desc">סדר את האותיות!</div>
+          </button>
+          <button id="game-speed-math-btn" class="feature-card" style="background:linear-gradient(135deg,#f3e5f5,#e1bee7)" onclick="navigate('game-speed-math')">
+            <div class="feature-icon">⚡</div>
+            <div class="feature-name">מתמטיקה מהירה</div>
+            <div class="feature-desc">פתור תרגילים בזמן!</div>
+          </button>
+          <button class="feature-card" style="background:linear-gradient(135deg,#e0f7fa,#b2ebf2)" onclick="navigate('game-fill-blank')">
+            <div class="feature-icon">✏️</div>
+            <div class="feature-name">השלם את החסר</div>
+            <div class="feature-desc">מלא את המילה החסרה</div>
+          </button>
+          <button class="feature-card" style="background:linear-gradient(135deg,#fce4ec,#f8bbd0)" onclick="navigate('game-true-false')">
+            <div class="feature-icon">✅</div>
+            <div class="feature-name">נכון או לא</div>
+            <div class="feature-desc">האם המשפט נכון?</div>
+          </button>
+          <button class="feature-card" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9)" onclick="navigate('game-match-drag')">
+            <div class="feature-icon">🔗</div>
+            <div class="feature-name">התאמה</div>
+            <div class="feature-desc">חבר זוגות מתאימים</div>
+          </button>
+          <button class="feature-card" style="background:linear-gradient(135deg,#fff8e1,#ffecb3)" onclick="navigate('game-spelling')">
+            <div class="feature-icon">🐝</div>
+            <div class="feature-name">איות</div>
+            <div class="feature-desc">שמע וכתוב!</div>
+          </button>
         </div>
       </section>
 
@@ -351,6 +382,84 @@
           <div class="race-options" id="race-options"></div>
           <div id="race-result" class="game-result hidden"></div>
           <button id="race-start" class="btn-primary" onclick="startRace()">התחל! 🏁</button>
+        </div>
+      </section>
+
+      <!-- Word Scramble Game Screen -->
+      <section id="screen-game-scramble" class="screen">
+        <div class="game-container">
+          <div class="scramble-score">ניקוד: <strong id="scramble-score">0</strong> | שאלה: <span id="scramble-current">1</span>/<span id="scramble-total">10</span></div>
+          <div class="scramble-hint" id="scramble-hint"></div>
+          <div class="scramble-letters" id="scramble-letters"></div>
+          <div class="scramble-answer" id="scramble-answer"></div>
+          <div class="scramble-buttons">
+            <button class="btn-secondary" onclick="clearScrambleAnswer()">🗑️ נקה</button>
+            <button class="btn-primary" onclick="checkScrambleAnswer()">✓ בדוק</button>
+          </div>
+          <div id="scramble-result" class="game-result hidden"></div>
+        </div>
+      </section>
+
+      <!-- Math Speed Challenge Game Screen -->
+      <section id="screen-game-speed-math" class="screen">
+        <div class="game-container">
+          <div class="speed-math-timer">⏱️ <span id="speed-math-timer">60</span></div>
+          <div class="speed-math-score">נכונות: <strong id="speed-math-correct">0</strong> | שגיאות: <strong id="speed-math-wrong">0</strong></div>
+          <div class="speed-math-problem" id="speed-math-problem"></div>
+          <input type="number" id="speed-math-input" class="speed-math-input" placeholder="?" autocomplete="off">
+          <button class="btn-primary" onclick="checkSpeedMathAnswer()" id="speed-math-submit">✓ בדוק</button>
+          <div id="speed-math-result" class="game-result hidden"></div>
+          <button id="speed-math-start" class="btn-primary" onclick="startSpeedMath()">התחל! ⚡</button>
+        </div>
+      </section>
+
+      <!-- Fill in the Blank Game Screen -->
+      <section id="screen-game-fill-blank" class="screen">
+        <div class="game-container">
+          <div class="fill-blank-progress">שאלה: <span id="fill-blank-current">1</span>/<span id="fill-blank-total">10</span></div>
+          <div class="fill-blank-score">ניקוד: <strong id="fill-blank-score">0</strong></div>
+          <div class="fill-blank-sentence" id="fill-blank-sentence"></div>
+          <div class="fill-blank-options" id="fill-blank-options"></div>
+          <div id="fill-blank-result" class="game-result hidden"></div>
+        </div>
+      </section>
+
+      <!-- True or False Game Screen -->
+      <section id="screen-game-true-false" class="screen">
+        <div class="game-container">
+          <div class="true-false-progress">שאלה: <span id="true-false-current">1</span>/<span id="true-false-total">10</span></div>
+          <div class="true-false-score">ניקוד: <strong id="true-false-score">0</strong></div>
+          <div class="true-false-statement" id="true-false-statement"></div>
+          <div class="true-false-buttons">
+            <button class="btn-true" onclick="answerTrueFalse(true)">✓ נכון</button>
+            <button class="btn-false" onclick="answerTrueFalse(false)">✗ לא נכון</button>
+          </div>
+          <div id="true-false-result" class="game-result hidden"></div>
+        </div>
+      </section>
+
+      <!-- Match Drag Game Screen -->
+      <section id="screen-game-match-drag" class="screen">
+        <div class="game-container">
+          <div class="match-drag-score">זוגות: <strong id="match-drag-matched">0</strong>/<span id="match-drag-total">5</span></div>
+          <div class="match-drag-area">
+            <div class="match-drag-left" id="match-drag-left"></div>
+            <div class="match-drag-right" id="match-drag-right"></div>
+          </div>
+          <div id="match-drag-result" class="game-result hidden"></div>
+        </div>
+      </section>
+
+      <!-- Spelling Bee Game Screen -->
+      <section id="screen-game-spelling" class="screen">
+        <div class="game-container">
+          <div class="spelling-progress">מילה: <span id="spelling-current">1</span>/<span id="spelling-total">10</span></div>
+          <div class="spelling-score">ניקוד: <strong id="spelling-score">0</strong></div>
+          <div class="spelling-hint" id="spelling-hint"></div>
+          <button class="btn-secondary spelling-play-btn" onclick="playSpellingWord()">🔊 שמע שוב</button>
+          <input type="text" id="spelling-input" class="spelling-input" placeholder="כתוב את המילה..." autocomplete="off">
+          <button class="btn-primary" onclick="checkSpellingAnswer()">✓ בדוק</button>
+          <div id="spelling-result" class="game-result hidden"></div>
         </div>
       </section>
 

@@ -181,6 +181,9 @@ function saveHighScore(gameId, score, extraData = {}) {
     playSound('record');
   }
   
+  // Check and update global record (async, fire-and-forget)
+  checkAndSaveGlobalRecord(gameId, score);
+  
   return isRecord;
 }
 
@@ -194,6 +197,102 @@ function showRecordBanner() {
     banner.classList.remove('show');
     setTimeout(() => banner.remove(), 500);
   }, 2500);
+}
+
+// ===== GLOBAL RECORDS (Firebase Firestore) =====
+let globalRecordsCache = {};
+
+async function loadGlobalRecord(gameId, forceRefresh = false) {
+  if (!forceRefresh && globalRecordsCache[gameId]) return globalRecordsCache[gameId];
+  if (!window.firebaseReady || !window.firebaseDB) return null;
+  try {
+    const docRef = window.firebaseDoc(window.firebaseDB, 'records', gameId);
+    const docSnap = await window.firebaseGetDoc(docRef);
+    if (docSnap.exists()) {
+      globalRecordsCache[gameId] = docSnap.data();
+      return docSnap.data();
+    }
+  } catch (e) { console.error('Load global record error:', e); }
+  return null;
+}
+
+async function checkAndSaveGlobalRecord(gameId, score) {
+  if (!window.firebaseReady || !window.firebaseDB) return false;
+  if (!currentUserId) return false;
+  const prof = loadProfile();
+  try {
+    // Always fetch fresh from Firestore to avoid stale cache
+    const current = await loadGlobalRecord(gameId, true);
+    if (current && current.score >= score) return false;
+
+    const recordData = {
+      score,
+      userName: prof?.name || 'תלמיד',
+      userAvatar: prof?.avatar || '😎',
+      userId: currentUserId,
+      date: window.firebaseServerTimestamp()
+    };
+    const docRef = window.firebaseDoc(window.firebaseDB, 'records', gameId);
+    await window.firebaseSetDoc(docRef, recordData);
+    globalRecordsCache[gameId] = { ...recordData, date: new Date() };
+    showGlobalRecordBanner(prof?.name || 'תלמיד');
+    return true;
+  } catch (e) { console.error('Save global record error:', e); }
+  return false;
+}
+
+function showGlobalRecordBanner(name) {
+  const banner = document.createElement('div');
+  banner.className = 'global-record-banner';
+  banner.innerHTML = `🌟🏆 ${name} שבר/ה את השיא! 🏆🌟`;
+  document.body.appendChild(banner);
+  setTimeout(() => banner.classList.add('show'), 10);
+  setTimeout(() => {
+    banner.classList.remove('show');
+    setTimeout(() => banner.remove(), 500);
+  }, 3500);
+}
+
+async function displayGameRecord(gameId, screenId) {
+  const screen = document.getElementById(screenId);
+  if (!screen) return;
+  const container = screen.querySelector('.game-container') || screen.querySelector('.quiz-container') || screen.querySelector('.balloon-game') || screen;
+  let recordBar = container.querySelector('.game-record-bar');
+  if (!recordBar) {
+    recordBar = document.createElement('div');
+    recordBar.className = 'game-record-bar';
+    container.insertBefore(recordBar, container.firstChild);
+  }
+  recordBar.innerHTML = '<span class="record-loading">🏆 טוען שיא...</span>';
+  // Always fetch fresh from Firestore
+  const record = await loadGlobalRecord(gameId, true);
+  if (record) {
+    recordBar.innerHTML = `<span class="record-trophy">🏆</span>
+      <span class="record-holder">${record.userAvatar || '😎'} ${record.userName || 'אנונימי'}</span>
+      <span class="record-divider">|</span>
+      <span class="record-score">שיא: ${record.score}</span>`;
+  } else {
+    recordBar.innerHTML = `<span class="record-trophy">🏆</span>
+      <span class="record-holder">אין שיא עדיין — תהיה הראשון!</span>`;
+  }
+}
+
+// Mapping screen names to game record IDs
+function getGameRecordId(screenName) {
+  const map = {
+    'quiz': 'quiz-' + currentSubject,
+    'balloon-pop': 'balloon-' + currentSubject,
+    'game-hangman': 'hangman-' + currentSubject,
+    'game-memory': 'memory-' + currentSubject,
+    'game-race': currentSubject + 'race',
+    'game-scramble': 'scramble-' + currentSubject,
+    'game-speed-math': 'speed-math',
+    'game-fill-blank': 'fill-blank-' + currentSubject,
+    'game-true-false': 'true-false-' + currentSubject,
+    'game-match-drag': 'match-drag-' + currentSubject,
+    'game-spelling': 'spelling-' + currentSubject,
+  };
+  return map[screenName] || null;
 }
 
 // Stars rating
@@ -722,12 +821,14 @@ function navigate(screen, subject, skipHistory = false) {
     case 'quiz':
       document.getElementById('screen-quiz').classList.add('active');
       headerTitle.textContent = 'חידון';
+      displayGameRecord(getGameRecordId('quiz'), 'screen-quiz');
       startQuiz();
       break;
 
     case 'balloon-pop':
       document.getElementById('screen-balloon-pop').classList.add('active');
       headerTitle.textContent = 'פיצוץ בלונים';
+      displayGameRecord(getGameRecordId('balloon-pop'), 'screen-balloon-pop');
       startBalloonPop();
       break;
 
@@ -736,24 +837,75 @@ function navigate(screen, subject, skipHistory = false) {
       headerTitle.textContent = 'משחקים';
       // Update race button for current subject
       updateRaceButton();
+      // Hide Word Scramble in Math (not relevant for math)
+      const scrambleBtn = document.getElementById('game-scramble-btn');
+      if (scrambleBtn) scrambleBtn.style.display = currentSubject === 'math' ? 'none' : '';
+      // Hide Speed Math in non-math subjects
+      const speedMathBtn = document.getElementById('game-speed-math-btn');
+      if (speedMathBtn) speedMathBtn.style.display = currentSubject === 'math' ? '' : 'none';
       break;
 
     case 'game-hangman':
       document.getElementById('screen-game-hangman').classList.add('active');
       headerTitle.textContent = 'תלייה';
+      displayGameRecord(getGameRecordId('game-hangman'), 'screen-game-hangman');
       startHangman();
       break;
 
     case 'game-memory':
       document.getElementById('screen-game-memory').classList.add('active');
       headerTitle.textContent = 'זיכרון';
+      displayGameRecord(getGameRecordId('game-memory'), 'screen-game-memory');
       startMemory();
       break;
 
     case 'game-race':
       document.getElementById('screen-game-race').classList.add('active');
       headerTitle.textContent = getRaceTitle();
+      displayGameRecord(getGameRecordId('game-race'), 'screen-game-race');
       initRace();
+      break;
+
+    case 'game-scramble':
+      document.getElementById('screen-game-scramble').classList.add('active');
+      headerTitle.textContent = 'ערבוב מילים';
+      displayGameRecord(getGameRecordId('game-scramble'), 'screen-game-scramble');
+      startScramble();
+      break;
+
+    case 'game-speed-math':
+      document.getElementById('screen-game-speed-math').classList.add('active');
+      headerTitle.textContent = 'מתמטיקה מהירה';
+      displayGameRecord(getGameRecordId('game-speed-math'), 'screen-game-speed-math');
+      initSpeedMath();
+      break;
+
+    case 'game-fill-blank':
+      document.getElementById('screen-game-fill-blank').classList.add('active');
+      headerTitle.textContent = 'השלם את החסר';
+      displayGameRecord(getGameRecordId('game-fill-blank'), 'screen-game-fill-blank');
+      startFillBlank();
+      break;
+
+    case 'game-true-false':
+      document.getElementById('screen-game-true-false').classList.add('active');
+      headerTitle.textContent = 'נכון או לא';
+      displayGameRecord(getGameRecordId('game-true-false'), 'screen-game-true-false');
+      startTrueFalse();
+      break;
+
+    case 'game-match-drag':
+      document.getElementById('screen-game-match-drag').classList.add('active');
+      headerTitle.textContent = 'התאמה';
+      displayGameRecord(getGameRecordId('game-match-drag'), 'screen-game-match-drag');
+      startMatchDrag();
+      break;
+
+    case 'game-spelling':
+      document.getElementById('screen-game-spelling').classList.add('active');
+      headerTitle.textContent = 'איות';
+      displayGameRecord(getGameRecordId('game-spelling'), 'screen-game-spelling');
+      startSpelling();
       break;
 
     case 'daily-challenge':
@@ -2039,6 +2191,661 @@ function endRace() {
     playSound('win');
     launchConfetti();
   }
+}
+
+// ===== WORD SCRAMBLE GAME =====
+let scrambleState = { words: [], current: 0, score: 0, answer: '', originalWord: '' };
+
+function startScramble() {
+  const data = getData();
+  let words = [];
+  
+  if (currentSubject === 'english') {
+    words = data.hangman.english.map(w => ({ word: w.word, hint: w.hint }));
+  } else if (currentSubject === 'hebrew') {
+    words = data.hangman.hebrew.map(w => ({ word: w.word, hint: w.hint }));
+  } else {
+    words = data.hangman.math.map(w => ({ word: w.word, hint: w.hint }));
+  }
+  
+  shuffle(words);
+  scrambleState = { words: words.slice(0, 10), current: 0, score: 0, answer: '' };
+  document.getElementById('scramble-result').classList.add('hidden');
+  renderScramble();
+}
+
+function renderScramble() {
+  const s = scrambleState;
+  if (s.current >= s.words.length) {
+    endScramble();
+    return;
+  }
+  
+  const wordObj = s.words[s.current];
+  s.originalWord = wordObj.word;
+  const letters = wordObj.word.split('');
+  shuffle(letters);
+  
+  document.getElementById('scramble-current').textContent = s.current + 1;
+  document.getElementById('scramble-total').textContent = s.words.length;
+  document.getElementById('scramble-score').textContent = s.score;
+  document.getElementById('scramble-hint').textContent = '💡 ' + wordObj.hint;
+  
+  document.getElementById('scramble-letters').innerHTML = letters.map((l, i) => 
+    `<button class="scramble-letter" onclick="addScrambleLetter(this, '${l}')">${l}</button>`
+  ).join('');
+  
+  document.getElementById('scramble-answer').innerHTML = '';
+  s.answer = '';
+}
+
+function addScrambleLetter(btn, letter) {
+  btn.classList.add('used');
+  btn.disabled = true;
+  scrambleState.answer += letter;
+  
+  const answerEl = document.getElementById('scramble-answer');
+  answerEl.innerHTML += `<span class="scramble-answer-letter">${letter}</span>`;
+}
+
+function clearScrambleAnswer() {
+  scrambleState.answer = '';
+  document.getElementById('scramble-answer').innerHTML = '';
+  document.querySelectorAll('.scramble-letter').forEach(btn => {
+    btn.classList.remove('used');
+    btn.disabled = false;
+  });
+}
+
+function checkScrambleAnswer() {
+  const s = scrambleState;
+  const correct = s.answer.toUpperCase() === s.originalWord.toUpperCase();
+  
+  if (correct) {
+    s.score += 10;
+    playSound('correct');
+    showPointsPopup(10);
+  } else {
+    playSound('wrong');
+  }
+  
+  s.current++;
+  setTimeout(renderScramble, 500);
+}
+
+function endScramble() {
+  const s = scrambleState;
+  const stars = getStarsRating(s.score);
+  const result = document.getElementById('scramble-result');
+  result.classList.remove('hidden');
+  
+  result.innerHTML = `<div class="compact-result">
+    <span class="result-emoji">${s.score >= 80 ? '🏆' : s.score >= 50 ? '🌟' : '💪'}</span>
+    <div class="result-text"><strong>ניקוד: ${s.score}</strong></div>
+    <div class="result-stars">${renderStars(stars)}</div>
+    <div class="result-btns">
+      <button class="btn-sm btn-primary" onclick="startScramble()">🔄 שוב</button>
+      <button class="btn-sm btn-secondary" onclick="goBack()">← חזרה</button>
+    </div>
+  </div>`;
+  
+  progress.stars += stars;
+  progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
+  saveProgress(progress);
+  saveHighScore('scramble-' + currentSubject, s.score);
+  if (s.score >= 80) { playSound('win'); launchConfetti(); }
+  checkAchievements();
+}
+
+// ===== MATH SPEED CHALLENGE GAME =====
+let speedMathState = { timer: null, timeLeft: 60, correct: 0, wrong: 0, currentProblem: null, active: false };
+
+function initSpeedMath() {
+  if (speedMathState.timer) clearInterval(speedMathState.timer);
+  speedMathState = { timer: null, timeLeft: 60, correct: 0, wrong: 0, currentProblem: null, active: false };
+  document.getElementById('speed-math-timer').textContent = '60';
+  document.getElementById('speed-math-correct').textContent = '0';
+  document.getElementById('speed-math-wrong').textContent = '0';
+  document.getElementById('speed-math-problem').textContent = 'לחץ "התחל" כדי להתחיל!';
+  document.getElementById('speed-math-input').value = '';
+  document.getElementById('speed-math-input').style.display = 'none';
+  document.getElementById('speed-math-submit').style.display = 'none';
+  document.getElementById('speed-math-start').style.display = 'block';
+  document.getElementById('speed-math-result').classList.add('hidden');
+}
+
+function startSpeedMath() {
+  speedMathState.active = true;
+  speedMathState.timeLeft = 60;
+  document.getElementById('speed-math-start').style.display = 'none';
+  document.getElementById('speed-math-input').style.display = 'block';
+  document.getElementById('speed-math-submit').style.display = 'block';
+  
+  generateSpeedMathProblem();
+  
+  speedMathState.timer = setInterval(() => {
+    speedMathState.timeLeft--;
+    document.getElementById('speed-math-timer').textContent = speedMathState.timeLeft;
+    if (speedMathState.timeLeft <= 0) endSpeedMath();
+  }, 1000);
+  
+  document.getElementById('speed-math-input').focus();
+}
+
+function generateSpeedMathProblem() {
+  const ops = ['+', '-', '×'];
+  const op = ops[Math.floor(Math.random() * ops.length)];
+  let a, b, answer;
+  
+  if (op === '+') {
+    a = Math.floor(Math.random() * 50) + 10;
+    b = Math.floor(Math.random() * 50) + 10;
+    answer = a + b;
+  } else if (op === '-') {
+    a = Math.floor(Math.random() * 50) + 30;
+    b = Math.floor(Math.random() * 30) + 1;
+    answer = a - b;
+  } else {
+    a = Math.floor(Math.random() * 12) + 1;
+    b = Math.floor(Math.random() * 12) + 1;
+    answer = a * b;
+  }
+  
+  speedMathState.currentProblem = { a, b, op, answer };
+  const problemEl = document.getElementById('speed-math-problem');
+  problemEl.textContent = `${a} ${op} ${b} = ?`;
+  problemEl.style.direction = 'ltr';
+  document.getElementById('speed-math-input').value = '';
+  document.getElementById('speed-math-input').focus();
+}
+
+function checkSpeedMathAnswer() {
+  if (!speedMathState.active) return;
+  
+  const input = parseInt(document.getElementById('speed-math-input').value);
+  if (input === speedMathState.currentProblem.answer) {
+    speedMathState.correct++;
+    document.getElementById('speed-math-correct').textContent = speedMathState.correct;
+    playSound('correct');
+    showPointsPopup(5);
+  } else {
+    speedMathState.wrong++;
+    document.getElementById('speed-math-wrong').textContent = speedMathState.wrong;
+    playSound('wrong');
+  }
+  generateSpeedMathProblem();
+}
+
+// Handle Enter key for speed math
+document.addEventListener('keypress', e => {
+  if (e.key === 'Enter' && speedMathState.active) checkSpeedMathAnswer();
+});
+
+function endSpeedMath() {
+  clearInterval(speedMathState.timer);
+  speedMathState.active = false;
+  
+  const s = speedMathState;
+  const score = s.correct * 10;
+  const stars = getStarsRating(score);
+  const result = document.getElementById('speed-math-result');
+  result.classList.remove('hidden');
+  
+  result.innerHTML = `<div class="compact-result">
+    <span class="result-emoji">${s.correct >= 10 ? '🏆' : s.correct >= 5 ? '⚡' : '💪'}</span>
+    <div class="result-text"><strong>${s.correct} נכונות, ${s.wrong} שגיאות</strong></div>
+    <div class="result-stars">${renderStars(stars)}</div>
+    <div class="result-btns">
+      <button class="btn-sm btn-primary" onclick="initSpeedMath(); startSpeedMath();">🔄 שוב</button>
+      <button class="btn-sm btn-secondary" onclick="goBack()">← חזרה</button>
+    </div>
+  </div>`;
+  
+  progress.stars += stars;
+  progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
+  saveProgress(progress);
+  saveHighScore('speed-math', s.correct);
+  if (s.correct >= 10) { playSound('win'); launchConfetti(); }
+  checkAchievements();
+}
+
+// ===== FILL IN THE BLANK GAME =====
+let fillBlankState = { questions: [], current: 0, score: 0 };
+
+function startFillBlank() {
+  const data = getData();
+  let questions = [];
+  
+  if (currentSubject === 'english') {
+    // Use grammar questions from big exam prep
+    questions = (data.bigExam?.grammar || []).map(q => ({
+      sentence: q.question,
+      options: q.options,
+      answer: q.options.indexOf(q.answer)
+    }));
+  } else if (currentSubject === 'math') {
+    // Create math fill-in-blank from fractions
+    questions = (data.mathBigExam?.fractions || []).slice(0, 10).map(q => ({
+      sentence: q.question,
+      options: q.options,
+      answer: q.correct
+    }));
+  } else {
+    // Hebrew - use quiz questions
+    questions = (data.hebrew?.quiz || []).slice(0, 10).map(q => ({
+      sentence: q.question,
+      options: q.options,
+      answer: q.correct
+    }));
+  }
+  
+  shuffle(questions);
+  fillBlankState = { questions: questions.slice(0, 10), current: 0, score: 0 };
+  document.getElementById('fill-blank-result').classList.add('hidden');
+  renderFillBlank();
+}
+
+function renderFillBlank() {
+  const s = fillBlankState;
+  if (s.current >= s.questions.length) {
+    endFillBlank();
+    return;
+  }
+  
+  const q = s.questions[s.current];
+  document.getElementById('fill-blank-current').textContent = s.current + 1;
+  document.getElementById('fill-blank-total').textContent = s.questions.length;
+  document.getElementById('fill-blank-score').textContent = s.score;
+  const sentenceEl = document.getElementById('fill-blank-sentence');
+  sentenceEl.textContent = q.sentence;
+  sentenceEl.style.direction = currentSubject === 'math' ? 'ltr' : 'rtl';
+  
+  document.getElementById('fill-blank-options').innerHTML = q.options.map((opt, i) => 
+    `<button class="fill-blank-option" style="${currentSubject === 'math' ? 'direction:ltr' : ''}" onclick="selectFillBlank(${i})">${opt}</button>`
+  ).join('');
+}
+
+function selectFillBlank(index) {
+  const s = fillBlankState;
+  const correct = index === s.questions[s.current].answer;
+  
+  document.querySelectorAll('.fill-blank-option').forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === s.questions[s.current].answer) btn.classList.add('correct');
+    else if (i === index) btn.classList.add('wrong');
+  });
+  
+  if (correct) {
+    s.score += 10;
+    playSound('correct');
+    showPointsPopup(10);
+  } else {
+    playSound('wrong');
+  }
+  
+  s.current++;
+  setTimeout(renderFillBlank, 1000);
+}
+
+function endFillBlank() {
+  const s = fillBlankState;
+  const stars = getStarsRating(s.score);
+  const result = document.getElementById('fill-blank-result');
+  result.classList.remove('hidden');
+  
+  result.innerHTML = `<div class="compact-result">
+    <span class="result-emoji">${s.score >= 80 ? '🏆' : s.score >= 50 ? '🌟' : '💪'}</span>
+    <div class="result-text"><strong>ניקוד: ${s.score}</strong></div>
+    <div class="result-stars">${renderStars(stars)}</div>
+    <div class="result-btns">
+      <button class="btn-sm btn-primary" onclick="startFillBlank()">🔄 שוב</button>
+      <button class="btn-sm btn-secondary" onclick="goBack()">← חזרה</button>
+    </div>
+  </div>`;
+  
+  progress.stars += stars;
+  progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
+  saveProgress(progress);
+  saveHighScore('fill-blank-' + currentSubject, s.score);
+  if (s.score >= 80) { playSound('win'); launchConfetti(); }
+  checkAchievements();
+}
+
+// ===== TRUE OR FALSE GAME =====
+let trueFalseState = { questions: [], current: 0, score: 0 };
+
+function startTrueFalse() {
+  let questions = [];
+  
+  if (currentSubject === 'math') {
+    questions = generateMathTrueFalse();
+  } else if (currentSubject === 'english') {
+    questions = generateEnglishTrueFalse();
+  } else {
+    questions = generateHebrewTrueFalse();
+  }
+  
+  shuffle(questions);
+  trueFalseState = { questions: questions.slice(0, 10), current: 0, score: 0 };
+  document.getElementById('true-false-result').classList.add('hidden');
+  renderTrueFalse();
+}
+
+function generateMathTrueFalse() {
+  return [
+    { statement: '½ = 0.5', isTrue: true },
+    { statement: '¼ = 0.4', isTrue: false },
+    { statement: '¾ = 0.75', isTrue: true },
+    { statement: 'סכום הזוויות במשולש = 180°', isTrue: true },
+    { statement: 'סכום הזוויות במרובע = 180°', isTrue: false },
+    { statement: 'שטח ריבוע = צלע × 4', isTrue: false },
+    { statement: 'היקף ריבוע = צלע × 4', isTrue: true },
+    { statement: '⅓ + ⅓ = ⅔', isTrue: true },
+    { statement: '0.5 > 0.45', isTrue: true },
+    { statement: 'שטח משולש = בסיס × גובה', isTrue: false },
+    { statement: '10% = 0.1', isTrue: true },
+    { statement: '50% = ½', isTrue: true },
+    { statement: 'מעוין הוא ריבוע', isTrue: false },
+    { statement: 'ריבוע הוא מלבן', isTrue: true },
+    { statement: 'קווים מקבילים נפגשים', isTrue: false }
+  ];
+}
+
+function generateEnglishTrueFalse() {
+  return [
+    { statement: 'The past of "go" is "went"', isTrue: true },
+    { statement: 'The past of "eat" is "eated"', isTrue: false },
+    { statement: '"She play" is correct', isTrue: false },
+    { statement: '"They are playing" is Present Progressive', isTrue: true },
+    { statement: '"Doesn\'t" is used with "I"', isTrue: false },
+    { statement: '"Library" means ספרייה', isTrue: true },
+    { statement: '"Yesterday" means מחר', isTrue: false },
+    { statement: 'The past of "see" is "saw"', isTrue: true },
+    { statement: '"An apple" is correct', isTrue: true },
+    { statement: '"A umbrella" is correct', isTrue: false },
+    { statement: 'The past of "have" is "had"', isTrue: true },
+    { statement: '"He is cook" is correct', isTrue: false },
+    { statement: '"Do" is used with "I, you, we, they"', isTrue: true },
+    { statement: 'The past of "write" is "wrote"', isTrue: true },
+    { statement: '"Beautiful" means מכוער', isTrue: false }
+  ];
+}
+
+function generateHebrewTrueFalse() {
+  return [
+    { statement: 'שם עצם מתאר פעולה', isTrue: false },
+    { statement: 'פועל מתאר פעולה או מצב', isTrue: true },
+    { statement: 'הרבים של "ילד" הוא "ילדות"', isTrue: false },
+    { statement: 'הרבים של "ילדה" הוא "ילדות"', isTrue: true },
+    { statement: 'שורש בעברית הוא 3 אותיות', isTrue: true },
+    { statement: '"אהבה" הוא שם עצם מופשט', isTrue: true },
+    { statement: '"ירושלים" הוא שם עצם כללי', isTrue: false },
+    { statement: 'שם תואר מתאר שם עצם', isTrue: true },
+    { statement: 'זמן עבר מתאר פעולה שתקרה', isTrue: false },
+    { statement: 'השורש של "כותב" הוא כ.ת.ב', isTrue: true },
+    { statement: 'נקבה של "גדול" היא "גדולה"', isTrue: true },
+    { statement: '"הוא" הוא גוף ראשון', isTrue: false },
+    { statement: '"אני" הוא גוף ראשון', isTrue: true },
+    { statement: 'מילת קישור מחברת בין משפטים', isTrue: true },
+    { statement: 'פסיק בא בסוף משפט', isTrue: false }
+  ];
+}
+
+function renderTrueFalse() {
+  const s = trueFalseState;
+  if (s.current >= s.questions.length) {
+    endTrueFalse();
+    return;
+  }
+  
+  const q = s.questions[s.current];
+  document.getElementById('true-false-current').textContent = s.current + 1;
+  document.getElementById('true-false-total').textContent = s.questions.length;
+  document.getElementById('true-false-score').textContent = s.score;
+  document.getElementById('true-false-statement').textContent = q.statement;
+  
+  document.querySelectorAll('.btn-true, .btn-false').forEach(btn => {
+    btn.disabled = false;
+    btn.classList.remove('correct', 'wrong');
+  });
+}
+
+function answerTrueFalse(answer) {
+  const s = trueFalseState;
+  const correct = answer === s.questions[s.current].isTrue;
+  
+  document.querySelectorAll('.btn-true, .btn-false').forEach(btn => btn.disabled = true);
+  
+  if (correct) {
+    s.score += 10;
+    playSound('correct');
+    showPointsPopup(10);
+    document.querySelector(answer ? '.btn-true' : '.btn-false').classList.add('correct');
+  } else {
+    playSound('wrong');
+    document.querySelector(answer ? '.btn-true' : '.btn-false').classList.add('wrong');
+    document.querySelector(s.questions[s.current].isTrue ? '.btn-true' : '.btn-false').classList.add('correct');
+  }
+  
+  s.current++;
+  setTimeout(renderTrueFalse, 1000);
+}
+
+function endTrueFalse() {
+  const s = trueFalseState;
+  const stars = getStarsRating(s.score);
+  const result = document.getElementById('true-false-result');
+  result.classList.remove('hidden');
+  
+  result.innerHTML = `<div class="compact-result">
+    <span class="result-emoji">${s.score >= 80 ? '🏆' : s.score >= 50 ? '✅' : '💪'}</span>
+    <div class="result-text"><strong>ניקוד: ${s.score}</strong></div>
+    <div class="result-stars">${renderStars(stars)}</div>
+    <div class="result-btns">
+      <button class="btn-sm btn-primary" onclick="startTrueFalse()">🔄 שוב</button>
+      <button class="btn-sm btn-secondary" onclick="goBack()">← חזרה</button>
+    </div>
+  </div>`;
+  
+  progress.stars += stars;
+  progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
+  saveProgress(progress);
+  saveHighScore('true-false-' + currentSubject, s.score);
+  if (s.score >= 80) { playSound('win'); launchConfetti(); }
+  checkAchievements();
+}
+
+// ===== MATCH DRAG GAME =====
+let matchDragState = { pairs: [], matched: 0, selected: null };
+
+function startMatchDrag() {
+  const data = getData();
+  let pairs = [];
+  
+  if (currentSubject === 'english') {
+    pairs = (data.wordMatch || []).slice(0, 5).map(p => ({ left: p.hebrew, right: p.english }));
+  } else if (currentSubject === 'math') {
+    pairs = data.memory.math.slice(0, 5).map(p => ({ left: p[0], right: p[1] }));
+  } else {
+    pairs = data.memory.hebrew.slice(0, 5).map(p => ({ left: p[0], right: p[1] }));
+  }
+  
+  matchDragState = { pairs, matched: 0, selected: null };
+  document.getElementById('match-drag-result').classList.add('hidden');
+  renderMatchDrag();
+}
+
+function renderMatchDrag() {
+  const s = matchDragState;
+  document.getElementById('match-drag-matched').textContent = s.matched;
+  document.getElementById('match-drag-total').textContent = s.pairs.length;
+  
+  const leftItems = s.pairs.map((p, i) => ({ text: p.left, index: i, matched: p.matched }));
+  const rightItems = s.pairs.map((p, i) => ({ text: p.right, index: i, matched: p.matched }));
+  shuffle(rightItems);
+  
+  document.getElementById('match-drag-left').innerHTML = leftItems.map(item => 
+    `<button class="match-item ${item.matched ? 'matched' : ''} ${s.selected?.side === 'left' && s.selected?.index === item.index ? 'selected' : ''}" 
+      onclick="selectMatchItem('left', ${item.index})" ${item.matched ? 'disabled' : ''}>${item.text}</button>`
+  ).join('');
+  
+  document.getElementById('match-drag-right').innerHTML = rightItems.map(item => 
+    `<button class="match-item ${item.matched ? 'matched' : ''} ${s.selected?.side === 'right' && s.selected?.index === item.index ? 'selected' : ''}" 
+      onclick="selectMatchItem('right', ${item.index})" ${item.matched ? 'disabled' : ''}>${item.text}</button>`
+  ).join('');
+}
+
+function selectMatchItem(side, index) {
+  const s = matchDragState;
+  
+  if (!s.selected) {
+    s.selected = { side, index };
+    renderMatchDrag();
+    return;
+  }
+  
+  if (s.selected.side === side) {
+    s.selected = { side, index };
+    renderMatchDrag();
+    return;
+  }
+  
+  // Check if match
+  const leftIndex = side === 'left' ? index : s.selected.index;
+  const rightIndex = side === 'right' ? index : s.selected.index;
+  
+  if (leftIndex === rightIndex) {
+    s.pairs[leftIndex].matched = true;
+    s.matched++;
+    playSound('correct');
+    showPointsPopup(20);
+  } else {
+    playSound('wrong');
+  }
+  
+  s.selected = null;
+  renderMatchDrag();
+  
+  if (s.matched === s.pairs.length) {
+    setTimeout(endMatchDrag, 500);
+  }
+}
+
+function endMatchDrag() {
+  const s = matchDragState;
+  const stars = 3;
+  const result = document.getElementById('match-drag-result');
+  result.classList.remove('hidden');
+  
+  result.innerHTML = `<div class="compact-result">
+    <span class="result-emoji">🏆</span>
+    <div class="result-text"><strong>מצאת את כל הזוגות!</strong></div>
+    <div class="result-stars">${renderStars(stars)}</div>
+    <div class="result-btns">
+      <button class="btn-sm btn-primary" onclick="startMatchDrag()">🔄 שוב</button>
+      <button class="btn-sm btn-secondary" onclick="goBack()">← חזרה</button>
+    </div>
+  </div>`;
+  
+  progress.stars += stars;
+  progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
+  saveProgress(progress);
+  saveHighScore('match-drag-' + currentSubject, s.pairs.length * 20);
+  playSound('win');
+  launchConfetti();
+  checkAchievements();
+}
+
+// ===== SPELLING BEE GAME =====
+let spellingState = { words: [], current: 0, score: 0, currentWord: '' };
+
+function startSpelling() {
+  const data = getData();
+  let words = [];
+  
+  if (currentSubject === 'english') {
+    words = (data.generalDictation || []).slice(0, 20).map(w => ({ word: w.word, hint: w.hebrewHint }));
+  } else {
+    // For non-English, use Hebrew flashcard words
+    words = (data.hebrew?.flashcards || []).slice(0, 10).map(f => ({ word: f.back, hint: f.front }));
+  }
+  
+  shuffle(words);
+  spellingState = { words: words.slice(0, 10), current: 0, score: 0, currentWord: '' };
+  document.getElementById('spelling-result').classList.add('hidden');
+  document.getElementById('spelling-input').value = '';
+  renderSpelling();
+}
+
+function renderSpelling() {
+  const s = spellingState;
+  if (s.current >= s.words.length) {
+    endSpelling();
+    return;
+  }
+  
+  s.currentWord = s.words[s.current].word;
+  document.getElementById('spelling-current').textContent = s.current + 1;
+  document.getElementById('spelling-total').textContent = s.words.length;
+  document.getElementById('spelling-score').textContent = s.score;
+  document.getElementById('spelling-hint').textContent = '💡 ' + s.words[s.current].hint;
+  document.getElementById('spelling-input').value = '';
+  document.getElementById('spelling-input').focus();
+  
+  // Auto-play word
+  playSpellingWord();
+}
+
+function playSpellingWord() {
+  if ('speechSynthesis' in window) {
+    const utterance = new SpeechSynthesisUtterance(spellingState.currentWord);
+    utterance.lang = currentSubject === 'english' ? 'en-US' : 'he-IL';
+    utterance.rate = 0.8;
+    speechSynthesis.speak(utterance);
+  }
+}
+
+function checkSpellingAnswer() {
+  const s = spellingState;
+  const input = document.getElementById('spelling-input').value.trim();
+  const correct = input.toLowerCase() === s.currentWord.toLowerCase();
+  
+  if (correct) {
+    s.score += 10;
+    playSound('correct');
+    showPointsPopup(10);
+  } else {
+    playSound('wrong');
+    // Show correct answer briefly
+    document.getElementById('spelling-hint').textContent = '❌ התשובה: ' + s.currentWord;
+  }
+  
+  s.current++;
+  setTimeout(renderSpelling, 1200);
+}
+
+function endSpelling() {
+  const s = spellingState;
+  const stars = getStarsRating(s.score);
+  const result = document.getElementById('spelling-result');
+  result.classList.remove('hidden');
+  
+  result.innerHTML = `<div class="compact-result">
+    <span class="result-emoji">${s.score >= 80 ? '🐝' : s.score >= 50 ? '🌟' : '💪'}</span>
+    <div class="result-text"><strong>ניקוד: ${s.score}</strong></div>
+    <div class="result-stars">${renderStars(stars)}</div>
+    <div class="result-btns">
+      <button class="btn-sm btn-primary" onclick="startSpelling()">🔄 שוב</button>
+      <button class="btn-sm btn-secondary" onclick="goBack()">← חזרה</button>
+    </div>
+  </div>`;
+  
+  progress.stars += stars;
+  progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
+  saveProgress(progress);
+  saveHighScore('spelling-' + currentSubject, s.score);
+  if (s.score >= 80) { playSound('win'); launchConfetti(); }
+  checkAchievements();
 }
 
 // ===== DAILY CHALLENGE =====

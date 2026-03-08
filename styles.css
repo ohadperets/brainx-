@@ -2777,3 +2777,407 @@ body.theme-pink .app-header {
   margin-top: 10px !important;
   padding: 10px !important;
 }
+/* ===== NEW GAMES STYLES ===== */
+
+/* Word Scramble */
+.scramble-score {
+  font-size: 16px;
+  margin-bottom: 12px;
+  color: var(--text-light);
+}
+
+.scramble-hint {
+  font-size: 18px;
+  color: var(--primary);
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+.scramble-letters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.scramble-letter {
+  width: 45px;
+  height: 45px;
+  font-size: 20px;
+  font-weight: 700;
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  background: white;
+  color: var(--primary);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.scramble-letter:hover {
+  background: var(--primary);
+  color: white;
+  transform: scale(1.1);
+}
+
+.scramble-letter.used {
+  background: #e2e8f0;
+  border-color: #e2e8f0;
+  color: #a0aec0;
+}
+
+.scramble-answer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  min-height: 50px;
+  padding: 12px;
+  background: #f7fafc;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.scramble-answer-letter {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  background: var(--primary);
+  color: white;
+  border-radius: 6px;
+}
+
+.scramble-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+/* Math Speed Challenge */
+.speed-math-timer {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--danger);
+  margin-bottom: 12px;
+}
+
+.speed-math-score {
+  font-size: 16px;
+  margin-bottom: 20px;
+  color: var(--text-light);
+}
+
+.speed-math-problem {
+  font-size: 36px;
+  font-weight: 700;
+  margin: 24px 0;
+  color: var(--text);
+}
+
+.speed-math-input {
+  display: block;
+  width: 120px;
+  height: 50px;
+  font-size: 24px;
+  text-align: center;
+  border: 3px solid var(--primary);
+  border-radius: 12px;
+  margin: 0 auto 16px;
+  font-family: inherit;
+  direction: ltr;
+}
+
+.speed-math-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+}
+
+/* Fill in the Blank */
+.fill-blank-progress,
+.fill-blank-score {
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: var(--text-light);
+}
+
+.fill-blank-sentence {
+  font-size: 20px;
+  line-height: 1.6;
+  margin: 24px 0;
+  padding: 20px;
+  background: #f7fafc;
+  border-radius: 12px;
+}
+
+.fill-blank-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.fill-blank-option {
+  padding: 14px 20px;
+  font-size: 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.fill-blank-option:hover {
+  border-color: var(--primary);
+  background: #f7fafc;
+}
+
+.fill-blank-option.correct {
+  background: #c6f6d5;
+  border-color: var(--success);
+}
+
+.fill-blank-option.wrong {
+  background: #fed7d7;
+  border-color: var(--danger);
+}
+
+/* True or False */
+.true-false-progress,
+.true-false-score {
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: var(--text-light);
+}
+
+.true-false-statement {
+  font-size: 22px;
+  line-height: 1.5;
+  margin: 30px 0;
+  padding: 24px;
+  background: #f7fafc;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.true-false-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.btn-true,
+.btn-false {
+  padding: 16px 40px;
+  font-size: 18px;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.btn-true {
+  background: var(--success);
+  color: white;
+}
+
+.btn-false {
+  background: var(--danger);
+  color: white;
+}
+
+.btn-true:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(72, 187, 120, 0.4);
+}
+
+.btn-false:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(245, 101, 101, 0.4);
+}
+
+.btn-true.correct,
+.btn-false.correct {
+  box-shadow: 0 0 0 4px rgba(72, 187, 120, 0.5);
+}
+
+.btn-true.wrong,
+.btn-false.wrong {
+  opacity: 0.5;
+}
+
+/* Match Drag */
+.match-drag-score {
+  font-size: 18px;
+  margin-bottom: 20px;
+  color: var(--text-light);
+}
+
+.match-drag-area {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.match-drag-left,
+.match-drag-right {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.match-item {
+  padding: 14px 24px;
+  font-size: 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 120px;
+  font-family: inherit;
+}
+
+.match-item:hover {
+  border-color: var(--primary);
+  background: #f7fafc;
+}
+
+.match-item.selected {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.match-item.matched {
+  background: #c6f6d5;
+  border-color: var(--success);
+  cursor: default;
+}
+
+/* Spelling Bee */
+.spelling-progress,
+.spelling-score {
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: var(--text-light);
+}
+
+.spelling-hint {
+  font-size: 20px;
+  color: var(--primary);
+  margin: 20px 0;
+  font-weight: 500;
+}
+
+.spelling-play-btn {
+  margin-bottom: 20px;
+  font-size: 18px;
+}
+
+.spelling-input {
+  width: 80%;
+  max-width: 300px;
+  height: 50px;
+  font-size: 20px;
+  text-align: center;
+  border: 3px solid var(--primary);
+  border-radius: 12px;
+  margin-bottom: 16px;
+  font-family: inherit;
+}
+
+.spelling-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+}
+
+/* ===== Global Record Bar (in-game display) ===== */
+.game-record-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #fff8e1, #ffecb3);
+  border: 2px solid #ffd54f;
+  border-radius: 12px;
+  padding: 8px 16px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #5d4037;
+  min-height: 36px;
+  animation: recordBarSlideIn 0.4s ease;
+}
+
+@keyframes recordBarSlideIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.game-record-bar .record-trophy {
+  font-size: 18px;
+}
+
+.game-record-bar .record-holder {
+  font-size: 14px;
+}
+
+.game-record-bar .record-divider {
+  color: #bbb;
+  font-weight: 300;
+}
+
+.game-record-bar .record-score {
+  background: linear-gradient(135deg, #ffd700, #ffb347);
+  color: #5d4037;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.game-record-bar .record-loading {
+  color: #999;
+  font-weight: 400;
+}
+
+/* Global record broken banner */
+.global-record-banner {
+  position: fixed;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #ff6b6b, #ffd700, #ff6b6b);
+  background-size: 200% 200%;
+  animation: globalRecordShimmer 1.5s ease infinite;
+  color: #fff;
+  padding: 14px 36px;
+  border-radius: 0 0 20px 20px;
+  font-size: 20px;
+  font-weight: 800;
+  box-shadow: 0 6px 30px rgba(255, 107, 107, 0.6);
+  z-index: 10000;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  transition: top 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  white-space: nowrap;
+}
+
+.global-record-banner.show {
+  top: 0;
+}
+
+@keyframes globalRecordShimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}

@@ -341,7 +341,27 @@ const APP_DATA = {
       { question: "What is 'כלב' in English?", options: ["cat", "dog", "bird", "fish"], correct: 1 },
       { question: "She ___ speak French.", options: ["don't", "doesn't", "didn't", "isn't"], correct: 1 },
       { question: "The past of 'write' is:", options: ["writed", "writes", "wrote", "writing"], correct: 2 },
-      { question: "What is 'משפחה' in English?", options: ["friend", "family", "school", "home"], correct: 1 }
+      { question: "What is 'משפחה' in English?", options: ["friend", "family", "school", "home"], correct: 1 },
+      // New quiz questions for 5th grade
+      { question: "The past of 'begin' is:", options: ["beginned", "began", "begun", "begins"], correct: 1 },
+      { question: "The past of 'catch' is:", options: ["catched", "caught", "catches", "catching"], correct: 1 },
+      { question: "She ___ (study) for the test now.", options: ["study", "studies", "is studying", "studied"], correct: 2 },
+      { question: "They ___ (not/watch) TV at the moment.", options: ["don't watch", "aren't watching", "not watching", "doesn't watch"], correct: 1 },
+      { question: "___ he sleeping right now?", options: ["Does", "Is", "Do", "Are"], correct: 1 },
+      { question: "What is 'סביבה' in English?", options: ["weather", "environment", "nature", "garden"], correct: 1 },
+      { question: "The opposite of 'dangerous' is:", options: ["scary", "safe", "careful", "strong"], correct: 1 },
+      { question: "I ___ my keys yesterday.", options: ["lose", "lost", "losed", "losing"], correct: 1 },
+      { question: "We ___ (fly) to London next week.", options: ["fly", "flies", "are flying", "flied"], correct: 2 },
+      { question: "The past of 'forget' is:", options: ["forgetted", "forgot", "forgeted", "forgetting"], correct: 1 },
+      { question: "What is 'להמציא' in English?", options: ["invent", "discover", "create", "build"], correct: 0 },
+      { question: "She ___ her homework every day.", options: ["do", "does", "doing", "did"], correct: 1 },
+      { question: "The children ___ (play) outside right now.", options: ["play", "plays", "are playing", "is playing"], correct: 2 },
+      { question: "What is 'מפחיד' in English?", options: ["scary", "scared", "scare", "scaring"], correct: 0 },
+      { question: "The past of 'teach' is:", options: ["teached", "taught", "teaches", "teaching"], correct: 1 },
+      { question: "I ___ (not/understand) this question.", options: ["don't understand", "doesn't understand", "not understand", "am not understand"], correct: 0 },
+      { question: "What is 'לזכור' in English?", options: ["forget", "remind", "remember", "think"], correct: 2 },
+      { question: "He ___ (sit) on the chair now.", options: ["sit", "sits", "is sitting", "sitting"], correct: 2 },
+      { question: "The past of 'win' is:", options: ["winned", "won", "wins", "winning"], correct: 1 }
     ],
     flashcards: [
       { front: "classroom", back: "כיתה" },
@@ -383,7 +403,34 @@ const APP_DATA = {
       { front: "easy", back: "קל" },
       { front: "always", back: "תמיד" },
       { front: "never", back: "אף פעם" },
-      { front: "sometimes", back: "לפעמים" }
+      { front: "sometimes", back: "לפעמים" },
+      // New flashcards for 5th grade
+      { front: "begin → ?", back: "began (עבר)" },
+      { front: "catch → ?", back: "caught (עבר)" },
+      { front: "choose → ?", back: "chose (עבר)" },
+      { front: "fall → ?", back: "fell (עבר)" },
+      { front: "find → ?", back: "found (עבר)" },
+      { front: "forget → ?", back: "forgot (עבר)" },
+      { front: "grow → ?", back: "grew (עבר)" },
+      { front: "keep → ?", back: "kept (עבר)" },
+      { front: "leave → ?", back: "left (עבר)" },
+      { front: "lose → ?", back: "lost (עבר)" },
+      { front: "meet → ?", back: "met (עבר)" },
+      { front: "send → ?", back: "sent (עבר)" },
+      { front: "spend → ?", back: "spent (עבר)" },
+      { front: "teach → ?", back: "taught (עבר)" },
+      { front: "tell → ?", back: "told (עבר)" },
+      { front: "win → ?", back: "won (עבר)" },
+      { front: "environment", back: "סביבה" },
+      { front: "dangerous", back: "מסוכן" },
+      { front: "remember", back: "לזכור" },
+      { front: "invent", back: "להמציא" },
+      { front: "scary", back: "מפחיד" },
+      { front: "wise", back: "חכם" },
+      { front: "breathe", back: "לנשום" },
+      { front: "change", back: "לשנות" },
+      { front: "Present Progressive", back: "am/is/are + verb+ing\nלתיאור פעולה שקורית עכשיו" },
+      { front: "I am + verb+ing", back: "אני עושה עכשיו\nI am eating = אני אוכל עכשיו" }
     ]
   },
 
@@ -603,7 +650,26 @@ const APP_DATA = {
       { question: "מה צריך להוסיף ל-⅓ כדי לקבל 1?", options: ["⅓", "⅔", "½", "¼"], correct: 1 },
       { question: "איזה שבר קטן יותר?", options: ["½", "⅓", "¼", "⅕"], correct: 3 },
       { question: "15.0 - 7.5 = ?", options: ["7.5", "8.5", "6.5", "7.0"], correct: 0 },
-      { question: "שטח ריבוע עם צלע 12:", options: ["48", "24", "144", "120"], correct: 2 }
+      { question: "שטח ריבוע עם צלע 12:", options: ["48", "24", "144", "120"], correct: 2 },
+      // New math quiz questions for 5th grade
+      { question: "⅖ + ⅗ = ?", options: ["⁵⁄₁₀", "1", "⁴⁄₅", "⅗"], correct: 1 },
+      { question: "0.75 + 0.25 = ?", options: ["0.100", "1", "1.00", "0.90"], correct: 1 },
+      { question: "מהו ⅓ מ-18?", options: ["3", "6", "9", "12"], correct: 1 },
+      { question: "מהו ¼ מ-24?", options: ["4", "6", "8", "12"], correct: 1 },
+      { question: "השווה: ⅔ ○ ¾", options: ["⅔ > ¾", "⅔ < ¾", "⅔ = ¾", "אי אפשר לדעת"], correct: 1 },
+      { question: "צמצם את השבר ⁶⁄₁₂:", options: ["⅓", "½", "¼", "⅔"], correct: 1 },
+      { question: "הרחב ²⁄₃ למכנה 12:", options: ["⁴⁄₁₂", "⁶⁄₁₂", "⁸⁄₁₂", "¹⁰⁄₁₂"], correct: 2 },
+      { question: "0.6 + 0.15 = ?", options: ["0.21", "0.75", "0.65", "6.15"], correct: 1 },
+      { question: "כמה עשיריות יש ב-0.7?", options: ["7", "70", "0.7", "0.07"], correct: 0 },
+      { question: "כמה מאיות יש ב-0.35?", options: ["3", "5", "35", "350"], correct: 2 },
+      { question: "מהו ⅕ כמספר עשרוני?", options: ["0.1", "0.2", "0.5", "0.15"], correct: 1 },
+      { question: "סדר פעולות: 10 + 2 × 5 = ?", options: ["60", "20", "25", "17"], correct: 1 },
+      { question: "סדר פעולות: (10 + 2) × 5 = ?", options: ["17", "20", "60", "25"], correct: 2 },
+      { question: "⁷⁄₁₀ - ³⁄₁₀ = ?", options: ["⁴⁄₂₀", "⁴⁄₁₀", "¹⁰⁄₁₀", "⁴⁄₀"], correct: 1 },
+      { question: "2 - 0.5 = ?", options: ["1.5", "1.05", "0.5", "2.5"], correct: 0 },
+      { question: "שטח מעוין עם אלכסונים 6 ו-8:", options: ["14", "24", "48", "96"], correct: 1 },
+      { question: "מהו 50% מ-80?", options: ["40", "30", "50", "25"], correct: 0 },
+      { question: "מהו 25% מ-100?", options: ["50", "75", "25", "10"], correct: 2 }
     ],
 
     // ========== GEOMETRY QUIZ (גאומטריה) ==========
@@ -653,7 +719,24 @@ const APP_DATA = {
       { front: "משולש שווה שוקיים:", back: "2 צלעות שוות\n2 זוויות שוות" },
       { front: "מהו מעוין?", back: "מרובע עם 4 צלעות שוות\n(הזוויות לא חייבות להיות ישרות)" },
       { front: "קווים מקבילים:", back: "קווים שלעולם לא נפגשים (║)" },
-      { front: "קווים מאונכים:", back: "קווים שנפגשים בזווית ישרה 90° (⊥)" }
+      { front: "קווים מאונכים:", back: "קווים שנפגשים בזווית ישרה 90° (⊥)" },
+      // New math flashcards for 5th grade
+      { front: "⅕ = ? עשרוני", back: "0.2" },
+      { front: "⅖ = ? עשרוני", back: "0.4" },
+      { front: "⅗ = ? עשרוני", back: "0.6" },
+      { front: "⅘ = ? עשרוני", back: "0.8" },
+      { front: "50% = ?", back: "½ או 0.5" },
+      { front: "25% = ?", back: "¼ או 0.25" },
+      { front: "75% = ?", back: "¾ או 0.75" },
+      { front: "10% = ?", back: "0.1 או ¹⁄₁₀" },
+      { front: "מהו צמצום שבר?", back: "חילוק מונה ומכנה באותו מספר\n⁶⁄₁₂ ÷ 6 = ½" },
+      { front: "מהו הרחבת שבר?", back: "כפל מונה ומכנה באותו מספר\n½ × 3 = ³⁄₆" },
+      { front: "סדר פעולות חשבון:", back: "1. סוגריים\n2. כפל וחילוק\n3. חיבור וחיסור" },
+      { front: "מהו אלכסון?", back: "קו מפינה לפינה בצורה\nחוצה את הצורה" },
+      { front: "מהו טרפז?", back: "מרובע עם זוג אחד\nשל צלעות מקבילות" },
+      { front: "מהו מקבילית?", back: "מרובע עם 2 זוגות\nצלעות מקבילות" },
+      { front: "איך מוצאים חלק מכמות?", back: "מחלקים במכנה\nכופלים במונה\n⅓ מ-18: 18÷3×1=6" },
+      { front: "השוואת שברים:", back: "הרחב למכנה משותף\n⅔ = ⁸⁄₁₂, ¾ = ⁹⁄₁₂\n⅔ < ¾" }
     ]
   },
 
@@ -871,7 +954,23 @@ const APP_DATA = {
       { word: 'IMPORTANT', hint: 'Something that matters a lot' },
       { word: 'YESTERDAY', hint: 'The day before today' },
       { word: 'TOMORROW', hint: 'The day after today' },
-      { word: 'PLAYGROUND', hint: 'Where children play outside' }
+      { word: 'PLAYGROUND', hint: 'Where children play outside' },
+      // New words for 5th grade
+      { word: 'ENVIRONMENT', hint: 'The world around us - nature' },
+      { word: 'ADVENTURE', hint: 'An exciting experience or journey' },
+      { word: 'CELEBRATE', hint: 'To have a party for a special day' },
+      { word: 'DANGEROUS', hint: 'Not safe, could hurt you' },
+      { word: 'EXCELLENT', hint: 'Very very good' },
+      { word: 'FANTASTIC', hint: 'Amazing, wonderful' },
+      { word: 'GOVERNMENT', hint: 'The people who run a country' },
+      { word: 'HELICOPTER', hint: 'A flying machine with spinning blades' },
+      { word: 'IMPOSSIBLE', hint: 'Cannot be done' },
+      { word: 'VEGETABLE', hint: 'Healthy food like carrots and cucumbers' },
+      { word: 'KNOWLEDGE', hint: 'Things you know and learn' },
+      { word: 'MICROWAVE', hint: 'A machine that heats food quickly' },
+      { word: 'NEWSPAPER', hint: 'Paper with daily news' },
+      { word: 'SURPRISED', hint: 'Shocked, did not expect it' },
+      { word: 'WONDERFUL', hint: 'Full of wonder, amazing' }
     ],
     math: [
       { word: 'שבר', hint: 'חלק מתוך שלם, כמו ½' },
@@ -888,7 +987,23 @@ const APP_DATA = {
       { word: 'כפל', hint: 'פעולה של לקחת מספר כמה פעמים' },
       { word: 'חילוק', hint: 'פעולה של לחלק לקבוצות שוות' },
       { word: 'זווית', hint: 'המפגש בין שני קווים' },
-      { word: 'קוטר', hint: 'קו שעובר דרך מרכז העיגול' }
+      { word: 'קוטר', hint: 'קו שעובר דרך מרכז העיגול' },
+      // New math words for 5th grade
+      { word: 'עשרוני', hint: 'מספר עם נקודה כמו 3.5' },
+      { word: 'עשירית', hint: 'חלק אחד מתוך עשרה - 0.1' },
+      { word: 'מאית', hint: 'חלק אחד מתוך מאה - 0.01' },
+      { word: 'מקבילית', hint: 'מרובע עם 2 זוגות צלעות מקבילות' },
+      { word: 'טרפז', hint: 'מרובע עם זוג אחד של צלעות מקבילות' },
+      { word: 'מעוין', hint: 'מרובע עם 4 צלעות שוות' },
+      { word: 'אלכסון', hint: 'קו מפינה לפינה בצורה' },
+      { word: 'מאונך', hint: 'קו שעומד בזווית ישרה' },
+      { word: 'מקביל', hint: 'קווים שלא נפגשים לעולם' },
+      { word: 'גובה', hint: 'האורך מלמטה עד למעלה' },
+      { word: 'בסיס', hint: 'הצלע התחתונה של צורה' },
+      { word: 'אחוז', hint: 'חלקים מתוך מאה - %' },
+      { word: 'שקול', hint: 'שברים ששווים אותו דבר' },
+      { word: 'צמצום', hint: 'להקטין שבר לצורה פשוטה' },
+      { word: 'הרחבה', hint: 'להגדיל מונה ומכנה באותו מספר' }
     ]
   },
 
@@ -902,12 +1017,25 @@ const APP_DATA = {
     english: [
       ['go', 'went'], ['eat', 'ate'], ['see', 'saw'], ['have', 'had'],
       ['make', 'made'], ['come', 'came'], ['take', 'took'], ['give', 'gave'],
-      ['write', 'wrote'], ['read', 'read'], ['buy', 'bought'], ['think', 'thought']
+      ['write', 'wrote'], ['read', 'read'], ['buy', 'bought'], ['think', 'thought'],
+      // New pairs for 5th grade
+      ['begin', 'began'], ['break', 'broke'], ['catch', 'caught'], ['choose', 'chose'],
+      ['draw', 'drew'], ['fall', 'fell'], ['find', 'found'], ['fly', 'flew'],
+      ['forget', 'forgot'], ['grow', 'grew'], ['hide', 'hid'], ['hold', 'held'],
+      ['keep', 'kept'], ['leave', 'left'], ['lose', 'lost'], ['meet', 'met'],
+      ['send', 'sent'], ['sit', 'sat'], ['sleep', 'slept'], ['spend', 'spent'],
+      ['stand', 'stood'], ['teach', 'taught'], ['tell', 'told'], ['win', 'won']
     ],
     math: [
       ['½', '0.5'], ['¼', '0.25'], ['¾', '0.75'], ['שטח ריבוע', 'צלע×צלע'],
       ['שטח מלבן', 'אורך×רוחב'], ['היקף ריבוע', 'צלע×4'], ['היקף מלבן', '(אורך+רוחב)×2'],
-      ['⅓', '0.33'], ['⅔', '0.67'], ['1', '100%'], ['½', '50%'], ['¼', '25%']
+      ['⅓', '0.33'], ['⅔', '0.67'], ['1', '100%'], ['½', '50%'], ['¼', '25%'],
+      // New math pairs for 5th grade
+      ['⅕', '0.2'], ['⅖', '0.4'], ['⅗', '0.6'], ['⅘', '0.8'],
+      ['שטח משולש', '(בסיס×גובה)÷2'], ['90°', 'זווית ישרה'], ['180°', 'זווית שטוחה'],
+      ['מונה', 'למעלה בשבר'], ['מכנה', 'למטה בשבר'], ['75%', '¾'],
+      ['10%', '0.1'], ['סכום זוויות משולש', '180°'], ['סכום זוויות מרובע', '360°'],
+      ['⅛', '0.125'], ['⅜', '0.375'], ['⅝', '0.625'], ['⅞', '0.875']
     ]
   },
 

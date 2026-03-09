@@ -843,6 +843,9 @@ function navigate(screen, subject, skipHistory = false) {
       // Hide Speed Math in non-math subjects
       const speedMathBtn = document.getElementById('game-speed-math-btn');
       if (speedMathBtn) speedMathBtn.style.display = currentSubject === 'math' ? '' : 'none';
+      // Hide Spelling Bee in Hebrew (doesn't work well)
+      const spellingBtn = document.getElementById('game-spelling-btn');
+      if (spellingBtn) spellingBtn.style.display = currentSubject === 'hebrew' ? 'none' : '';
       break;
 
     case 'game-hangman':

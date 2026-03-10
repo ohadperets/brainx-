@@ -3014,6 +3014,69 @@ body.theme-pink .app-header {
   opacity: 0.5;
 }
 
+/* Word Problems Game */
+.wp-progress,
+.wp-score {
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: var(--text-light);
+}
+
+.wp-question {
+  font-size: 20px;
+  line-height: 1.7;
+  margin: 24px 0;
+  padding: 24px;
+  background: #f7fafc;
+  border-radius: 12px;
+  font-weight: 500;
+  direction: rtl;
+  text-align: right;
+}
+
+.wp-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.wp-option-btn {
+  padding: 16px 12px;
+  font-size: 20px;
+  font-weight: 700;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  direction: ltr;
+}
+
+.wp-option-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.wp-option-btn.correct {
+  background: #c6f6d5;
+  border-color: var(--success);
+  box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.4);
+}
+
+.wp-option-btn.wrong {
+  background: #fed7d7;
+  border-color: var(--danger);
+  opacity: 0.7;
+}
+
+.wp-option-btn:disabled {
+  cursor: default;
+}
+
 /* Match Drag */
 .match-drag-score {
   font-size: 18px;

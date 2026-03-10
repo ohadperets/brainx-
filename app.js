@@ -837,15 +837,18 @@ function navigate(screen, subject, skipHistory = false) {
       headerTitle.textContent = 'משחקים';
       // Update race button for current subject
       updateRaceButton();
-      // Hide Word Scramble in Math (not relevant for math)
+      // Hide Word Scramble in Math and English
       const scrambleBtn = document.getElementById('game-scramble-btn');
-      if (scrambleBtn) scrambleBtn.style.display = currentSubject === 'math' ? 'none' : '';
+      if (scrambleBtn) scrambleBtn.style.display = (currentSubject === 'math' || currentSubject === 'english') ? 'none' : '';
       // Hide Speed Math in non-math subjects
       const speedMathBtn = document.getElementById('game-speed-math-btn');
       if (speedMathBtn) speedMathBtn.style.display = currentSubject === 'math' ? '' : 'none';
-      // Hide Spelling Bee in Hebrew (doesn't work well)
+      // Hide Spelling Bee in Hebrew and Math
       const spellingBtn = document.getElementById('game-spelling-btn');
-      if (spellingBtn) spellingBtn.style.display = currentSubject === 'hebrew' ? 'none' : '';
+      if (spellingBtn) spellingBtn.style.display = (currentSubject === 'hebrew' || currentSubject === 'math') ? 'none' : '';
+      // Hide Word Problems in non-math subjects (math only)
+      const wpBtn = document.getElementById('game-word-problems-btn');
+      if (wpBtn) wpBtn.style.display = currentSubject === 'math' ? '' : 'none';
       break;
 
     case 'game-hangman':
@@ -895,6 +898,13 @@ function navigate(screen, subject, skipHistory = false) {
       headerTitle.textContent = 'נכון או לא';
       displayGameRecord(getGameRecordId('game-true-false'), 'screen-game-true-false');
       startTrueFalse();
+      break;
+
+    case 'game-word-problems':
+      document.getElementById('screen-game-word-problems').classList.add('active');
+      headerTitle.textContent = 'בעיות חשבון';
+      displayGameRecord('word-problems-math', 'screen-game-word-problems');
+      startWordProblems();
       break;
 
     case 'game-match-drag':
@@ -2847,6 +2857,86 @@ function endSpelling() {
   progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
   saveProgress(progress);
   saveHighScore('spelling-' + currentSubject, s.score);
+  if (s.score >= 80) { playSound('win'); launchConfetti(); }
+  checkAchievements();
+}
+
+// ===== WORD PROBLEMS GAME (בעיות מילוליות) =====
+let wordProblemsState = { questions: [], current: 0, score: 0 };
+
+function startWordProblems() {
+  const data = getData();
+  const all = (data.mathWordProblems || []).slice();
+  shuffle(all);
+  wordProblemsState = { questions: all.slice(0, 10), current: 0, score: 0 };
+  document.getElementById('wp-result').classList.add('hidden');
+  renderWordProblem();
+}
+
+function renderWordProblem() {
+  const s = wordProblemsState;
+  if (s.current >= s.questions.length) {
+    endWordProblems();
+    return;
+  }
+  const q = s.questions[s.current];
+  document.getElementById('wp-current').textContent = s.current + 1;
+  document.getElementById('wp-total').textContent = s.questions.length;
+  document.getElementById('wp-score').textContent = s.score;
+  document.getElementById('wp-question').textContent = q.q;
+
+  const optionsEl = document.getElementById('wp-options');
+  const shuffled = q.options.slice();
+  shuffle(shuffled);
+  optionsEl.innerHTML = shuffled.map(opt =>
+    `<button class="wp-option-btn" onclick="answerWordProblem(this, ${opt}, ${q.answer})">${opt.toLocaleString()}</button>`
+  ).join('');
+}
+
+function answerWordProblem(btn, chosen, correct) {
+  const s = wordProblemsState;
+  const buttons = document.querySelectorAll('.wp-option-btn');
+  buttons.forEach(b => b.disabled = true);
+
+  if (chosen === correct) {
+    s.score += 10;
+    btn.classList.add('correct');
+    playSound('correct');
+    showPointsPopup(10);
+  } else {
+    btn.classList.add('wrong');
+    playSound('wrong');
+    buttons.forEach(b => {
+      if (parseInt(b.textContent.replace(/,/g, '')) === correct) b.classList.add('correct');
+    });
+  }
+
+  s.current++;
+  setTimeout(renderWordProblem, 1200);
+}
+
+function endWordProblems() {
+  const s = wordProblemsState;
+  const stars = getStarsRating(s.score);
+  const result = document.getElementById('wp-result');
+  result.classList.remove('hidden');
+  document.getElementById('wp-options').innerHTML = '';
+  document.getElementById('wp-question').textContent = '';
+
+  result.innerHTML = `<div class="compact-result">
+    <span class="result-emoji">${s.score >= 80 ? '🏆' : s.score >= 50 ? '✅' : '💪'}</span>
+    <div class="result-text"><strong>ניקוד: ${s.score}</strong></div>
+    <div class="result-stars">${renderStars(stars)}</div>
+    <div class="result-btns">
+      <button class="btn-sm btn-primary" onclick="startWordProblems()">🔄 שוב</button>
+      <button class="btn-sm btn-secondary" onclick="goBack()">← חזרה</button>
+    </div>
+  </div>`;
+
+  progress.stars += stars;
+  progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
+  saveProgress(progress);
+  saveHighScore('word-problems-math', s.score);
   if (s.score >= 80) { playSound('win'); launchConfetti(); }
   checkAchievements();
 }

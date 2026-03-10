@@ -345,6 +345,22 @@
             <div class="feature-name">איות</div>
             <div class="feature-desc">שמע וכתוב!</div>
           </button>
+          <button id="game-word-problems-btn" class="feature-card" style="background:linear-gradient(135deg,#e8eaf6,#c5cae9)" onclick="navigate('game-word-problems')">
+            <div class="feature-icon">🧩</div>
+            <div class="feature-name">בעיות חשבון</div>
+            <div class="feature-desc">פתור בעיות מילוליות!</div>
+          </button>
+        </div>
+      </section>
+
+      <!-- Word Problems Game Screen -->
+      <section id="screen-game-word-problems" class="screen">
+        <div class="game-container">
+          <div class="wp-progress">שאלה: <span id="wp-current">1</span>/<span id="wp-total">10</span></div>
+          <div class="wp-score">ניקוד: <strong id="wp-score">0</strong></div>
+          <div class="wp-question" id="wp-question"></div>
+          <div class="wp-options" id="wp-options"></div>
+          <div id="wp-result" class="game-result hidden"></div>
         </div>
       </section>
 

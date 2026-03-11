@@ -1178,6 +1178,15 @@ function updateSubjectFeatures() {
     }
   }
 
+  if (currentSubject === 'hebrew') {
+    html += `
+    <button class="feature-card" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9)" onclick="navigate('reading-comp')">
+      <div class="feature-icon">📖</div>
+      <div class="feature-name">הבנת הנקרא</div>
+      <div class="feature-desc">קרא וענה על שאלות</div>
+    </button>`;
+  }
+
   if (currentSubject === 'english') {
     html += `
     <button class="feature-card" style="background:linear-gradient(135deg,#fff3e0,#ffe0b2)" onclick="navigate('dictation')">

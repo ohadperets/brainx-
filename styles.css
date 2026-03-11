@@ -3014,6 +3014,105 @@ body.theme-pink .app-header {
   opacity: 0.5;
 }
 
+/* Reading Comprehension */
+.rc-passage-card {
+  min-height: 120px;
+}
+
+.rc-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.rc-text {
+  font-size: 17px;
+  line-height: 1.9;
+  padding: 20px;
+  background: #f7fafc;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  direction: rtl;
+  text-align: right;
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #e2e8f0;
+}
+
+.rc-divider {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 16px 0;
+  padding: 8px;
+  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+  border-radius: 8px;
+}
+
+.rc-progress {
+  font-size: 16px;
+  margin-bottom: 12px;
+  color: var(--text-light);
+  text-align: center;
+}
+
+.rc-question {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 16px 0;
+  padding: 16px;
+  background: #fffde7;
+  border-radius: 10px;
+  direction: rtl;
+  text-align: right;
+  line-height: 1.6;
+}
+
+.rc-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rc-option-btn {
+  padding: 14px 16px;
+  font-size: 16px;
+  font-weight: 500;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  text-align: right;
+  direction: rtl;
+  line-height: 1.4;
+}
+
+.rc-option-btn:hover:not(:disabled) {
+  border-color: var(--primary);
+  background: #f0f4ff;
+}
+
+.rc-option-btn.correct {
+  background: #c6f6d5;
+  border-color: var(--success);
+  box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.3);
+}
+
+.rc-option-btn.wrong {
+  background: #fed7d7;
+  border-color: var(--danger);
+  opacity: 0.7;
+}
+
+.rc-option-btn:disabled {
+  cursor: default;
+}
+
 /* Word Problems Game */
 .wp-progress,
 .wp-score {

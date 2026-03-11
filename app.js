@@ -907,6 +907,17 @@ function navigate(screen, subject, skipHistory = false) {
       startWordProblems();
       break;
 
+    case 'reading-comp':
+      document.getElementById('screen-reading-comp').classList.add('active');
+      headerTitle.textContent = 'הבנת הנקרא';
+      renderReadingCompPassages();
+      break;
+
+    case 'reading-passage':
+      document.getElementById('screen-reading-passage').classList.add('active');
+      headerTitle.textContent = 'הבנת הנקרא';
+      break;
+
     case 'game-match-drag':
       document.getElementById('screen-game-match-drag').classList.add('active');
       headerTitle.textContent = 'התאמה';
@@ -2858,6 +2869,100 @@ function endSpelling() {
   saveProgress(progress);
   saveHighScore('spelling-' + currentSubject, s.score);
   if (s.score >= 80) { playSound('win'); launchConfetti(); }
+  checkAchievements();
+}
+
+// ===== READING COMPREHENSION (הבנת הנקרא) =====
+let rcState = { passage: null, current: 0, score: 0 };
+
+function renderReadingCompPassages() {
+  const data = getData();
+  const passages = data.readingComprehension || [];
+  const grid = document.getElementById('reading-comp-passages');
+  grid.innerHTML = passages.map((p, i) => `
+    <button class="feature-card rc-passage-card" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9)" onclick="startReadingPassage(${i})">
+      <div class="feature-icon">${p.icon}</div>
+      <div class="feature-name">${p.title}</div>
+      <div class="feature-desc">${p.questions.length} שאלות</div>
+    </button>
+  `).join('');
+}
+
+function startReadingPassage(index) {
+  const data = getData();
+  const passage = data.readingComprehension[index];
+  rcState = { passage, current: 0, score: 0 };
+
+  navigate('reading-passage');
+  document.getElementById('rc-title').textContent = passage.title;
+  document.getElementById('rc-text').innerHTML = passage.text.replace(/\n/g, '<br>');
+  document.getElementById('rc-result').classList.add('hidden');
+  renderRCQuestion();
+}
+
+function renderRCQuestion() {
+  const s = rcState;
+  if (s.current >= s.passage.questions.length) {
+    endReadingComp();
+    return;
+  }
+  const q = s.passage.questions[s.current];
+  document.getElementById('rc-current').textContent = s.current + 1;
+  document.getElementById('rc-total').textContent = s.passage.questions.length;
+  document.getElementById('rc-score').textContent = s.score;
+  document.getElementById('rc-question').textContent = q.q;
+
+  const optionsEl = document.getElementById('rc-options');
+  const letters = ['A', 'B', 'C', 'D'];
+  optionsEl.innerHTML = q.options.map((opt, i) =>
+    `<button class="rc-option-btn" onclick="answerRC(this, ${i}, ${q.answer})">${letters[i]}. ${opt}</button>`
+  ).join('');
+}
+
+function answerRC(btn, chosen, correct) {
+  const buttons = document.querySelectorAll('.rc-option-btn');
+  buttons.forEach(b => b.disabled = true);
+
+  if (chosen === correct) {
+    rcState.score += 10;
+    btn.classList.add('correct');
+    playSound('correct');
+    showPointsPopup(10);
+  } else {
+    btn.classList.add('wrong');
+    playSound('wrong');
+    buttons[correct].classList.add('correct');
+  }
+
+  rcState.current++;
+  setTimeout(renderRCQuestion, 1200);
+}
+
+function endReadingComp() {
+  const s = rcState;
+  const maxScore = s.passage.questions.length * 10;
+  const pct = Math.round((s.score / maxScore) * 100);
+  const stars = pct >= 90 ? 3 : pct >= 60 ? 2 : pct >= 30 ? 1 : 0;
+  const result = document.getElementById('rc-result');
+  result.classList.remove('hidden');
+  document.getElementById('rc-options').innerHTML = '';
+  document.getElementById('rc-question').textContent = '';
+
+  result.innerHTML = `<div class="compact-result">
+    <span class="result-emoji">${pct >= 80 ? '🏆' : pct >= 50 ? '✅' : '💪'}</span>
+    <div class="result-text"><strong>ניקוד: ${s.score} מתוך ${maxScore} (${pct}%)</strong></div>
+    <div class="result-stars">${renderStars(stars)}</div>
+    <div class="result-btns">
+      <button class="btn-sm btn-primary" onclick="startReadingPassage(${getData().readingComprehension.indexOf(s.passage)})">🔄 שוב</button>
+      <button class="btn-sm btn-secondary" onclick="navigate('reading-comp')">← לקטעים</button>
+    </div>
+  </div>`;
+
+  progress.stars += stars;
+  progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
+  saveProgress(progress);
+  saveHighScore('reading-comp-' + s.passage.id, s.score);
+  if (pct >= 80) { playSound('win'); launchConfetti(); }
   checkAchievements();
 }
 

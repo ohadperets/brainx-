@@ -367,6 +367,54 @@ html, body {
 .lessons-card { background: linear-gradient(135deg, #fef3c7, #fffbeb); }
 .quiz-card { background: linear-gradient(135deg, #c6f6d5, #f0fff4); }
 .balloon-card { background: linear-gradient(135deg, #fce4ec, #ffeef2); }
+.english-test-card { background: linear-gradient(135deg, #eff6ff, #dbeafe); }
+
+.english-test-toolbar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.english-test-paper {
+  background: #fff;
+  border: 1px solid #dbe4ff;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px;
+  line-height: 1.55;
+  color: #1f2937;
+}
+
+.english-test-paper h2 {
+  font-size: 22px;
+  margin-bottom: 8px;
+  color: #1e3a8a;
+}
+
+.english-test-paper h3 {
+  margin-top: 14px;
+  margin-bottom: 8px;
+  color: #1f2937;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 4px;
+}
+
+.english-test-paper ol {
+  padding-inline-start: 20px;
+}
+
+.english-test-paper li {
+  margin-bottom: 8px;
+}
+
+.english-answer-key {
+  margin-top: 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-sm);
+  padding: 12px;
+}
 
 /* ===== LESSONS ===== */
 .lessons-list {

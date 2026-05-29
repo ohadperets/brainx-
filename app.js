@@ -1037,9 +1037,30 @@ function navigate(screen, subject, skipHistory = false) {
       startMultiplicationQuiz();
       break;
 
+    case 'et-all-tests':
+      document.getElementById('screen-et-all-tests').classList.add('active');
+      headerTitle.textContent = 'English Tests';
+      break;
+
     case 'english-test-0626':
+    case 'english-test-1':
+      etCurrentTestId = 1; etMenuRoute = 'english-test-0626';
       document.getElementById('screen-english-test-0626').classList.add('active');
       headerTitle.textContent = 'English Test – June 2026';
+      updateETMenu();
+      break;
+
+    case 'english-test-2':
+      etCurrentTestId = 2; etMenuRoute = 'english-test-2';
+      document.getElementById('screen-english-test-0626').classList.add('active');
+      headerTitle.textContent = 'English Test – July 2026';
+      updateETMenu();
+      break;
+
+    case 'english-test-3':
+      etCurrentTestId = 3; etMenuRoute = 'english-test-3';
+      document.getElementById('screen-english-test-0626').classList.add('active');
+      headerTitle.textContent = 'English Test – August 2026';
       updateETMenu();
       break;
 
@@ -1234,10 +1255,10 @@ function updateSubjectFeatures() {
     const grade = profile?.grade || 5;
     if (grade === 5) {
       html += `
-      <button class="feature-card" style="grid-column: 1 / -1; background:linear-gradient(135deg,#e3f2fd,#90caf9); padding: 28px 16px;" onclick="navigate('english-test-0626')">
+      <button class="feature-card" style="grid-column: 1 / -1; background:linear-gradient(135deg,#e3f2fd,#90caf9); padding: 28px 16px;" onclick="navigate('et-all-tests')">
         <div class="feature-icon" style="font-size:2.5rem">📋</div>
-        <div class="feature-name" style="font-size:1.2rem; font-weight:800; color:#0d47a1">English Test – June 2026</div>
-        <div class="feature-desc" style="font-size:0.88rem; color:#1565c0">⏰ Time &bull; 🔤 Pronouns &bull; ✏️ Grammar &bull; 📍 Prepositions &bull; 📖 Reading</div>
+        <div class="feature-name" style="font-size:1.2rem; font-weight:800; color:#0d47a1">English Tests – 2026</div>
+        <div class="feature-desc" style="font-size:0.88rem; color:#1565c0">3 Tests &bull; ⏰ Time &bull; 🔤 Pronouns &bull; ✏️ Grammar &bull; 📍 Prepositions &bull; 📖 Reading</div>
       </button>`;
       html += `
       <button class="feature-card big-exam-card" style="grid-column: 1 / -1; background:linear-gradient(135deg,#ffd54f,#ffb300); padding: 32px 16px;" onclick="navigate('big-exam')">
@@ -5116,17 +5137,34 @@ const ET_READING_PASSAGE = [
 
 let etQuizState = {};
 let etReadingState = {};
+let etCurrentTestId = 1;
+let etMenuRoute = 'english-test-0626';
+
+function etGetAllQuestions() {
+  if (etCurrentTestId === 2) return ET_QUESTIONS_2;
+  if (etCurrentTestId === 3) return ET_QUESTIONS_3;
+  return ET_QUESTIONS;
+}
+function etGetReadingPassage() {
+  if (etCurrentTestId === 2) return ET_READING_PASSAGE_2;
+  if (etCurrentTestId === 3) return ET_READING_PASSAGE_3;
+  return ET_READING_PASSAGE;
+}
+function navigateBackToETMenu() { navigate(etMenuRoute); }
 
 function etGetScores() {
-  return JSON.parse(localStorage.getItem('etScores-' + currentUserId) || '{}');
+  return JSON.parse(localStorage.getItem(`etScores-${etCurrentTestId}-${currentUserId}`) || '{}');
 }
 function etSaveScore(partId, score) {
   const map = etGetScores();
   map[partId] = score;
-  localStorage.setItem('etScores-' + currentUserId, JSON.stringify(map));
+  localStorage.setItem(`etScores-${etCurrentTestId}-${currentUserId}`, JSON.stringify(map));
 }
 
 function updateETMenu() {
+  const testTitles = { 1: 'English Test – June 2026', 2: 'English Test – July 2026', 3: 'English Test – August 2026' };
+  const h2 = document.querySelector('#screen-english-test-0626 h2');
+  if (h2) h2.textContent = `📋 ${testTitles[etCurrentTestId]}`;
   const parts = Object.keys(ET_PART_META);
   const scoreMap = etGetScores();
   let totalScore = 0, totalMax = 0, doneCount = 0;
@@ -5165,7 +5203,7 @@ function updateETMenu() {
 }
 
 function startETPart(partId) {
-  const qs = ET_QUESTIONS[partId];
+  const qs = etGetAllQuestions()[partId];
   const meta = ET_PART_META[partId];
   etQuizState = { partId, questions: qs, current: 0, correct: 0, answered: false, maxPts: meta.pts };
 
@@ -5342,7 +5380,7 @@ function startETReading() {
   const passageEl = document.getElementById('et-reading-passage');
   if (passageEl) {
     let html = '';
-    ET_READING_PASSAGE.forEach(block => {
+    etGetReadingPassage().forEach(block => {
       if (block.heading) html += `<h3 style="margin-bottom:12px;color:#0d47a1;font-size:1.1rem;">${block.heading}</h3>`;
       if (block.text)    html += `<p style="margin-bottom:12px;">${block.text}</p>`;
     });
@@ -5366,7 +5404,7 @@ function startETReadingQuestions() {
 }
 
 function renderETReadingQuestion() {
-  const questions = ET_QUESTIONS.reading;
+  const questions = etGetAllQuestions().reading;
   const { current } = etReadingState;
   const q = questions[current];
   const total = questions.length;
@@ -5404,7 +5442,7 @@ function answerETReading(idx) {
   if (etReadingState.answered) return;
   etReadingState.answered = true;
 
-  const q = ET_QUESTIONS.reading[etReadingState.current];
+  const q = etGetAllQuestions().reading[etReadingState.current];
   const isCorrect = idx === q.ans;
 
   if (isCorrect) { etReadingState.correct++; playSound('correct'); }
@@ -5434,13 +5472,14 @@ function answerETReading(idx) {
 
 function nextETReadingQuestion() {
   etReadingState.current++;
-  if (etReadingState.current >= ET_QUESTIONS.reading.length) showETReadingResults();
+  if (etReadingState.current >= etGetAllQuestions().reading.length) showETReadingResults();
   else renderETReadingQuestion();
 }
 
 function showETReadingResults() {
+  const readingQs = etGetAllQuestions().reading;
   const { correct } = etReadingState;
-  const total = ET_QUESTIONS.reading.length;
+  const total = readingQs.length;
   const maxPts = 25;
   const score = Math.round((correct / total) * maxPts);
   etSaveScore('reading', score);
@@ -5452,7 +5491,7 @@ function showETReadingResults() {
 
   let keyHTML = `<div class="et-answer-key">
     <h3>📋 Answer Key – Part E: Reading Comprehension</h3>`;
-  ET_QUESTIONS.reading.forEach((q, i) => {
+  readingQs.forEach((q, i) => {
     keyHTML += `<div class="et-key-row">
       <span class="et-key-num">Q${i + 1}</span>
       <span class="et-key-ans">${q.options[q.ans]}</span>
@@ -5467,9 +5506,148 @@ function showETReadingResults() {
     <p style="direction:ltr; margin-bottom:12px;">${correct} out of ${total} correct &nbsp;(${pct}%)</p>
     ${keyHTML}
     <button class="btn-primary" onclick="startETReading()" style="margin-top:16px;">Try Again 🔄</button>
-    <button class="btn-secondary" onclick="navigate('english-test-0626')" style="margin-top:8px;">← Back to Menu</button>
+    <button class="btn-secondary" onclick="navigateBackToETMenu()" style="margin-top:8px;">← Back to Menu</button>
   `;
   resEl.classList.remove('hidden');
 
   if (pct >= 80) { playSound('win'); launchConfetti(); }
 }
+
+// ===== ENGLISH TEST – JULY 2026 (Test 2) =====
+
+const ET_QUESTIONS_2 = {
+  time: [
+    { q: '🕖  The clock shows  6:00\nWhat time is it?',                            options: ["It's half past six.",      "It's six o'clock.",       "It's quarter past six.",    "It's quarter to six."],     ans: 1 },
+    { q: '🕧  The clock shows 12:30\nWhat time is it?',                            options: ["It's quarter past twelve.","It's twelve o'clock.",    "It's half past twelve.",    "It's quarter to one."],     ans: 2 },
+    { q: '⏰  The clock shows  1:15\nWhat time is it?',                            options: ["It's quarter to one.",     "It's one o'clock.",       "It's quarter past one.",    "It's half past one."],      ans: 2 },
+    { q: '⏰  The clock shows  7:45\nWhat time is it?',                            options: ["It's quarter past seven.", "It's half past seven.",   "It's quarter to eight.",    "It's quarter to seven."],   ans: 2 },
+    { q: 'Tom eats lunch at 1:30.\nHow does he say the time in English?',          options: ["It's one o'clock.",        "It's half past one.",     "It's quarter past one.",    "It's quarter to two."],     ans: 1 },
+    { q: '🕙  The clock shows 10:00\nHow do you say this time in English?',        options: ["It's ten past.",           "It's ten o'clock.",       "It's half past ten.",       "It's quarter past ten."],   ans: 1 },
+    { q: 'Write the number: The word "eleven" in digits is:',                      options: ['9', '10', '11', '12'],                                                                                         ans: 2 },
+    { q: 'Write the number: The word "three" in digits is:',                       options: ['1', '2', '3', '4'],                                                                                            ans: 2 },
+  ],
+  pronouns: [
+    { q: "That is Sarah.  _____  book is on the table.",                           options: ['My', 'Your', 'His', 'Her'],          ans: 3 },
+    { q: "We are in class five.  _____  classroom is on the second floor.",        options: ['My', 'Our', 'Their', 'His'],         ans: 1 },
+    { q: "The rabbit eats  _____  carrots every morning.",                         options: ['his', 'her', 'its', 'their'],        ans: 2 },
+    { q: "David and Sam are brothers.  _____  house is next to the park.",         options: ['My', 'His', 'Her', 'Their'],         ans: 3 },
+    { q: "I have a new pen.  _____  pen is blue.",                                 options: ['My', 'Your', 'His', 'Their'],        ans: 0 },
+    { q: "You have a sister.  What is  _____  name?",                             options: ['my', 'your', 'his', 'her'],          ans: 3 },
+    { q: "My brother has a dog.  _____  dog loves to run.",                        options: ['My', 'His', 'Her', 'Their'],         ans: 1 },
+    { q: "The children forgot  _____  homework at school.",                        options: ['my', 'your', 'its', 'their'],        ans: 3 },
+  ],
+  grammar: [
+    { q: "_____  a dog barking outside.",                                          options: ['There are', 'There is', 'There have', 'There am'],      ans: 1,  hint: 'Topic: There is / There are' },
+    { q: "_____  six chairs around the kitchen table.",                            options: ['There is', 'There am', 'There have', 'There are'],      ans: 3,  hint: 'Topic: There is / There are' },
+    { q: "Look at the shelf.\n_____  three books and a pencil case on it.",        options: ['There is', 'There are', 'Is there', 'Are there'],       ans: 1,  hint: 'Topic: There is / There are' },
+    { q: "The baby  _____  a new soft toy.",                                       options: ['have', 'are having', 'has', 'having'],                  ans: 2,  hint: 'Topic: Has / Have' },
+    { q: "My friends  _____  a swimming pool in their garden.",                    options: ['has', 'have', 'is having', 'are have'],                 ans: 1,  hint: 'Topic: Has / Have' },
+    { q: "We  _____  a new math teacher this year.",                               options: ['has', 'have', 'is having', 'am having'],                ans: 1,  hint: 'Topic: Has / Have' },
+    { q: "Look! The cat  _____  up the tree right now.",                           options: ['climb', 'climbs', 'is climbing', 'are climbing'],       ans: 2,  hint: 'Topic: Present Progressive' },
+    { q: "The boys  _____  a sandcastle at the beach at the moment.",              options: ['is building', 'are building', 'builds', 'building'],    ans: 1,  hint: 'Topic: Present Progressive' },
+    { q: "I  _____  my homework at this moment.",                                  options: ['do', 'does', 'are doing', 'am doing'],                  ans: 3,  hint: 'Topic: Present Progressive' },
+    { q: "Listen! She  _____  a beautiful song right now.",                        options: ['sing', 'sings', 'is singing', 'are singing'],           ans: 2,  hint: 'Topic: Present Progressive' },
+  ],
+  prepositions: [
+    { q: "The cat is sleeping  _____  the chair.\n(on top of the chair)",          options: ['under', 'on', 'above', 'behind'],          ans: 1 },
+    { q: "The keys are  _____  the bag.\n(inside the bag)",                        options: ['on', 'in', 'above', 'near'],               ans: 1 },
+    { q: "The ball rolled  _____  the table.\n(below the table)",                  options: ['on', 'in', 'under', 'above'],              ans: 2 },
+    { q: "The park is  _____  my house.\n(a short walk away, close but not attached)", options: ['in', 'above', 'near', 'behind'],       ans: 2 },
+    { q: "The boy is standing  _____  the door.\n(outside, facing the door)",      options: ['behind', 'in front of', 'above', 'next to'], ans: 1 },
+    { q: "The lamp is hanging  _____  the dining table.\n(directly over it)",      options: ['under', 'in front of', 'above', 'in'],    ans: 2 },
+    { q: "The post office is  _____  the supermarket.\n(right beside it)",         options: ['above', 'behind', 'in front of', 'next to'], ans: 3 },
+    { q: "The bag is on the floor  _____  the sofa.\n(the sofa is in front of the bag)", options: ['on', 'in', 'behind', 'near'],        ans: 2 },
+  ],
+  reading: [
+    { q: 'How old is Ben?',                                                        options: ['Eight years old', 'Nine years old', 'Ten years old', 'Eleven years old'], ans: 2, type: 'mc' },
+    { q: "Where does Ben's family have a tall apple tree?",                        options: ['In the park', 'Near the school', 'In their garden', 'At the sports center'], ans: 2, type: 'mc' },
+    { q: 'What sport does Ben love?',                                              options: ['Swimming', 'Basketball', 'Tennis', 'Football'], ans: 3, type: 'mc' },
+    { q: "What is the librarian's name?",                                          options: ['Miss Brown', 'Miss Smith', 'Miss Green', 'Miss Johnson'], ans: 2, type: 'mc' },
+    { q: "Where does Fluffy the rabbit live?",                                     options: ["In Ben's bedroom", 'In the kitchen', 'In a wooden box in the garden', 'Under the apple tree'], ans: 2, type: 'mc' },
+    { q: 'What day do Ben and the narrator go to the sports center?',              options: ['Friday', 'Saturday', 'Sunday', 'Monday'], ans: 1, type: 'sa' },
+    { q: 'How many lanes does the swimming pool have?',                            options: ['Four', 'Five', 'Six', 'Seven'], ans: 2, type: 'sa' },
+    { q: "What is the name of Ben's rabbit?",                                      options: ['Cotton', 'Snowball', 'Fluffy', 'Pepper'], ans: 2, type: 'sa' },
+    { q: 'What does Ben give Fluffy every evening?',                               options: ['Dry food', 'Fresh vegetables', 'Warm milk', 'Seeds'], ans: 1, type: 'sa' },
+    { q: 'How does Miss Green help the children?',                                 options: ['She brings them snacks', 'She plays games with them', 'She recommends good books', 'She teaches them English'], ans: 2, type: 'sa' },
+    { q: '✅ TRUE or FALSE:\n"The swimming pool water is always warm."',           options: ['TRUE ✓', 'FALSE ✗'], ans: 1, type: 'tf' },
+    { q: '✅ TRUE or FALSE:\n"Ben and his friend sometimes visit the library on Sundays."', options: ['TRUE ✓', 'FALSE ✗'], ans: 0, type: 'tf' },
+  ]
+};
+
+const ET_READING_PASSAGE_2 = [
+  { heading: 'My Friend Ben', text: null },
+  { heading: null, text: "Ben is my best friend. He is ten years old and he lives near my house. We go to the same school. Ben has a big family. He lives with his parents, his grandmother, and his two sisters. Their house has a garden with a tall apple tree." },
+  { heading: null, text: "Every Saturday morning, Ben and I go to the sports center. Ben loves football. He is always running and kicking the ball. I like swimming. There is a big swimming pool at the sports center. The pool has six lanes and the water is always cold." },
+  { heading: null, text: "On Sundays, we sometimes visit the library near our school. The library has hundreds of books. There are also computers where children can read stories online. The librarian's name is Miss Green. She is very friendly and helpful. She always recommends good books for us to read." },
+  { heading: null, text: "Ben has a pet rabbit. Its name is Fluffy. Fluffy lives in a wooden box in the garden. Every evening, Ben gives Fluffy fresh vegetables to eat." }
+];
+
+// ===== ENGLISH TEST – AUGUST 2026 (Test 3) =====
+
+const ET_QUESTIONS_3 = {
+  time: [
+    { q: '🕑  The clock shows  2:00\nWhat time is it?',                            options: ["It's half past two.",      "It's two o'clock.",       "It's quarter past two.",    "It's quarter to two."],     ans: 1 },
+    { q: '🕠  The clock shows  5:30\nWhat time is it?',                            options: ["It's quarter past five.",  "It's five o'clock.",      "It's half past five.",      "It's quarter to six."],     ans: 2 },
+    { q: '⏰  The clock shows  9:15\nWhat time is it?',                            options: ["It's quarter to nine.",    "It's nine o'clock.",      "It's quarter past nine.",   "It's half past nine."],     ans: 2 },
+    { q: '⏰  The clock shows  3:45\nWhat time is it?',                            options: ["It's quarter past three.", "It's half past three.",   "It's quarter to three.",    "It's quarter to four."],    ans: 3 },
+    { q: "Mia's ballet class starts at 11:00.\nHow does she say the time in English?", options: ["It's half past eleven.", "It's quarter past eleven.", "It's eleven o'clock.", "It's quarter to eleven."], ans: 2 },
+    { q: '🕦  The clock shows 11:30\nHow do you say this time in English?',        options: ["It's eleven o'clock.",     "It's half past eleven.",  "It's quarter past eleven.", "It's quarter to twelve."],  ans: 1 },
+    { q: 'Write the number: The word "nine" in digits is:',                        options: ['7', '8', '9', '10'],                                                                                           ans: 2 },
+    { q: 'Write the number: The word "four" in digits is:',                        options: ['2', '3', '4', '5'],                                                                                            ans: 2 },
+  ],
+  pronouns: [
+    { q: "Look at Emma.  _____  eyes are blue.",                                   options: ['My', 'Your', 'His', 'Her'],          ans: 3 },
+    { q: "John and I are classmates.  _____  teacher is very funny.",              options: ['My', 'Our', 'Their', 'His'],         ans: 1 },
+    { q: "The lion opened  _____  mouth wide.",                                    options: ['his', 'her', 'its', 'their'],        ans: 2 },
+    { q: "The twins share a room.  _____  room is very big.",                      options: ['My', 'His', 'Her', 'Their'],         ans: 3 },
+    { q: "I love  _____  grandparents very much.",                                 options: ['my', 'your', 'his', 'their'],        ans: 0 },
+    { q: "Look at the puppy!  _____  tail is wagging!",                            options: ['His', 'Her', 'Its', 'Their'],        ans: 2 },
+    { q: "Daniel forgot  _____  lunch box at home.",                               options: ['my', 'your', 'his', 'their'],        ans: 2 },
+    { q: "Did you bring  _____  umbrella today?",                                  options: ['my', 'your', 'his', 'their'],        ans: 1 },
+  ],
+  grammar: [
+    { q: "_____  a bird singing in the tree.",                                     options: ['There are', 'There is', 'There have', 'There am'],      ans: 1,  hint: 'Topic: There is / There are' },
+    { q: "_____  many children playing in the park.",                              options: ['There is', 'There am', 'There have', 'There are'],      ans: 3,  hint: 'Topic: There is / There are' },
+    { q: "_____  a new restaurant on King Street.",                                options: ['There are', 'There is', 'Is there', 'Are there'],       ans: 1,  hint: 'Topic: There is / There are' },
+    { q: "Our neighbor  _____  a lovely garden.",                                  options: ['have', 'are having', 'has', 'having'],                  ans: 2,  hint: 'Topic: Has / Have' },
+    { q: "The twins  _____  a pet cat named Luna.",                                options: ['has', 'have', 'is having', 'are have'],                 ans: 1,  hint: 'Topic: Has / Have' },
+    { q: "Every student  _____  a dictionary in this class.",                      options: ['have', 'are having', 'has', 'having'],                  ans: 2,  hint: 'Topic: Has / Have' },
+    { q: "Watch out! The baby  _____  your keys right now!",                       options: ['hold', 'holds', 'is holding', 'are holding'],           ans: 2,  hint: 'Topic: Present Progressive' },
+    { q: "Look at those kids! They  _____  in the rain!",                          options: ['is dancing', 'are dancing', 'dances', 'dancing'],       ans: 1,  hint: 'Topic: Present Progressive' },
+    { q: "My dad  _____  the car right now.",                                      options: ['wash', 'washes', 'are washing', 'is washing'],          ans: 3,  hint: 'Topic: Present Progressive' },
+    { q: "The teacher  _____  something on the board at this moment.",             options: ['write', 'writes', 'is writing', 'are writing'],         ans: 2,  hint: 'Topic: Present Progressive' },
+  ],
+  prepositions: [
+    { q: "The glasses are  _____  the table.\n(on top of the table)",              options: ['under', 'on', 'above', 'behind'],          ans: 1 },
+    { q: "The mouse ran  _____  the sofa.\n(below the sofa)",                      options: ['on', 'in', 'under', 'above'],              ans: 2 },
+    { q: "Put the books  _____  the bag.\n(inside the bag)",                       options: ['on', 'in', 'above', 'next to'],            ans: 1 },
+    { q: "The pharmacy is  _____  the clinic.\n(right beside it)",                 options: ['above', 'behind', 'in front of', 'next to'], ans: 3 },
+    { q: "The plane is flying  _____  the city.\n(up in the air, over the city)",  options: ['in', 'on', 'under', 'above'],              ans: 3 },
+    { q: "The children are waiting  _____  the school gate.\n(outside, at the entrance)", options: ['behind', 'in front of', 'above', 'in'], ans: 1 },
+    { q: "The post box is  _____  the bank.\n(close to it but not attached)",      options: ['in', 'above', 'near', 'behind'],           ans: 2 },
+    { q: "The cat is hiding  _____  the curtain.\n(the curtain is in front of it)", options: ['on', 'in front of', 'behind', 'above'],   ans: 2 },
+  ],
+  reading: [
+    { q: 'What day does class 5B visit the city farm?',                            options: ['Friday', 'Saturday', 'Sunday', 'Monday'],  ans: 1, type: 'mc' },
+    { q: "What time do students arrive at the farm?",                              options: ["Eight o'clock", "Nine o'clock", "Half past nine", "Quarter past nine"], ans: 1, type: 'mc' },
+    { q: 'What do the children give to the rabbits?',                              options: ['Grain', 'Hay', 'Carrots', 'Apples'],       ans: 2, type: 'mc' },
+    { q: 'Where is the small classroom?',                                          options: ['Near the pond', 'Under the oak tree', 'In the vegetable garden', 'Inside the barn'], ans: 3, type: 'mc' },
+    { q: 'What time does the last bus home leave?',                                options: ["Quarter past two", "Half past two", "Two o'clock", "Quarter to three"], ans: 1, type: 'mc' },
+    { q: "What is the farmer's name?",                                             options: ['Mr. Smith', 'Mr. Brown', 'Mr. Jones', 'Mr. Green'], ans: 1, type: 'sa' },
+    { q: 'What do the children eat during the picnic?',                            options: ['Pizza', 'Sandwiches', 'Hot dogs', 'Soup'], ans: 1, type: 'sa' },
+    { q: 'Where do the children sit for the picnic?',                              options: ['In the barn', 'Under the big oak tree', 'In the classroom', 'Near the pond'], ans: 1, type: 'sa' },
+    { q: 'What are some children doing after the tour?',                           options: ['Playing football', 'Taking photos', 'Drawing pictures of the animals', 'Reading books'], ans: 2, type: 'sa' },
+    { q: 'How do students feel at the end of the day?',                            options: ['Tired and bored', 'Excited and hungry', 'Tired but happy', 'Sad and sleepy'], ans: 2, type: 'sa' },
+    { q: '✅ TRUE or FALSE:\n"The farm has no horses."',                           options: ['TRUE ✓', 'FALSE ✗'], ans: 1, type: 'tf' },
+    { q: '✅ TRUE or FALSE:\n"The children drink apple juice at the picnic."',     options: ['TRUE ✓', 'FALSE ✗'], ans: 0, type: 'tf' },
+  ]
+};
+
+const ET_READING_PASSAGE_3 = [
+  { heading: 'The City Farm', text: null },
+  { heading: null, text: "Every Saturday, class 5B visits the city farm. The farm is not far from their school. Students arrive at the farm at nine o'clock in the morning. A friendly farmer named Mr. Brown always welcomes them." },
+  { heading: null, text: "The farm has many different animals. There are horses, cows, pigs, chickens, and rabbits. The children love feeding the animals. They give carrots to the rabbits and grain to the chickens. There is also a large vegetable garden. In the garden, there are tomatoes, cucumbers, and sunflowers growing in neat rows." },
+  { heading: null, text: "Inside the barn, there are tools and machines. The students learn how farmers use these tools to plant and harvest vegetables. There is also a small classroom inside the barn with wooden chairs and tables." },
+  { heading: null, text: "After the tour, the children sit under the big oak tree and have a picnic. They eat sandwiches and drink apple juice. Some children are drawing pictures of the animals. Others are writing notes in their notebooks. Everyone loves this weekly trip." },
+  { heading: null, text: "The last bus home leaves at half past two. The children always feel tired but happy at the end of the day." }
+];

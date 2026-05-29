@@ -1057,9 +1057,36 @@
         </div>
       </section>
 
-      <!-- ===== ENGLISH TEST JUNE 2026 ===== -->
+      <!-- ===== ENGLISH TESTS 2026 ===== -->
 
-      <!-- ET Main Menu -->
+      <!-- All Tests Selection -->
+      <section id="screen-et-all-tests" class="screen">
+        <div class="game-container">
+          <div class="dictation-header">
+            <h2 style="direction:ltr; text-align:center;">📋 English Tests – 2026</h2>
+            <p style="color:#666; margin-bottom:1rem; direction:ltr; text-align:center;">Grade 5 &nbsp;|&nbsp; Choose a test to practise</p>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <button class="feature-card" style="background:linear-gradient(135deg,#e3f2fd,#90caf9); padding:24px 20px; text-align:left; direction:ltr;" onclick="navigate('english-test-0626')">
+              <div style="font-size:2rem; margin-bottom:6px;">📝</div>
+              <div style="font-size:1.1rem; font-weight:800; color:#0d47a1;">English Test – June 2026</div>
+              <div style="font-size:0.88rem; color:#1565c0; margin-top:4px;">Test 1 &nbsp;|&nbsp; ⏰ Time · 🔤 Pronouns · ✏️ Grammar · 📍 Prepositions · 📖 Reading</div>
+            </button>
+            <button class="feature-card" style="background:linear-gradient(135deg,#e8f5e9,#a5d6a7); padding:24px 20px; text-align:left; direction:ltr;" onclick="navigate('english-test-2')">
+              <div style="font-size:2rem; margin-bottom:6px;">📝</div>
+              <div style="font-size:1.1rem; font-weight:800; color:#1b5e20;">English Test – July 2026</div>
+              <div style="font-size:0.88rem; color:#2e7d32; margin-top:4px;">Test 2 &nbsp;|&nbsp; ⏰ Time · 🔤 Pronouns · ✏️ Grammar · 📍 Prepositions · 📖 Reading</div>
+            </button>
+            <button class="feature-card" style="background:linear-gradient(135deg,#fce4ec,#f48fb1); padding:24px 20px; text-align:left; direction:ltr;" onclick="navigate('english-test-3')">
+              <div style="font-size:2rem; margin-bottom:6px;">📝</div>
+              <div style="font-size:1.1rem; font-weight:800; color:#880e4f;">English Test – August 2026</div>
+              <div style="font-size:0.88rem; color:#ad1457; margin-top:4px;">Test 3 &nbsp;|&nbsp; ⏰ Time · 🔤 Pronouns · ✏️ Grammar · 📍 Prepositions · 📖 Reading</div>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ET Shared Test Menu (reused for all 3 tests) -->
       <section id="screen-english-test-0626" class="screen">
         <div class="game-container">
           <div class="dictation-header">
@@ -1094,7 +1121,7 @@
             <p id="et-time-results-text" style="direction:ltr;"></p>
             <div id="et-time-answer-key"></div>
             <button class="btn-primary" onclick="restartETPart('time')" style="margin-top:16px;">Try Again 🔄</button>
-            <button class="btn-secondary" onclick="navigate('english-test-0626')" style="margin-top:8px;">← Back to Menu</button>
+            <button class="btn-secondary" onclick="navigateBackToETMenu()" style="margin-top:8px;">← Back to Menu</button>
           </div>
         </div>
       </section>
@@ -1122,7 +1149,7 @@
             <p id="et-pronouns-results-text" style="direction:ltr;"></p>
             <div id="et-pronouns-answer-key"></div>
             <button class="btn-primary" onclick="restartETPart('pronouns')" style="margin-top:16px;">Try Again 🔄</button>
-            <button class="btn-secondary" onclick="navigate('english-test-0626')" style="margin-top:8px;">← Back to Menu</button>
+            <button class="btn-secondary" onclick="navigateBackToETMenu()" style="margin-top:8px;">← Back to Menu</button>
           </div>
         </div>
       </section>
@@ -1150,7 +1177,7 @@
             <p id="et-grammar-results-text" style="direction:ltr;"></p>
             <div id="et-grammar-answer-key"></div>
             <button class="btn-primary" onclick="restartETPart('grammar')" style="margin-top:16px;">Try Again 🔄</button>
-            <button class="btn-secondary" onclick="navigate('english-test-0626')" style="margin-top:8px;">← Back to Menu</button>
+            <button class="btn-secondary" onclick="navigateBackToETMenu()" style="margin-top:8px;">← Back to Menu</button>
           </div>
         </div>
       </section>
@@ -1178,7 +1205,7 @@
             <p id="et-prepositions-results-text" style="direction:ltr;"></p>
             <div id="et-prepositions-answer-key"></div>
             <button class="btn-primary" onclick="restartETPart('prepositions')" style="margin-top:16px;">Try Again 🔄</button>
-            <button class="btn-secondary" onclick="navigate('english-test-0626')" style="margin-top:8px;">← Back to Menu</button>
+            <button class="btn-secondary" onclick="navigateBackToETMenu()" style="margin-top:8px;">← Back to Menu</button>
           </div>
         </div>
       </section>

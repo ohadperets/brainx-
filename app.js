@@ -4,7 +4,6 @@
 let currentScreen = 'home';
 let currentSubject = null;
 let screenHistory = [];
-let selectedEnglishTestIndex = 0;
 let quizState = {};
 let balloonPopState = {};
 let hangmanState = {};
@@ -973,18 +972,6 @@ function navigate(screen, subject, skipHistory = false) {
       headerTitle.textContent = 'הכנה למבחן הגדול';
       break;
 
-    case 'english-tests':
-      document.getElementById('screen-english-tests').classList.add('active');
-      headerTitle.textContent = 'English Tests';
-      renderEnglishTestsMenu();
-      break;
-
-    case 'english-test-view':
-      document.getElementById('screen-english-test-view').classList.add('active');
-      headerTitle.textContent = 'English Test';
-      renderEnglishTestView();
-      break;
-
     case 'big-exam-grammar':
       document.getElementById('screen-big-exam-grammar').classList.add('active');
       headerTitle.textContent = 'Grammar';
@@ -1208,13 +1195,6 @@ function updateSubjectFeatures() {
       <div class="feature-desc">הכנה למבחן והכתבה כללי</div>
     </button>`;
 
-    html += `
-    <button class="feature-card" style="background:linear-gradient(135deg,#dbeafe,#bfdbfe)" onclick="navigate('english-tests')">
-      <div class="feature-icon">🧾</div>
-      <div class="feature-name">English Tests</div>
-      <div class="feature-desc">3 comprehensive tests</div>
-    </button>`;
-
     const grade = profile?.grade || 5;
     if (grade === 5) {
       html += `
@@ -1227,313 +1207,6 @@ function updateSubjectFeatures() {
   }
 
   grid.innerHTML = html;
-}
-
-const ENGLISH_COMPREHENSIVE_TESTS = [
-  {
-    title: 'English Test 1 - Grade 5',
-    subtitle: 'Total score: 100 | Time: 60-75 minutes',
-    content: `
-      <div class="english-test-paper">
-        <h2>English Test 1 - Grade 5</h2>
-        <p><strong>Topics:</strong> Telling time, possessive pronouns, grammar and writing, prepositions, reading comprehension.</p>
-        <p><strong>Instructions:</strong> Read carefully. Answer all questions in clear English.</p>
-
-        <h3>Part A: Telling Time (20 points)</h3>
-        <ol>
-          <li>Choose: 6:00<br>a) half past six b) six o'clock c) quarter to six d) quarter past six</li>
-          <li>Choose: 4:30<br>a) half past four b) four o'clock c) quarter to four d) quarter past four</li>
-          <li>Choose: 9:15<br>a) quarter to nine b) half past nine c) quarter past nine d) nine o'clock</li>
-          <li>Choose: 1:45<br>a) quarter to two b) half past one c) quarter past one d) two o'clock</li>
-          <li>Write the time sentence: Minute hand on 12, hour hand on 8.</li>
-          <li>Write the time sentence: Minute hand on 6, hour hand between 11 and 12.</li>
-          <li>Write the time sentence: Minute hand on 3, hour hand just after 5.</li>
-          <li>Write in words: 7</li>
-          <li>Write in digits: twelve</li>
-          <li>Complete: 10 = ______ ; three = ______</li>
-        </ol>
-
-        <h3>Part B: Possessive Pronouns (15 points)</h3>
-        <ol start="11">
-          <li>I am Sara. This is ______ pencil case.</li>
-          <li>Dan has a dog. ______ dog is friendly.</li>
-          <li>We are classmates. ______ classroom is big.</li>
-          <li>You are my friend. Is this ______ bag?</li>
-          <li>The baby is sleeping in ______ bed.</li>
-          <li>Lia has a bike. ______ bike is new.</li>
-          <li>The students are in the yard. ______ teacher is smiling.</li>
-          <li>Complete: Tom and I are brothers. This is ______ room.</li>
-          <li>Complete: You and Noa have red hats. These are ______ hats.</li>
-          <li>Correct the error: I am Ben. Her favorite color is blue.</li>
-        </ol>
-
-        <h3>Part C: Grammar and Writing (25 points)</h3>
-        <ol start="21">
-          <li>______ a cat on the chair. (There is / There are)</li>
-          <li>______ five books on the shelf. (There is / There are)</li>
-          <li>The monkey ______ a long tail. (has / have)</li>
-          <li>The girls ______ lunch at school. (has / have)</li>
-          <li>I ______ (write) in my notebook now.</li>
-          <li>The boys ______ (play) football now.</li>
-          <li>The teacher ______ (talk) to us now.</li>
-          <li>Write one sentence with: The ____ has ____.</li>
-          <li>Write one sentence with: The ____ have ____.</li>
-        </ol>
-
-        <h3>Part D: Prepositions (15 points)</h3>
-        <ol start="30">
-          <li>The ball is ______ the box. (in / on / under)</li>
-          <li>The clock is ______ the door. (above / behind / in)</li>
-          <li>The shoes are ______ the bed. (under / above / next to)</li>
-          <li>The school is ______ the park. (near / in / on)</li>
-          <li>The cat is ______ the sofa and the wall. (behind / in front of / above)</li>
-          <li>The table is ______ the window. (next to / under / in)</li>
-          <li>Write one sentence using: in front of</li>
-          <li>Write one sentence using: behind</li>
-        </ol>
-
-        <h3>Part E: Reading Comprehension (25 points)</h3>
-        <p><strong>Passage:</strong> Maya is eleven years old. Every Friday, she wakes up at seven o'clock and helps her father prepare breakfast. There are eggs, vegetables, and bread on the kitchen table. At nine o'clock, Maya meets her cousin Ron near the community center. They take two basketballs and walk to the sports court. Ron is practicing passes, and Maya is shooting to the basket. After one hour, they rest under a tree and drink water. Then they go to the library. Maya reads a story about sea animals, while Ron chooses a book about space. In the afternoon, they return home. Maya does her homework and calls her friend to study together for a science test. In the evening, her family eats dinner and talks about the day. Maya feels tired but happy because she spent time learning, playing, and helping at home.</p>
-        <ol start="38">
-          <li>How old is Maya?<br>a) 10 b) 11 c) 12 d) 13</li>
-          <li>What time does she wake up?<br>a) 6:00 b) 7:00 c) 8:00 d) 9:00</li>
-          <li>Where does she meet Ron?<br>a) at school b) near the community center c) at the beach d) in the kitchen</li>
-          <li>What is Ron practicing?<br>a) reading b) drawing c) passes d) singing</li>
-          <li>What does Maya read in the library?<br>a) a book about space b) a story about sea animals c) a math book d) a newspaper</li>
-          <li>Short answer: Name one thing they eat or drink during the day.</li>
-          <li>Short answer: Where do they rest?</li>
-          <li>Short answer: What does Maya do in the afternoon?</li>
-          <li>Short answer: Why does she call her friend?</li>
-          <li>Short answer: How does she feel in the evening?</li>
-          <li>True / False: Maya and Ron go to the library after the sports court.</li>
-          <li>True / False: Maya feels angry at the end of the day.</li>
-        </ol>
-      </div>
-    `,
-    answerKey: `
-      <h3>Answer Key - Test 1</h3>
-      <p>1-b, 2-a, 3-c, 4-a, 5-It's eight o'clock, 6-It's half past eleven, 7-It's a quarter past five, 8-seven, 9-12, 10-ten / 3</p>
-      <p>11-my, 12-his, 13-our, 14-your, 15-its, 16-her, 17-their, 18-our, 19-your, 20-My favorite color is blue.</p>
-      <p>21-There is, 22-There are, 23-has, 24-have, 25-am writing, 26-are playing, 27-is talking</p>
-      <p>30-in, 31-above, 32-under, 33-near, 34-behind, 35-next to</p>
-      <p>38-b, 39-b, 40-b, 41-c, 42-b, 43-54: Accept logical answers from passage; 49-True, 50-False.</p>
-    `
-  },
-  {
-    title: 'English Test 2 - Grade 5',
-    subtitle: 'Total score: 100 | Time: 60-75 minutes',
-    content: `
-      <div class="english-test-paper">
-        <h2>English Test 2 - Grade 5</h2>
-        <p><strong>Topics:</strong> Telling time, possessive pronouns, grammar and writing, prepositions, reading comprehension.</p>
-
-        <h3>Part A: Telling Time (20 points)</h3>
-        <ol>
-          <li>Choose: 2:00<br>a) two o'clock b) half past two c) quarter past two d) quarter to two</li>
-          <li>Choose: 12:30<br>a) quarter past twelve b) half past twelve c) quarter to twelve d) twelve o'clock</li>
-          <li>Choose: 7:15<br>a) quarter to seven b) quarter past seven c) half past seven d) seven o'clock</li>
-          <li>Choose: 10:45<br>a) quarter past ten b) half past ten c) quarter to eleven d) eleven o'clock</li>
-          <li>Write the time sentence: Minute hand on 12, hour hand on 1.</li>
-          <li>Write the time sentence: Minute hand on 6, hour hand between 4 and 5.</li>
-          <li>Write the time sentence: Minute hand on 9, hour hand close to 2.</li>
-          <li>Write in words: 9</li>
-          <li>Write in digits: eleven</li>
-          <li>Complete: 6 = ______ ; one = ______</li>
-        </ol>
-
-        <h3>Part B: Possessive Pronouns (15 points)</h3>
-        <ol start="11">
-          <li>I am Amir. This is ______ lunch.</li>
-          <li>Noa has a guitar. ______ guitar is brown.</li>
-          <li>You and I are teammates. This is ______ ball.</li>
-          <li>You are in my class. Is this ______ desk?</li>
-          <li>The bird is in ______ nest.</li>
-          <li>Tom has a sister. ______ sister is ten.</li>
-          <li>The players are ready. ______ coach is here.</li>
-          <li>Complete: We are at school. This is ______ library.</li>
-          <li>Complete: You and Maya are friends. These are ______ bikes.</li>
-          <li>Correct the error: He is Dan. Her shoes are black.</li>
-        </ol>
-
-        <h3>Part C: Grammar and Writing (25 points)</h3>
-        <ol start="21">
-          <li>______ a pencil on the table. (There is / There are)</li>
-          <li>______ two windows in the room. (There is / There are)</li>
-          <li>The dog ______ big ears. (has / have)</li>
-          <li>The children ______ a school project. (has / have)</li>
-          <li>She ______ (read) a comic now.</li>
-          <li>They ______ (run) in the yard now.</li>
-          <li>We ______ (clean) the classroom now.</li>
-          <li>Write one sentence with: There are</li>
-          <li>Write one sentence with Present Progressive.</li>
-        </ol>
-
-        <h3>Part D: Prepositions (15 points)</h3>
-        <ol start="30">
-          <li>The cookies are ______ the jar. (in / on / above)</li>
-          <li>The lamp is ______ the table. (on / under / behind)</li>
-          <li>The cat is ______ the chair. (under / above / in front of)</li>
-          <li>The bus stop is ______ my house. (near / in / behind)</li>
-          <li>The tree is ______ the house. (behind / in / above)</li>
-          <li>The shoes are ______ the door. (next to / in / on)</li>
-          <li>Write one sentence using: above</li>
-          <li>Write one sentence using: near</li>
-        </ol>
-
-        <h3>Part E: Reading Comprehension (25 points)</h3>
-        <p><strong>Passage:</strong> Eli is a fifth-grade student who loves science and sports. On Tuesday, he arrives at school at a quarter to eight. His first lesson is English, and his second lesson is science. During science class, the students are building a small model of the solar system. Eli and his partner place the planets carefully on a black board. At break time, Eli eats an apple and a sandwich. Then he goes to the school yard and plays with his friends. In the afternoon, he returns home and helps his little brother with homework. Later, Eli practices basketball near his house. His coach says he is improving every week. At night, Eli prepares his bag for the next day. He checks his notebook, his pencil case, and his water bottle. Before he sleeps, he reads two pages from a space book. Eli feels proud because he studies hard and also makes time for his hobbies.</p>
-        <ol start="38">
-          <li>What grade is Eli in?<br>a) 4th b) 5th c) 6th d) 7th</li>
-          <li>When does he arrive at school?<br>a) 7:15 b) 7:30 c) 7:45 d) 8:15</li>
-          <li>What do students build in science class?<br>a) a map b) a model of the solar system c) a robot d) a tree house</li>
-          <li>What does Eli eat at break time?<br>a) cake and juice b) apple and sandwich c) pizza d) soup</li>
-          <li>What does Eli do before sleeping?<br>a) watches TV b) plays a game c) reads two pages d) calls a friend</li>
-          <li>Short answer: Name one subject Eli learns at school.</li>
-          <li>Short answer: Who does Eli help at home?</li>
-          <li>Short answer: Where does Eli practice basketball?</li>
-          <li>Short answer: What items does Eli check in his bag?</li>
-          <li>Short answer: Why does Eli feel proud?</li>
-          <li>True / False: Eli's first lesson is math.</li>
-          <li>True / False: Eli balances schoolwork and hobbies.</li>
-        </ol>
-      </div>
-    `,
-    answerKey: `
-      <h3>Answer Key - Test 2</h3>
-      <p>1-a, 2-b, 3-b, 4-c, 5-It's one o'clock, 6-It's half past four, 7-It's a quarter to two, 8-nine, 9-11, 10-six / 1</p>
-      <p>11-my, 12-her, 13-our, 14-your, 15-its, 16-his, 17-their, 18-our, 19-your, 20-His shoes are black.</p>
-      <p>21-There is, 22-There are, 23-has, 24-have, 25-is reading, 26-are running, 27-are cleaning</p>
-      <p>30-in, 31-on, 32-under, 33-near, 34-behind, 35-next to</p>
-      <p>38-b, 39-c, 40-b, 41-b, 42-c, 43-54: Accept logical answers from passage; 49-False, 50-True.</p>
-    `
-  },
-  {
-    title: 'English Test 3 - Grade 5',
-    subtitle: 'Total score: 100 | Time: 60-75 minutes',
-    content: `
-      <div class="english-test-paper">
-        <h2>English Test 3 - Grade 5</h2>
-        <p><strong>Topics:</strong> Telling time, possessive pronouns, grammar and writing, prepositions, reading comprehension.</p>
-
-        <h3>Part A: Telling Time (20 points)</h3>
-        <ol>
-          <li>Choose: 11:00<br>a) eleven o'clock b) half past eleven c) quarter past eleven d) quarter to eleven</li>
-          <li>Choose: 5:30<br>a) quarter past five b) half past five c) five o'clock d) quarter to five</li>
-          <li>Choose: 3:15<br>a) quarter to three b) quarter past three c) half past three d) three o'clock</li>
-          <li>Choose: 8:45<br>a) quarter past eight b) half past eight c) quarter to nine d) nine o'clock</li>
-          <li>Write the time sentence: Minute hand on 12, hour hand on 6.</li>
-          <li>Write the time sentence: Minute hand on 6, hour hand between 9 and 10.</li>
-          <li>Write the time sentence: Minute hand on 3, hour hand just after 12.</li>
-          <li>Write in words: 4</li>
-          <li>Write in digits: ten</li>
-          <li>Complete: 2 = ______ ; twelve = ______</li>
-        </ol>
-
-        <h3>Part B: Possessive Pronouns (15 points)</h3>
-        <ol start="11">
-          <li>I am Gal. ______ favorite sport is swimming.</li>
-          <li>Roni has a rabbit. ______ rabbit is white.</li>
-          <li>We are a team. ______ captain is very kind.</li>
-          <li>You have a new jacket. Is this ______ jacket?</li>
-          <li>The robot moves ______ arms.</li>
-          <li>David has a cousin. ______ cousin lives in Haifa.</li>
-          <li>The children are in class. ______ books are open.</li>
-          <li>Complete: My sister and I love music. ______ teacher is great.</li>
-          <li>Complete: You and your brother are here. These are ______ seats.</li>
-          <li>Correct the error: I am Lior. Their notebook is blue.</li>
-        </ol>
-
-        <h3>Part C: Grammar and Writing (25 points)</h3>
-        <ol start="21">
-          <li>______ a bird on the roof. (There is / There are)</li>
-          <li>______ four chairs in the kitchen. (There is / There are)</li>
-          <li>The elephant ______ a long trunk. (has / have)</li>
-          <li>My friends ______ a new game. (has / have)</li>
-          <li>He ______ (draw) a map now.</li>
-          <li>The girls ______ (sing) now.</li>
-          <li>I ______ (eat) dinner now.</li>
-          <li>Write one sentence with: The ____ has ____.</li>
-          <li>Write one sentence with: There are ____.</li>
-        </ol>
-
-        <h3>Part D: Prepositions (15 points)</h3>
-        <ol start="30">
-          <li>The keys are ______ the bag. (in / on / near)</li>
-          <li>The poster is ______ the bed. (above / under / behind)</li>
-          <li>The ball is ______ the table. (under / above / next to)</li>
-          <li>The bakery is ______ the bank. (near / in / on)</li>
-          <li>The boy is standing ______ the gate. (in front of / above / under)</li>
-          <li>The bike is ______ the car. (next to / in / behind)</li>
-          <li>Write one sentence using: under</li>
-          <li>Write one sentence using: next to</li>
-        </ol>
-
-        <h3>Part E: Reading Comprehension (25 points)</h3>
-        <p><strong>Passage:</strong> On Sunday, Neta and her class go on a short trip to a nature museum. They arrive at half past eight and meet a guide named Mr. Ben. First, the class visits a room with large pictures of animals from deserts, forests, and oceans. Neta writes notes in her notebook because she wants to remember new facts. Later, the students watch a short film about sea turtles. The guide explains how people can protect beaches and keep the water clean. At ten o'clock, the class has a snack break near the museum garden. Neta shares fruit with her friend Yael. After the break, they join a workshop and build a small model of a turtle habitat. In the afternoon, they return to school by bus. Neta tells her mother that the trip was fun and important. She says she wants to help the environment by using less plastic and by recycling at home.</p>
-        <ol start="38">
-          <li>Where does Neta go with her class?<br>a) a zoo b) a museum c) a theater d) a stadium</li>
-          <li>What time do they arrive?<br>a) 8:00 b) 8:15 c) 8:30 d) 9:00</li>
-          <li>What does Neta do during the visit?<br>a) sleeps b) writes notes c) paints d) runs</li>
-          <li>What is the short film about?<br>a) birds b) forests c) sea turtles d) buses</li>
-          <li>How do they return to school?<br>a) by train b) by car c) by bus d) on foot</li>
-          <li>Short answer: What is the guide's name?</li>
-          <li>Short answer: Where do students have snack break?</li>
-          <li>Short answer: What model do they build?</li>
-          <li>Short answer: What does Neta want to use less of?</li>
-          <li>Short answer: Give one reason Neta thinks the trip is important.</li>
-          <li>True / False: Neta shares fruit with Yael.</li>
-          <li>True / False: The class returns by bicycle.</li>
-        </ol>
-      </div>
-    `,
-    answerKey: `
-      <h3>Answer Key - Test 3</h3>
-      <p>1-a, 2-b, 3-b, 4-c, 5-It's six o'clock, 6-It's half past nine, 7-It's a quarter past twelve, 8-four, 9-10, 10-two / 12</p>
-      <p>11-my, 12-her, 13-our, 14-your, 15-its, 16-his, 17-their, 18-our, 19-your, 20-My notebook is blue.</p>
-      <p>21-There is, 22-There are, 23-has, 24-have, 25-is drawing, 26-are singing, 27-am eating</p>
-      <p>30-in, 31-above, 32-under, 33-near, 34-in front of, 35-next to</p>
-      <p>38-b, 39-c, 40-b, 41-c, 42-c, 43-54: Accept logical answers from passage; 49-True, 50-False.</p>
-    `
-  }
-];
-
-function renderEnglishTestsMenu() {
-  const list = document.getElementById('english-tests-list');
-  if (!list) return;
-  list.innerHTML = ENGLISH_COMPREHENSIVE_TESTS.map((test, idx) => `
-    <button class="feature-card english-test-card" onclick="openEnglishTest(${idx})">
-      <div class="feature-icon">🧾</div>
-      <div class="feature-name">${test.title}</div>
-      <div class="feature-desc">${test.subtitle}</div>
-    </button>
-  `).join('');
-}
-
-function openEnglishTest(index) {
-  selectedEnglishTestIndex = index;
-  navigate('english-test-view');
-}
-
-function renderEnglishTestView() {
-  const root = document.getElementById('english-test-paper-root');
-  if (!root) return;
-  const test = ENGLISH_COMPREHENSIVE_TESTS[selectedEnglishTestIndex] || ENGLISH_COMPREHENSIVE_TESTS[0];
-  root.innerHTML = `
-    <div class="english-test-toolbar">
-      <button class="btn-secondary" onclick="navigate('english-tests')">← Back to tests</button>
-      <button class="btn-secondary" onclick="toggleEnglishTestAnswerKey()">Show / Hide answer key</button>
-    </div>
-    ${test.content}
-    <div id="english-test-answer-key" class="english-answer-key hidden">
-      ${test.answerKey}
-    </div>
-  `;
-}
-
-function toggleEnglishTestAnswerKey() {
-  const el = document.getElementById('english-test-answer-key');
-  if (!el) return;
-  el.classList.toggle('hidden');
 }
 
 // ===== HOME PROGRESS =====
@@ -3499,29 +3172,6 @@ function nextDailyChallenge() {
 let selectedDictationWeek = 0;
 let dictationMode = 'general'; // 'general' or 'test-prep'
 
-function isEitanProfile() {
-  if (!profile?.name) return false;
-  const normalized = profile.name.trim().toLowerCase();
-  return normalized === 'eitan' || normalized === 'איתן';
-}
-
-function getEitanEnglishTestPrepWords() {
-  return [
-    { word: 'dangerous', hebrewHint: 'מסוכן' },
-    { word: 'library', hebrewHint: 'ספרייה' },
-    { word: 'notebook', hebrewHint: 'מחברת' },
-    { word: 'teacher', hebrewHint: 'מורה' },
-    { word: 'student', hebrewHint: 'תלמיד' },
-    { word: 'went', hebrewHint: 'הלך (עבר של go)' },
-    { word: 'ate', hebrewHint: 'אכל (עבר של eat)' },
-    { word: 'came', hebrewHint: 'בא (עבר של come)' },
-    { word: 'made', hebrewHint: 'עשה (עבר של make)' },
-    { word: 'wrote', hebrewHint: 'כתב (עבר של write)' },
-    { word: 'doesn\'t', hebrewHint: 'לא (יחיד/הווה)' },
-    { word: 'didn\'t', hebrewHint: 'לא (עבר)' }
-  ];
-}
-
 function showGeneralDictationMenu() {
   dictationMode = 'general';
   navigate('dictation-general');
@@ -3530,10 +3180,7 @@ function showGeneralDictationMenu() {
 function startTestPrepDictation() {
   dictationMode = 'test-prep';
   const data = getData();
-  const useEitanStudy = isEitanProfile();
-  const words = useEitanStudy
-    ? [...getEitanEnglishTestPrepWords()]
-    : [...(data.testPrepDictation || [])];
+  const words = [...(data.testPrepDictation || [])];
   
   if (words.length === 0) {
     alert('אין מילים להכתבה הכנה למבחן');
@@ -3541,10 +3188,9 @@ function startTestPrepDictation() {
   }
   
   shuffle(words);
-  const testPrepTitle = useEitanStudy ? "Eitan's English Test Study" : 'הכנה למבחן';
-  dictationState = { words, current: 0, score: 0, weekTitle: testPrepTitle, answered: false, tries: 0, isTestPrep: true };
+  dictationState = { words, current: 0, score: 0, weekTitle: 'הכנה למבחן', answered: false, tries: 0, isTestPrep: true };
 
-  document.getElementById('dictation-week').textContent = `📚 ${testPrepTitle}`;
+  document.getElementById('dictation-week').textContent = '📚 הכנה למבחן';
   document.getElementById('dictation-results').classList.add('hidden');
   document.getElementById('dictation-feedback').classList.add('hidden');
 
@@ -3557,7 +3203,7 @@ function startTestPrepDictation() {
   // Navigate to dictation typing screen
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-dictation-typing').classList.add('active');
-  document.getElementById('header-title').textContent = testPrepTitle;
+  document.getElementById('header-title').textContent = 'הכנה למבחן';
   history.pushState({ screen: 'dictation-test-prep' }, '', '');
 
   renderDictationWord();

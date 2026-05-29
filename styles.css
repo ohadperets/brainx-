@@ -3364,3 +3364,47 @@ body.theme-pink .app-header {
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
+
+/* ===== English Test June 2026 ===== */
+.et-answer-key {
+  direction: ltr;
+  text-align: left;
+  background: #f8f9fa;
+  border: 2px solid #e3f2fd;
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 20px;
+}
+
+.et-answer-key h3 {
+  color: #0d47a1;
+  font-size: 1rem;
+  margin-bottom: 12px;
+  text-align: center;
+  border-bottom: 2px solid #bbdefb;
+  padding-bottom: 8px;
+}
+
+.et-key-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 5px 0;
+  border-bottom: 1px solid #e8eef6;
+  font-size: 0.9rem;
+}
+
+.et-key-row:last-child {
+  border-bottom: none;
+}
+
+.et-key-num {
+  font-weight: 700;
+  color: #1565c0;
+  min-width: 30px;
+}
+
+.et-key-ans {
+  color: #1b5e20;
+  font-weight: 600;
+}

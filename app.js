@@ -1037,6 +1037,42 @@ function navigate(screen, subject, skipHistory = false) {
       startMultiplicationQuiz();
       break;
 
+    case 'english-test-0626':
+      document.getElementById('screen-english-test-0626').classList.add('active');
+      headerTitle.textContent = 'English Test – June 2026';
+      updateETMenu();
+      break;
+
+    case 'et-time':
+      document.getElementById('screen-et-time').classList.add('active');
+      headerTitle.textContent = 'Part A – Telling Time';
+      startETPart('time');
+      break;
+
+    case 'et-pronouns':
+      document.getElementById('screen-et-pronouns').classList.add('active');
+      headerTitle.textContent = 'Part B – Possessive Pronouns';
+      startETPart('pronouns');
+      break;
+
+    case 'et-grammar':
+      document.getElementById('screen-et-grammar').classList.add('active');
+      headerTitle.textContent = 'Part C – Grammar & Writing';
+      startETPart('grammar');
+      break;
+
+    case 'et-prepositions':
+      document.getElementById('screen-et-prepositions').classList.add('active');
+      headerTitle.textContent = 'Part D – Prepositions';
+      startETPart('prepositions');
+      break;
+
+    case 'et-reading':
+      document.getElementById('screen-et-reading').classList.add('active');
+      headerTitle.textContent = 'Part E – Reading';
+      startETReading();
+      break;
+
     case 'achievements':
       document.getElementById('screen-achievements').classList.add('active');
       headerTitle.textContent = 'הישגים';
@@ -1197,6 +1233,12 @@ function updateSubjectFeatures() {
 
     const grade = profile?.grade || 5;
     if (grade === 5) {
+      html += `
+      <button class="feature-card" style="grid-column: 1 / -1; background:linear-gradient(135deg,#e3f2fd,#90caf9); padding: 28px 16px;" onclick="navigate('english-test-0626')">
+        <div class="feature-icon" style="font-size:2.5rem">📋</div>
+        <div class="feature-name" style="font-size:1.2rem; font-weight:800; color:#0d47a1">English Test – June 2026</div>
+        <div class="feature-desc" style="font-size:0.88rem; color:#1565c0">⏰ Time &bull; 🔤 Pronouns &bull; ✏️ Grammar &bull; 📍 Prepositions &bull; 📖 Reading</div>
+      </button>`;
       html += `
       <button class="feature-card big-exam-card" style="grid-column: 1 / -1; background:linear-gradient(135deg,#ffd54f,#ffb300); padding: 32px 16px;" onclick="navigate('big-exam')">
         <div class="feature-icon" style="font-size:2.5rem">🏆</div>
@@ -4992,4 +5034,442 @@ async function loadAnalytics() {
     console.error('Analytics error:', error);
     tableEl.innerHTML = `<div style="text-align: center; padding: 30px; color: #e74c3c;">שגיאה: ${error.message}</div>`;
   }
+}
+
+// ===== ENGLISH TEST – JUNE 2026 =====
+
+const ET_PART_META = {
+  time:         { icon: '🕐', title: 'Part A – Telling Time',           pts: 20, color: 'linear-gradient(135deg,#e3f2fd,#bbdefb)' },
+  pronouns:     { icon: '🔤', title: 'Part B – Possessive Pronouns',     pts: 15, color: 'linear-gradient(135deg,#f3e5f5,#e1bee7)' },
+  grammar:      { icon: '✏️', title: 'Part C – Grammar & Writing',       pts: 25, color: 'linear-gradient(135deg,#e8f5e9,#c8e6c9)' },
+  prepositions: { icon: '📍', title: 'Part D – Prepositions',            pts: 15, color: 'linear-gradient(135deg,#fff3e0,#ffe0b2)' },
+  reading:      { icon: '📖', title: 'Part E – Reading Comprehension',   pts: 25, color: 'linear-gradient(135deg,#fce4ec,#f8bbd0)' }
+};
+
+const ET_QUESTIONS = {
+  time: [
+    { q: '🕒  The clock shows  3:00\nWhat time is it?',                          options: ["It's half past three.",   "It's three o'clock.",    "It's quarter past three.",  "It's quarter to three."],  ans: 1 },
+    { q: '🕣  The clock shows  8:30\nWhat time is it?',                          options: ["It's half past nine.",    "It's quarter past eight.","It's half past eight.",     "It's quarter to nine."],   ans: 2 },
+    { q: '⏰  The clock shows 10:15\nWhat time is it?',                          options: ["It's quarter to ten.",    "It's ten o'clock.",       "It's quarter past ten.",    "It's half past ten."],     ans: 2 },
+    { q: '⏰  The clock shows  4:45\nWhat time is it?',                          options: ["It's quarter to four.",   "It's quarter past four.", "It's half past four.",      "It's quarter to five."],   ans: 3 },
+    { q: 'Sarah goes to sleep at 9:30.\nHow does she say the time in English?',   options: ["It's nine o'clock.",      "It's half past nine.",    "It's quarter past nine.",   "It's quarter to nine."],   ans: 1 },
+    { q: '🕔  The clock shows  4:00\nHow do you say this time in English?',       options: ["It's four past.",         "It's four o'clock.",      "It's half past four.",      "It's quarter past four."], ans: 1 },
+    { q: 'Write the number: The word "twelve" in digits is:',                    options: ['10', '11', '12', '13'],                                                                                       ans: 2 },
+    { q: 'Write the number: The word "seven" in digits is:',                     options: ['5', '6', '7', '8'],                                                                                           ans: 2 },
+  ],
+  pronouns: [
+    { q: "That is Peter.  _____  bag is on the chair.",                          options: ['My', 'Your', 'His', 'Her'],            ans: 2 },
+    { q: "Anna and I love our school.  _____  school has a big garden.",         options: ['My', 'Our', 'Their', 'His'],           ans: 1 },
+    { q: "The cat is sleeping in  _____  basket.",                               options: ['his', 'her', 'its', 'their'],          ans: 2 },
+    { q: "Tom and Lucy are students.  _____  teacher is very kind.",             options: ['My', 'His', 'Her', 'Their'],           ans: 3 },
+    { q: "I have a new pencil case.  _____  pencil case is red.",                options: ['My', 'Your', 'His', 'Their'],          ans: 0 },
+    { q: "You have a dog.  What is  _____  name?",                              options: ['my', 'your', 'his', 'their'],          ans: 1 },
+    { q: "The birds are sleeping in  _____  nest.",                              options: ['my', 'your', 'its', 'their'],          ans: 3 },
+    { q: "My sister has a new bike.  _____  bike is pink.",                      options: ['My', 'His', 'Her', 'Their'],           ans: 2 },
+  ],
+  grammar: [
+    { q: "_____  a cat sleeping on the mat.",                                    options: ['There are', 'There is', 'There have', 'There am'],      ans: 1,  hint: 'Topic: There is / There are' },
+    { q: "_____  four birds on the tree.",                                       options: ['There is', 'There am', 'There have', 'There are'],      ans: 3,  hint: 'Topic: There is / There are' },
+    { q: "Look at the bowl.\n_____  two apples and a banana inside.",            options: ['There is', 'There are', 'Is there', 'Are there'],       ans: 1,  hint: 'Topic: There is / There are' },
+    { q: "The children  _____  a new teacher this year.",                        options: ['has', 'have', 'is having', 'are have'],                 ans: 1,  hint: 'Topic: Has / Have' },
+    { q: "Our school  _____  a big library.",                                    options: ['have', 'are having', 'has', 'having'],                  ans: 2,  hint: 'Topic: Has / Have' },
+    { q: "My parents  _____  a new car.",                                        options: ['has', 'have', 'is having', 'am having'],                ans: 1,  hint: 'Topic: Has / Have' },
+    { q: "Look!  The boy  _____  very fast right now.",                          options: ['run', 'runs', 'is running', 'are running'],             ans: 2,  hint: 'Topic: Present Progressive' },
+    { q: "The girls  _____  basketball in the park at the moment.",              options: ['is playing', 'are playing', 'plays', 'playing'],        ans: 1,  hint: 'Topic: Present Progressive' },
+    { q: "My little sister  _____  breakfast right now.",                        options: ['eat', 'eats', 'are eating', 'is eating'],               ans: 3,  hint: 'Topic: Present Progressive' },
+    { q: "The dog  _____  in the garden right now.",                             options: ['run', 'runs', 'is running', 'are running'],             ans: 2,  hint: 'Topic: Present Progressive' },
+  ],
+  prepositions: [
+    { q: "The book is  _____  the desk.\n(it is on top of the desk)",           options: ['under', 'on', 'above', 'behind'],         ans: 1 },
+    { q: "The dog is hiding  _____  the bed.\n(it is below the bed)",           options: ['on', 'near', 'under', 'in front of'],     ans: 2 },
+    { q: "The bus stop is  _____  the school.\n(close to it, but not inside)",  options: ['in', 'above', 'behind', 'near'],          ans: 3 },
+    { q: "The children are standing  _____  the teacher.\n(they face the teacher – the teacher is behind them)", options: ['behind', 'in front of', 'above', 'next to'], ans: 1 },
+    { q: "The bird is flying  _____  the house.\n(up in the sky, over the house)", options: ['in', 'on', 'under', 'above'],           ans: 3 },
+    { q: "The cat is sitting  _____  the sofa.\n(to the side of the sofa)",     options: ['in front of', 'above', 'next to', 'under'], ans: 2 },
+    { q: "The ball is  _____  the box.\n(inside the box)",                      options: ['on', 'in', 'above', 'near'],              ans: 1 },
+    { q: "The picture is hanging  _____  the sofa.\n(higher than the sofa, on the wall)", options: ['under', 'in front of', 'next to', 'above'], ans: 3 },
+  ],
+  reading: [
+    { q: 'What time do classes start at Green Valley School?',                  options: ["Quarter past eight", "Half past eight", "Eight o'clock", "Quarter to nine"],           ans: 1, type: 'mc' },
+    { q: 'How many students are there in the school?',                          options: ["Twenty", "One hundred", "Two hundred", "Twenty-two"],                                  ans: 2, type: 'mc' },
+    { q: 'What is Miss Johnson teaching her class about today?',                options: ["Mathematics", "Hebrew grammar", "Animals", "How to draw"],                            ans: 2, type: 'mc' },
+    { q: 'Where is the small pond?',                                            options: ["In the classroom", "Near the cafeteria", "In the school garden", "Under the oak tree"], ans: 2, type: 'mc' },
+    { q: 'What time does the school day end?',                                  options: ["Quarter past three", "Half past three", "Three o'clock", "Quarter to four"],          ans: 3, type: 'mc' },
+    { q: 'What day of the week is it in the story?',                            options: ["Monday", "Tuesday", "Wednesday", "Thursday"],                                         ans: 1, type: 'sa' },
+    { q: 'Where do the students go at half past twelve?',                       options: ["To the garden", "To the library", "To the cafeteria", "To the classroom"],            ans: 2, type: 'sa' },
+    { q: 'What are some children doing under the big oak tree?',                options: ["Playing football", "Drawing pictures", "Taking notes", "Watching ducks"],             ans: 1, type: 'sa' },
+    { q: 'What can the students see through the classroom window?',             options: ["The cafeteria", "The road", "The school garden", "Other classrooms"],                  ans: 2, type: 'sa' },
+    { q: 'What do students carry on their backs when going home?',              options: ["Lunch boxes", "School bags", "Notebooks", "Umbrellas"],                                ans: 1, type: 'sa' },
+    { q: '✅ TRUE or FALSE:\n"The school garden has colorful flowers and a pond."', options: ['TRUE ✓', 'FALSE ✗'],                                                               ans: 0, type: 'tf' },
+    { q: '✅ TRUE or FALSE:\n"The students arrive at school at half past eight."',  options: ['TRUE ✓', 'FALSE ✗'],                                                               ans: 1, type: 'tf' },
+  ]
+};
+
+const ET_READING_PASSAGE = [
+  { heading: 'A Day at Green Valley School', text: null },
+  { heading: null, text: 'It is a sunny Tuesday morning at Green Valley School. The school has two hundred students and twenty teachers. Every morning, students arrive at quarter past eight. Classes start at half past eight.' },
+  { heading: null, text: 'Today is a special day. Miss Johnson, the English teacher, is teaching her class about animals. She is showing pictures of different animals on the board. The students are watching carefully and taking notes in their notebooks.' },
+  { heading: null, text: 'In the classroom, there are thirty chairs and a big whiteboard. There is also a large window near the door. The students can see the school garden through the window. In the garden, there are many colorful flowers and a small pond. A family of ducks lives near the pond.' },
+  { heading: null, text: 'At half past twelve, the students go to the cafeteria for lunch. After lunch, they play in the schoolyard. Some children are playing football, and others are drawing pictures under the big oak tree.' },
+  { heading: null, text: 'The school day ends at quarter to four. The students say goodbye to their teachers and walk home. They carry their heavy school bags on their backs.' }
+];
+
+let etQuizState = {};
+let etReadingState = {};
+
+function etGetScores() {
+  return JSON.parse(localStorage.getItem('etScores-' + currentUserId) || '{}');
+}
+function etSaveScore(partId, score) {
+  const map = etGetScores();
+  map[partId] = score;
+  localStorage.setItem('etScores-' + currentUserId, JSON.stringify(map));
+}
+
+function updateETMenu() {
+  const parts = Object.keys(ET_PART_META);
+  const scoreMap = etGetScores();
+  let totalScore = 0, totalMax = 0, doneCount = 0;
+
+  let gridHTML = '';
+  parts.forEach(id => {
+    const meta = ET_PART_META[id];
+    const score = scoreMap[id];
+    const done = score !== undefined;
+    if (done) { totalScore += score; doneCount++; }
+    totalMax += meta.pts;
+    const badge = done
+      ? `<span style="color:#2e7d32;font-weight:700;font-size:0.95rem;">✅ ${score} / ${meta.pts} pts</span>`
+      : `<span style="color:#666;">${meta.pts} pts</span>`;
+    gridHTML += `
+    <button class="feature-card" style="background:${meta.color};" onclick="navigate('et-${id}')">
+      <div class="feature-icon" style="font-size:2rem">${meta.icon}</div>
+      <div class="feature-name" style="font-size:0.95rem;">${meta.title}</div>
+      <div class="feature-desc">${badge}</div>
+    </button>`;
+  });
+
+  const gridEl = document.getElementById('et-parts-grid');
+  if (gridEl) gridEl.innerHTML = gridHTML;
+
+  const totalEl = document.getElementById('et-total-score');
+  if (totalEl) {
+    if (doneCount > 0) {
+      const pct = Math.round((totalScore / totalMax) * 100);
+      totalEl.textContent = `Total Score: ${totalScore} / ${totalMax}  (${pct}%)`;
+      totalEl.style.display = '';
+    } else {
+      totalEl.style.display = 'none';
+    }
+  }
+}
+
+function startETPart(partId) {
+  const qs = ET_QUESTIONS[partId];
+  const meta = ET_PART_META[partId];
+  etQuizState = { partId, questions: qs, current: 0, correct: 0, answered: false, maxPts: meta.pts };
+
+  const p = 'et-' + partId + '-';
+  const progressFill = document.getElementById(p + 'progress-fill');
+  const counter      = document.getElementById(p + 'counter');
+  const results      = document.getElementById(p + 'results');
+  const feedback     = document.getElementById(p + 'feedback');
+  const nextBtn      = document.getElementById(p + 'next');
+  const qEl          = document.getElementById(p + 'question');
+  const optEl        = document.getElementById(p + 'options');
+  const hintEl       = document.getElementById(p + 'hint');
+
+  if (progressFill) progressFill.style.width = '0%';
+  if (results)      { results.classList.add('hidden'); }
+  if (feedback)     feedback.classList.add('hidden');
+  if (nextBtn)      nextBtn.classList.add('hidden');
+  if (qEl)          qEl.style.display = '';
+  if (optEl)        optEl.style.display = '';
+  if (hintEl)       { hintEl.style.display = 'none'; }
+
+  const quizHeader = document.querySelector('#screen-et-' + partId + ' .quiz-header');
+  if (quizHeader) quizHeader.style.display = '';
+
+  renderETQuestion();
+}
+
+function renderETQuestion() {
+  const { partId, questions, current } = etQuizState;
+  const p = 'et-' + partId + '-';
+  const q = questions[current];
+  const total = questions.length;
+
+  const progressFill = document.getElementById(p + 'progress-fill');
+  if (progressFill) progressFill.style.width = `${(current / total) * 100}%`;
+  const counter = document.getElementById(p + 'counter');
+  if (counter) counter.textContent = `Question ${current + 1} of ${total}`;
+
+  const qEl = document.getElementById(p + 'question');
+  if (qEl) qEl.innerHTML = q.q.replace(/\n/g, '<br>');
+
+  const hintEl = document.getElementById(p + 'hint');
+  if (hintEl) {
+    if (q.hint) { hintEl.textContent = q.hint; hintEl.style.display = ''; }
+    else        { hintEl.style.display = 'none'; }
+  }
+
+  const optEl = document.getElementById(p + 'options');
+  if (optEl) {
+    optEl.innerHTML = q.options.map((opt, i) =>
+      `<button class="quiz-option" onclick="answerETQuestion(${i})">${opt}</button>`
+    ).join('');
+  }
+
+  const feedback = document.getElementById(p + 'feedback');
+  const nextBtn  = document.getElementById(p + 'next');
+  if (feedback) feedback.classList.add('hidden');
+  if (nextBtn)  nextBtn.classList.add('hidden');
+
+  etQuizState.answered = false;
+}
+
+function answerETQuestion(idx) {
+  if (etQuizState.answered) return;
+  etQuizState.answered = true;
+
+  const { partId, questions, current } = etQuizState;
+  const p = 'et-' + partId + '-';
+  const q = questions[current];
+  const isCorrect = idx === q.ans;
+
+  if (isCorrect) { etQuizState.correct++; playSound('correct'); }
+  else           { playSound('wrong'); }
+
+  const optEl = document.getElementById(p + 'options');
+  if (optEl) {
+    optEl.querySelectorAll('.quiz-option').forEach((btn, i) => {
+      btn.disabled = true;
+      if (i === q.ans) btn.classList.add('correct');
+      else if (i === idx) btn.classList.add('wrong');
+    });
+  }
+
+  const feedback = document.getElementById(p + 'feedback');
+  if (feedback) {
+    feedback.classList.remove('hidden', 'correct', 'wrong');
+    feedback.classList.add(isCorrect ? 'correct' : 'wrong');
+    feedback.textContent = isCorrect
+      ? '✓  Correct!  Well done!'
+      : `✗  The correct answer is:  "${q.options[q.ans]}"`;
+  }
+
+  const nextBtn = document.getElementById(p + 'next');
+  if (nextBtn) nextBtn.classList.remove('hidden');
+}
+
+function nextETQuestion(partId) {
+  etQuizState.current++;
+  if (etQuizState.current >= etQuizState.questions.length) showETResults(partId);
+  else renderETQuestion();
+}
+
+function showETResults(partId) {
+  const { correct, questions, maxPts } = etQuizState;
+  const total = questions.length;
+  const score = Math.round((correct / total) * maxPts);
+  etSaveScore(partId, score);
+
+  const p = 'et-' + partId + '-';
+  const quizHeader = document.querySelector('#screen-et-' + partId + ' .quiz-header');
+  const qEl    = document.getElementById(p + 'question');
+  const hintEl = document.getElementById(p + 'hint');
+  const optEl  = document.getElementById(p + 'options');
+  const fb     = document.getElementById(p + 'feedback');
+  const nxt    = document.getElementById(p + 'next');
+
+  if (quizHeader) quizHeader.style.display = 'none';
+  if (qEl)    qEl.style.display    = 'none';
+  if (hintEl) hintEl.style.display = 'none';
+  if (optEl)  optEl.style.display  = 'none';
+  if (fb)     fb.classList.add('hidden');
+  if (nxt)    nxt.classList.add('hidden');
+
+  const pct   = Math.round((correct / total) * 100);
+  const emoji = pct >= 90 ? '🌟' : pct >= 75 ? '😊' : pct >= 60 ? '👍' : '💪';
+
+  const titleEl = document.getElementById(p + 'results-title');
+  const textEl  = document.getElementById(p + 'results-text');
+  const keyEl   = document.getElementById(p + 'answer-key');
+  const resEl   = document.getElementById(p + 'results');
+
+  if (titleEl) titleEl.textContent = `${emoji}  ${score} / ${maxPts} points`;
+  if (textEl)  textEl.textContent  = `${correct} out of ${total} correct  (${pct}%)`;
+
+  if (keyEl) {
+    let kh = `<div class="et-answer-key">
+      <h3>📋 Answer Key – ${ET_PART_META[partId].title}</h3>`;
+    questions.forEach((q, i) => {
+      kh += `<div class="et-key-row">
+        <span class="et-key-num">Q${i + 1}</span>
+        <span class="et-key-ans">${q.options[q.ans]}</span>
+      </div>`;
+    });
+    kh += '</div>';
+    keyEl.innerHTML = kh;
+  }
+
+  if (resEl) resEl.classList.remove('hidden');
+  if (pct >= 80) { playSound('win'); launchConfetti(); }
+}
+
+function restartETPart(partId) {
+  const p = 'et-' + partId + '-';
+  const quizHeader = document.querySelector('#screen-et-' + partId + ' .quiz-header');
+  const qEl    = document.getElementById(p + 'question');
+  const hintEl = document.getElementById(p + 'hint');
+  const optEl  = document.getElementById(p + 'options');
+  const resEl  = document.getElementById(p + 'results');
+
+  if (quizHeader) quizHeader.style.display = '';
+  if (qEl)    qEl.style.display    = '';
+  if (hintEl) hintEl.style.display = 'none';
+  if (optEl)  optEl.style.display  = '';
+  if (resEl)  resEl.classList.add('hidden');
+
+  startETPart(partId);
+}
+
+// --- Part E Reading ---
+
+function startETReading() {
+  etReadingState = { phase: 'passage', current: 0, correct: 0, answered: false };
+
+  const passageEl = document.getElementById('et-reading-passage');
+  if (passageEl) {
+    let html = '';
+    ET_READING_PASSAGE.forEach(block => {
+      if (block.heading) html += `<h3 style="margin-bottom:12px;color:#0d47a1;font-size:1.1rem;">${block.heading}</h3>`;
+      if (block.text)    html += `<p style="margin-bottom:12px;">${block.text}</p>`;
+    });
+    passageEl.innerHTML = html;
+  }
+
+  document.getElementById('et-reading-passage-area').classList.remove('hidden');
+  document.getElementById('et-reading-quiz-area').classList.add('hidden');
+  document.getElementById('et-reading-results').classList.add('hidden');
+}
+
+function startETReadingQuestions() {
+  etReadingState.phase = 'quiz';
+  etReadingState.current = 0;
+  etReadingState.correct = 0;
+
+  document.getElementById('et-reading-passage-area').classList.add('hidden');
+  document.getElementById('et-reading-quiz-area').classList.remove('hidden');
+
+  renderETReadingQuestion();
+}
+
+function renderETReadingQuestion() {
+  const questions = ET_QUESTIONS.reading;
+  const { current } = etReadingState;
+  const q = questions[current];
+  const total = questions.length;
+
+  const progressFill = document.getElementById('et-reading-progress-fill');
+  if (progressFill) progressFill.style.width = `${(current / total) * 100}%`;
+  const counter = document.getElementById('et-reading-counter');
+  if (counter) counter.textContent = `Question ${current + 1} of ${total}`;
+
+  const typeEl = document.getElementById('et-reading-type');
+  if (typeEl) {
+    const labels = { mc: '🔵 Multiple Choice', sa: '📝 Short Answer', tf: '✅ True / False' };
+    typeEl.textContent = labels[q.type] || '';
+  }
+
+  const qEl = document.getElementById('et-reading-question');
+  if (qEl) qEl.innerHTML = q.q.replace(/\n/g, '<br>');
+
+  const optEl = document.getElementById('et-reading-options');
+  if (optEl) {
+    optEl.innerHTML = q.options.map((opt, i) =>
+      `<button class="quiz-option" onclick="answerETReading(${i})">${opt}</button>`
+    ).join('');
+  }
+
+  const fb  = document.getElementById('et-reading-feedback');
+  const nxt = document.getElementById('et-reading-next');
+  if (fb)  fb.classList.add('hidden');
+  if (nxt) nxt.classList.add('hidden');
+
+  etReadingState.answered = false;
+}
+
+function answerETReading(idx) {
+  if (etReadingState.answered) return;
+  etReadingState.answered = true;
+
+  const q = ET_QUESTIONS.reading[etReadingState.current];
+  const isCorrect = idx === q.ans;
+
+  if (isCorrect) { etReadingState.correct++; playSound('correct'); }
+  else           { playSound('wrong'); }
+
+  const optEl = document.getElementById('et-reading-options');
+  if (optEl) {
+    optEl.querySelectorAll('.quiz-option').forEach((btn, i) => {
+      btn.disabled = true;
+      if (i === q.ans) btn.classList.add('correct');
+      else if (i === idx) btn.classList.add('wrong');
+    });
+  }
+
+  const fb = document.getElementById('et-reading-feedback');
+  if (fb) {
+    fb.classList.remove('hidden', 'correct', 'wrong');
+    fb.classList.add(isCorrect ? 'correct' : 'wrong');
+    fb.textContent = isCorrect
+      ? '✓  Correct!  Well done!'
+      : `✗  The correct answer is:  "${q.options[q.ans]}"`;
+  }
+
+  const nxt = document.getElementById('et-reading-next');
+  if (nxt) nxt.classList.remove('hidden');
+}
+
+function nextETReadingQuestion() {
+  etReadingState.current++;
+  if (etReadingState.current >= ET_QUESTIONS.reading.length) showETReadingResults();
+  else renderETReadingQuestion();
+}
+
+function showETReadingResults() {
+  const { correct } = etReadingState;
+  const total = ET_QUESTIONS.reading.length;
+  const maxPts = 25;
+  const score = Math.round((correct / total) * maxPts);
+  etSaveScore('reading', score);
+
+  document.getElementById('et-reading-quiz-area').classList.add('hidden');
+
+  const pct   = Math.round((correct / total) * 100);
+  const emoji = pct >= 90 ? '🌟' : pct >= 75 ? '😊' : pct >= 60 ? '👍' : '💪';
+
+  let keyHTML = `<div class="et-answer-key">
+    <h3>📋 Answer Key – Part E: Reading Comprehension</h3>`;
+  ET_QUESTIONS.reading.forEach((q, i) => {
+    keyHTML += `<div class="et-key-row">
+      <span class="et-key-num">Q${i + 1}</span>
+      <span class="et-key-ans">${q.options[q.ans]}</span>
+    </div>`;
+  });
+  keyHTML += '</div>';
+
+  const resEl = document.getElementById('et-reading-results');
+  resEl.innerHTML = `
+    <div class="results-emoji">${emoji}</div>
+    <h2 style="direction:ltr;">${score} / ${maxPts} points</h2>
+    <p style="direction:ltr; margin-bottom:12px;">${correct} out of ${total} correct &nbsp;(${pct}%)</p>
+    ${keyHTML}
+    <button class="btn-primary" onclick="startETReading()" style="margin-top:16px;">Try Again 🔄</button>
+    <button class="btn-secondary" onclick="navigate('english-test-0626')" style="margin-top:8px;">← Back to Menu</button>
+  `;
+  resEl.classList.remove('hidden');
+
+  if (pct >= 80) { playSound('win'); launchConfetti(); }
 }

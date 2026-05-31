@@ -1064,6 +1064,27 @@ function navigate(screen, subject, skipHistory = false) {
       updateETMenu();
       break;
 
+    case 'english-test-4':
+      etCurrentTestId = 4; etMenuRoute = 'english-test-4';
+      document.getElementById('screen-english-test-0626').classList.add('active');
+      headerTitle.textContent = 'English Test – September 2026';
+      updateETMenu();
+      break;
+
+    case 'english-test-5':
+      etCurrentTestId = 5; etMenuRoute = 'english-test-5';
+      document.getElementById('screen-english-test-0626').classList.add('active');
+      headerTitle.textContent = 'English Test – October 2026';
+      updateETMenu();
+      break;
+
+    case 'english-test-6':
+      etCurrentTestId = 6; etMenuRoute = 'english-test-6';
+      document.getElementById('screen-english-test-0626').classList.add('active');
+      headerTitle.textContent = 'English Test – November 2026';
+      updateETMenu();
+      break;
+
     case 'et-time':
       document.getElementById('screen-et-time').classList.add('active');
       headerTitle.textContent = 'Part A – Telling Time';
@@ -5143,11 +5164,17 @@ let etMenuRoute = 'english-test-0626';
 function etGetAllQuestions() {
   if (etCurrentTestId === 2) return ET_QUESTIONS_2;
   if (etCurrentTestId === 3) return ET_QUESTIONS_3;
+  if (etCurrentTestId === 4) return ET_QUESTIONS_4;
+  if (etCurrentTestId === 5) return ET_QUESTIONS_5;
+  if (etCurrentTestId === 6) return ET_QUESTIONS_6;
   return ET_QUESTIONS;
 }
 function etGetReadingPassage() {
   if (etCurrentTestId === 2) return ET_READING_PASSAGE_2;
   if (etCurrentTestId === 3) return ET_READING_PASSAGE_3;
+  if (etCurrentTestId === 4) return ET_READING_PASSAGE_4;
+  if (etCurrentTestId === 5) return ET_READING_PASSAGE_5;
+  if (etCurrentTestId === 6) return ET_READING_PASSAGE_6;
   return ET_READING_PASSAGE;
 }
 function navigateBackToETMenu() { navigate(etMenuRoute); }
@@ -5162,7 +5189,7 @@ function etSaveScore(partId, score) {
 }
 
 function updateETMenu() {
-  const testTitles = { 1: 'English Test – June 2026', 2: 'English Test – July 2026', 3: 'English Test – August 2026' };
+  const testTitles = { 1: 'English Test – June 2026', 2: 'English Test – July 2026', 3: 'English Test – August 2026', 4: 'English Test – September 2026', 5: 'English Test – October 2026', 6: 'English Test – November 2026' };
   const h2 = document.querySelector('#screen-english-test-0626 h2');
   if (h2) h2.textContent = `📋 ${testTitles[etCurrentTestId]}`;
   const parts = Object.keys(ET_PART_META);
@@ -5650,4 +5677,214 @@ const ET_READING_PASSAGE_3 = [
   { heading: null, text: "Inside the barn, there are tools and machines. The students learn how farmers use these tools to plant and harvest vegetables. There is also a small classroom inside the barn with wooden chairs and tables." },
   { heading: null, text: "After the tour, the children sit under the big oak tree and have a picnic. They eat sandwiches and drink apple juice. Some children are drawing pictures of the animals. Others are writing notes in their notebooks. Everyone loves this weekly trip." },
   { heading: null, text: "The last bus home leaves at half past two. The children always feel tired but happy at the end of the day." }
+];
+
+// ===== ENGLISH TEST – SEPTEMBER 2026 (Test 4) =====
+
+const ET_QUESTIONS_4 = {
+  time: [
+    { q: '🕖  The clock shows  7:00\nWhat time is it?',                              options: ["It's half past seven.",    "It's seven o'clock.",     "It's quarter past seven.",  "It's quarter to seven."],   ans: 1 },
+    { q: '🕞  The clock shows  3:30\nWhat time is it?',                              options: ["It's quarter to three.",   "It's three o'clock.",     "It's half past three.",     "It's quarter past three."], ans: 2 },
+    { q: '⏰  The clock shows  6:15\nWhat time is it?',                              options: ["It's quarter to six.",     "It's six o'clock.",       "It's quarter past six.",    "It's half past six."],      ans: 2 },
+    { q: '⏰  The clock shows  9:45\nWhat time is it?',                              options: ["It's quarter past nine.", "It's half past nine.",    "It's nine o'clock.",        "It's quarter to ten."],     ans: 3 },
+    { q: "Dan wakes up at 5:30.\nHow does he say the time in English?",              options: ["It's five o'clock.",       "It's half past five.",    "It's quarter past five.",   "It's quarter to six."],     ans: 1 },
+    { q: '🕚  The clock shows 11:00\nHow do you say this time in English?',          options: ["It's eleven past.",        "It's eleven o'clock.",    "It's half past eleven.",    "It's quarter past eleven."], ans: 1 },
+    { q: 'Write the number: The word "eight" in digits is:',                        options: ['6', '7', '8', '9'],                                                                                               ans: 2 },
+    { q: 'Write the number: The word "five" in digits is:',                         options: ['3', '4', '5', '6'],                                                                                               ans: 2 },
+  ],
+  pronouns: [
+    { q: "That is Mr. Green.  _____  car is new.",                                  options: ['My', 'Your', 'His', 'Her'],            ans: 2 },
+    { q: "My classmates and I trained hard.  _____  team won the match.",            options: ['My', 'Our', 'Their', 'His'],           ans: 1 },
+    { q: "The horse jumped over  _____  fence.",                                    options: ['his', 'her', 'its', 'their'],          ans: 2 },
+    { q: "Maya and Lior are partners.  _____  project is about animals.",            options: ['My', 'His', 'Her', 'Their'],           ans: 3 },
+    { q: "I have a new backpack.  _____  backpack is green.",                        options: ['My', 'Your', 'His', 'Their'],          ans: 0 },
+    { q: "You have a younger brother.  What is  _____  name?",                     options: ['my', 'your', 'his', 'their'],          ans: 1 },
+    { q: "Grandma keeps all  _____  photos in a big album.",                         options: ['my', 'your', 'her', 'their'],          ans: 2 },
+    { q: "The penguins huddle together to keep  _____  chicks warm.",                options: ['my', 'your', 'its', 'their'],          ans: 3 },
+  ],
+  grammar: [
+    { q: "_____  a spider on the ceiling.",                                          options: ['There are', 'There is', 'There have', 'There am'],      ans: 1,  hint: 'Topic: There is / There are' },
+    { q: "_____  three candles on the birthday cake.",                               options: ['There is', 'There am', 'There have', 'There are'],      ans: 3,  hint: 'Topic: There is / There are' },
+    { q: "Look at the basket.\n_____  five oranges and a mango inside.",             options: ['There is', 'There are', 'Is there', 'Are there'],       ans: 1,  hint: 'Topic: There is / There are' },
+    { q: "Every dog  _____  a great sense of smell.",                                options: ['have', 'are having', 'has', 'having'],                  ans: 2,  hint: 'Topic: Has / Have' },
+    { q: "The children  _____  a lot of homework tonight.",                          options: ['has', 'have', 'is having', 'are have'],                 ans: 1,  hint: 'Topic: Has / Have' },
+    { q: "My mother  _____  a beautiful singing voice.",                             options: ['have', 'are having', 'has', 'having'],                  ans: 2,  hint: 'Topic: Has / Have' },
+    { q: "Look!  The baby  _____  her first steps right now!",                       options: ['walk', 'walks', 'is walking', 'are walking'],           ans: 2,  hint: 'Topic: Present Progressive' },
+    { q: "The kids  _____  a snowman in the garden at the moment.",                  options: ['is building', 'are building', 'builds', 'building'],    ans: 1,  hint: 'Topic: Present Progressive' },
+    { q: "My brother  _____  the dishes right now.",                                 options: ['wash', 'washes', 'are washing', 'is washing'],          ans: 3,  hint: 'Topic: Present Progressive' },
+    { q: "The fans  _____  at the concert right now.",                               options: ['is cheering', 'are cheering', 'cheers', 'cheering'],    ans: 1,  hint: 'Topic: Present Progressive' },
+  ],
+  prepositions: [
+    { q: "The shoes are  _____  the bed.\n(below the bed frame, on the floor)",     options: ['on', 'near', 'under', 'above'],            ans: 2 },
+    { q: "The jacket is hanging  _____  the hook.\n(attached to the hook)",         options: ['under', 'on', 'in front of', 'behind'],   ans: 1 },
+    { q: "The supermarket is  _____  our house.\n(a short distance away)",          options: ['in', 'above', 'behind', 'near'],           ans: 3 },
+    { q: "The children are sitting  _____  the teacher.\n(the teacher can see their faces)", options: ['behind', 'in front of', 'above', 'next to'], ans: 1 },
+    { q: "The helicopter is flying  _____  the stadium.\n(up in the air, over it)", options: ['in', 'on', 'under', 'above'],              ans: 3 },
+    { q: "The toy box is  _____  the wardrobe.\n(to the side of it)",               options: ['in front of', 'above', 'next to', 'under'], ans: 2 },
+    { q: "The coins are  _____  the piggy bank.\n(inside the piggy bank)",          options: ['on', 'in', 'above', 'near'],               ans: 1 },
+    { q: "The poster is hanging  _____  the desk.\n(on the wall, higher than the desk)", options: ['under', 'in front of', 'next to', 'above'], ans: 3 },
+  ],
+  reading: [
+    { q: 'What day is sports day?',                                                  options: ['Monday', 'Tuesday', 'Wednesday', 'Thursday'],                                               ans: 2, type: 'mc' },
+    { q: 'How many lanes does the running track have?',                              options: ['Two', 'Three', 'Four', 'Five'],                                                              ans: 2, type: 'mc' },
+    { q: 'Who is the sports teacher?',                                               options: ['Mr. Carter', 'Mr. Brown', 'Mr. Smith', 'Mr. Jones'],                                        ans: 0, type: 'mc' },
+    { q: 'What time does the first race begin?',                                     options: ["Nine o'clock", "Half past nine", "Quarter past nine", "Quarter to ten"],                    ans: 1, type: 'mc' },
+    { q: 'Who wins the 100-metre race?',                                             options: ['Ben from 5B', 'Sam from 5A', 'Tom from 5A', 'Jack from 5C'],                               ans: 2, type: 'mc' },
+    { q: 'What month is sports day?',                                                options: ['September', 'October', 'November', 'December'],                                             ans: 0, type: 'sa' },
+    { q: 'What does Mr. Carter carry during the event?',                             options: ['A flag and a clipboard', 'A medal and a trophy', 'A whistle and a stopwatch', 'A notebook and a pen'], ans: 2, type: 'sa' },
+    { q: 'Where do students sit for lunch?',                                         options: ['In the classroom', 'Under the trees near the fence', 'In the cafeteria', 'On the field benches'], ans: 1, type: 'sa' },
+    { q: 'Which class wins the relay race?',                                         options: ['Class 5A', 'Class 5B', 'Class 5C', 'Class 6A'],                                            ans: 1, type: 'sa' },
+    { q: 'What time does the medal ceremony take place?',                            options: ["Half past two", "Quarter to three", "Three o'clock", "Quarter past three"],                ans: 2, type: 'sa' },
+    { q: '✅ TRUE or FALSE:\n"Tom\'s time in the 100-metre race was fourteen seconds."', options: ['TRUE ✓', 'FALSE ✗'],                                                                   ans: 0, type: 'tf' },
+    { q: '✅ TRUE or FALSE:\n"Students eat hot food for lunch on sports day."',      options: ['TRUE ✓', 'FALSE ✗'],                                                                        ans: 1, type: 'tf' },
+  ]
+};
+
+const ET_READING_PASSAGE_4 = [
+  { heading: 'Sports Day at Maple Hill School', text: null },
+  { heading: null, text: "It is a warm Wednesday in September. Maple Hill School is having its annual sports day. All the students from Year 5 and Year 6 are taking part. Mr. Carter, the sports teacher, is standing in the middle of the field. He has a whistle and a stopwatch." },
+  { heading: null, text: "The school field has four lanes for running. There are also stations for the long jump, the high jump, and the ball throw. At half past nine, the first race begins. Twenty students line up at the start. The crowd is cheering loudly." },
+  { heading: null, text: "Tom from 5A wins the 100-metre race. His time is fourteen seconds. Class 5B wins the relay race at the end of the morning." },
+  { heading: null, text: "At half past twelve, everyone stops for lunch. The students sit under the trees near the fence. They eat their packed lunches and drink cold water. Some children are playing games while waiting." },
+  { heading: null, text: "At three o'clock, Mr. Carter gives out the medals and trophies. Everyone goes home feeling proud and tired." }
+];
+
+// ===== ENGLISH TEST – OCTOBER 2026 (Test 5) =====
+
+const ET_QUESTIONS_5 = {
+  time: [
+    { q: '🕢  The clock shows  7:30\nWhat time is it?',                              options: ["It's quarter past seven.", "It's seven o'clock.",     "It's half past seven.",     "It's quarter to eight."],   ans: 2 },
+    { q: '🕔  The clock shows  5:00\nWhat time is it?',                              options: ["It's half past five.",     "It's five o'clock.",      "It's quarter past five.",   "It's quarter to five."],    ans: 1 },
+    { q: '⏰  The clock shows  2:15\nWhat time is it?',                              options: ["It's quarter to two.",     "It's two o'clock.",       "It's quarter past two.",    "It's half past two."],      ans: 2 },
+    { q: '⏰  The clock shows  8:45\nWhat time is it?',                              options: ["It's quarter past eight.","It's half past eight.",    "It's eight o'clock.",       "It's quarter to nine."],    ans: 3 },
+    { q: "The show starts at 4:00.\nHow do you say this time in English?",           options: ["It's quarter to four.",    "It's four o'clock.",      "It's half past four.",      "It's quarter past four."],  ans: 1 },
+    { q: '🕛  The clock shows 12:00\nHow do you say this time in English?',          options: ["It's twelve past.",        "It's twelve o'clock.",    "It's half past twelve.",    "It's quarter past twelve."], ans: 1 },
+    { q: 'Write the number: The word "ten" in digits is:',                          options: ['8', '9', '10', '11'],                                                                                              ans: 2 },
+    { q: 'Write the number: The word "six" in digits is:',                          options: ['4', '5', '6', '7'],                                                                                                ans: 2 },
+  ],
+  pronouns: [
+    { q: "Look at Linda.  _____  dress is purple.",                                  options: ['My', 'Your', 'His', 'Her'],            ans: 3 },
+    { q: "My brother and I share a room.  _____  room is quite small.",              options: ['My', 'Our', 'Their', 'His'],           ans: 1 },
+    { q: "The cow gave  _____  calf some milk.",                                     options: ['his', 'her', 'its', 'their'],          ans: 2 },
+    { q: "Jack and Amy are cousins.  _____  grandparents live in the village.",      options: ['My', 'His', 'Her', 'Their'],           ans: 3 },
+    { q: "I lost  _____  keys this morning.",                                        options: ['my', 'your', 'his', 'their'],          ans: 0 },
+    { q: "You left  _____  coat on the chair.",                                      options: ['my', 'your', 'his', 'their'],          ans: 1 },
+    { q: "Oliver walked  _____  dog to the park.",                                   options: ['my', 'your', 'his', 'their'],          ans: 2 },
+    { q: "The students are working on  _____  project.",                             options: ['my', 'your', 'its', 'their'],          ans: 3 },
+  ],
+  grammar: [
+    { q: "_____  a fly in my soup!",                                                 options: ['There are', 'There is', 'There have', 'There am'],      ans: 1,  hint: 'Topic: There is / There are' },
+    { q: "_____  twelve months in a year.",                                          options: ['There is', 'There am', 'There have', 'There are'],      ans: 3,  hint: 'Topic: There is / There are' },
+    { q: "Look at the fridge.\n_____  two sandwiches and a bottle of juice inside.", options: ['There is', 'There are', 'Is there', 'Are there'],       ans: 1,  hint: 'Topic: There is / There are' },
+    { q: "The restaurant  _____  a lovely view of the sea.",                         options: ['have', 'are having', 'has', 'having'],                  ans: 2,  hint: 'Topic: Has / Have' },
+    { q: "My classmates  _____  a lot of questions today.",                          options: ['has', 'have', 'is having', 'are have'],                 ans: 1,  hint: 'Topic: Has / Have' },
+    { q: "The kitten  _____  very sharp claws.",                                     options: ['have', 'are having', 'has', 'having'],                  ans: 2,  hint: 'Topic: Has / Have' },
+    { q: "Shh!  The baby  _____  right now.",                                        options: ['sleep', 'sleeps', 'is sleeping', 'are sleeping'],       ans: 2,  hint: 'Topic: Present Progressive' },
+    { q: "The workers  _____  a new bridge at the moment.",                          options: ['is building', 'are building', 'builds', 'building'],    ans: 1,  hint: 'Topic: Present Progressive' },
+    { q: "Look at Jake!  He  _____  his bike at the moment.",                        options: ['fix', 'fixes', 'is fixing', 'are fixing'],              ans: 2,  hint: 'Topic: Present Progressive' },
+    { q: "The girls  _____  songs around the campfire right now.",                   options: ['is singing', 'are singing', 'sings', 'singing'],        ans: 1,  hint: 'Topic: Present Progressive' },
+  ],
+  prepositions: [
+    { q: "The cat is sitting  _____  the fireplace.\n(right beside it, to the left)", options: ['on', 'above', 'next to', 'under'],         ans: 2 },
+    { q: "The letter is  _____  the envelope.\n(inside the envelope)",               options: ['on', 'in', 'above', 'next to'],            ans: 1 },
+    { q: "The plane is flying  _____  the clouds.\n(lower than the clouds)",         options: ['on', 'under', 'above', 'behind'],          ans: 1 },
+    { q: "The dog is hiding  _____  the curtain.\n(the curtain is in front of the dog)", options: ['in front of', 'above', 'behind', 'next to'], ans: 2 },
+    { q: "The clock is  _____  the wall.\n(attached to the wall surface)",           options: ['on', 'in', 'above', 'under'],              ans: 0 },
+    { q: "The bank is  _____  the post office.\n(very close but not attached)",      options: ['in', 'above', 'near', 'behind'],           ans: 2 },
+    { q: "The teacher is standing  _____  the class.\n(at the front, students are behind)", options: ['behind', 'in front of', 'above', 'next to'], ans: 1 },
+    { q: "The lamp is  _____  the bookshelf.\n(on a higher level than the shelf)",   options: ['under', 'in front of', 'next to', 'above'], ans: 3 },
+  ],
+  reading: [
+    { q: 'What day does the class visit the museum?',                                options: ['Tuesday', 'Wednesday', 'Thursday', 'Friday'],                                              ans: 2, type: 'mc' },
+    { q: 'How long is the bus journey to the museum?',                               options: ['Ten minutes', 'Twenty minutes', 'Thirty minutes', 'Forty minutes'],                        ans: 1, type: 'mc' },
+    { q: 'What is on the first floor of the museum?',                                options: ['Space models', 'A rocket model', 'Dinosaur bones', 'A gift shop'],                         ans: 2, type: 'mc' },
+    { q: 'How tall is the rocket model?',                                            options: ['Three metres', 'Five metres', 'Two metres', 'Four metres'],                                ans: 0, type: 'mc' },
+    { q: 'What time does the bus leave for school?',                                 options: ['Quarter past two', 'Half past two', "Two o'clock", 'Quarter to three'],                   ans: 0, type: 'mc' },
+    { q: "What is the teacher's name?",                                              options: ['Mrs. Davis', 'Mrs. Smith', 'Mrs. Green', 'Mrs. Brown'],                                    ans: 0, type: 'sa' },
+    { q: 'What is hanging from the ceiling on the second floor?',                    options: ['Dinosaur bones', 'A giant rocket', 'Models of the planets', 'Photos of space'],            ans: 2, type: 'sa' },
+    { q: 'What do the children have for lunch?',                                     options: ['Pizza and cola', 'Sandwiches and orange juice', 'Hot dogs and water', 'Soup and bread'],   ans: 1, type: 'sa' },
+    { q: 'What do many children buy in the gift shop?',                              options: ['Books and pens', 'Stickers and toys', 'Postcards and small magnets', 'Calendars and badges'], ans: 2, type: 'sa' },
+    { q: 'What homework does Mrs. Davis give the class?',                            options: ['To draw a picture of a dinosaur', 'To write about their favourite part of the visit', 'To read a book about space', 'To make a model of a rocket'], ans: 1, type: 'sa' },
+    { q: '✅ TRUE or FALSE:\n"The T-Rex skeleton is near the entrance."',            options: ['TRUE ✓', 'FALSE ✗'],                                                                       ans: 0, type: 'tf' },
+    { q: '✅ TRUE or FALSE:\n"The museum has five floors."',                         options: ['TRUE ✓', 'FALSE ✗'],                                                                       ans: 1, type: 'tf' },
+  ]
+};
+
+const ET_READING_PASSAGE_5 = [
+  { heading: 'A Visit to the Science Museum', text: null },
+  { heading: null, text: "It is a cool Thursday morning in October. Mrs. Davis is taking class 5C on a trip to the National Science Museum. The museum is in the city centre, about twenty minutes from their school by bus. The children are very excited." },
+  { heading: null, text: "The museum has four floors. On the first floor, there is a large hall with dinosaur bones. There is a giant T-Rex skeleton standing near the entrance. The children are amazed. Some of them are taking photos and others are drawing sketches in their notebooks." },
+  { heading: null, text: "On the second floor, there is an exhibition about space. There are models of the planets hanging from the ceiling. There is also a model of a rocket that is three metres tall. Students can press buttons to hear facts about each planet." },
+  { heading: null, text: "At half past twelve, the class goes to the museum café. They have sandwiches and orange juice for lunch. After lunch, they visit the gift shop. Many children buy postcards and small magnets to take home." },
+  { heading: null, text: "The bus back to school leaves at quarter past two. When they arrive, Mrs. Davis gives them homework: to write a paragraph about their favourite part of the visit." }
+];
+
+// ===== ENGLISH TEST – NOVEMBER 2026 (Test 6) =====
+
+const ET_QUESTIONS_6 = {
+  time: [
+    { q: '🕐  The clock shows  1:00\nWhat time is it?',                              options: ["It's half past one.",      "It's one o'clock.",       "It's quarter past one.",    "It's quarter to one."],     ans: 1 },
+    { q: '🕡  The clock shows  6:30\nWhat time is it?',                              options: ["It's quarter past six.",   "It's six o'clock.",       "It's half past six.",       "It's quarter to seven."],   ans: 2 },
+    { q: '⏰  The clock shows  4:15\nWhat time is it?',                              options: ["It's quarter to four.",    "It's four o'clock.",      "It's quarter past four.",   "It's half past four."],     ans: 2 },
+    { q: '⏰  The clock shows 10:45\nWhat time is it?',                              options: ["It's quarter past ten.",   "It's half past ten.",     "It's ten o'clock.",         "It's quarter to eleven."],  ans: 3 },
+    { q: "The train leaves at 2:30.\nHow do you say this time in English?",          options: ["It's two o'clock.",        "It's half past two.",     "It's quarter past two.",    "It's quarter to three."],   ans: 1 },
+    { q: '🕗  The clock shows  8:00\nHow do you say this time in English?',          options: ["It's eight past.",         "It's eight o'clock.",     "It's half past eight.",     "It's quarter past eight."], ans: 1 },
+    { q: 'Write the number: The word "thirteen" in digits is:',                     options: ['11', '12', '13', '14'],                                                                                            ans: 2 },
+    { q: 'Write the number: The word "two" in digits is:',                          options: ['0', '1', '2', '3'],                                                                                                ans: 2 },
+  ],
+  pronouns: [
+    { q: "Look at George.  _____  hat is very funny.",                               options: ['My', 'Your', 'His', 'Her'],            ans: 2 },
+    { q: "The whole class cleaned up together.  _____  classroom looks much better now.", options: ['My', 'Our', 'Their', 'His'],      ans: 1 },
+    { q: "The turtle hides inside  _____  shell when it is scared.",                 options: ['his', 'her', 'its', 'their'],          ans: 2 },
+    { q: "Ella and Noa are best friends.  _____  locker is next to mine.",           options: ['My', 'His', 'Her', 'Their'],           ans: 3 },
+    { q: "This is  _____  drawing, not yours.",                                      options: ['my', 'your', 'his', 'their'],          ans: 0 },
+    { q: "Look at the kittens!  _____  eyes are just opening!",                     options: ['His', 'Her', 'Its', 'Their'],          ans: 3 },
+    { q: "Mrs. Lee praised Josh for  _____  hard work.",                             options: ['my', 'your', 'his', 'their'],          ans: 2 },
+    { q: "I finished  _____  homework before dinner.",                               options: ['my', 'your', 'his', 'their'],          ans: 0 },
+  ],
+  grammar: [
+    { q: "_____  a rainbow in the sky after the rain.",                              options: ['There are', 'There is', 'There have', 'There am'],      ans: 1,  hint: 'Topic: There is / There are' },
+    { q: "_____  twenty-eight days in February.",                                    options: ['There is', 'There am', 'There have', 'There are'],      ans: 3,  hint: 'Topic: There is / There are' },
+    { q: "Look at the sky.\n_____  some big clouds and a little sun today.",         options: ['There is', 'There are', 'Is there', 'Are there'],       ans: 1,  hint: 'Topic: There is / There are' },
+    { q: "The hotel  _____  a beautiful rooftop pool.",                              options: ['have', 'are having', 'has', 'having'],                  ans: 2,  hint: 'Topic: Has / Have' },
+    { q: "My cousins  _____  a farm with horses.",                                   options: ['has', 'have', 'is having', 'are have'],                 ans: 1,  hint: 'Topic: Has / Have' },
+    { q: "The parrot  _____  bright colourful feathers.",                            options: ['have', 'are having', 'has', 'having'],                  ans: 2,  hint: 'Topic: Has / Have' },
+    { q: "Look!  A puppy  _____  in the mud right now!",                             options: ['play', 'plays', 'is playing', 'are playing'],           ans: 2,  hint: 'Topic: Present Progressive' },
+    { q: "We  _____  a board game this evening.",                                    options: ['is playing', 'are playing', 'plays', 'playing'],        ans: 1,  hint: 'Topic: Present Progressive' },
+    { q: "My sister  _____  for her maths test right now.",                          options: ['study', 'studies', 'are studying', 'is studying'],      ans: 3,  hint: 'Topic: Present Progressive' },
+    { q: "The chefs  _____  a big meal for the party at the moment.",                options: ['is cooking', 'are cooking', 'cooks', 'cooking'],        ans: 1,  hint: 'Topic: Present Progressive' },
+  ],
+  prepositions: [
+    { q: "The glasses are  _____  the bedside table.\n(on the surface of the table)", options: ['under', 'on', 'above', 'behind'],         ans: 1 },
+    { q: "The slippers are  _____  the bed.\n(below the bed, on the floor)",         options: ['on', 'in', 'under', 'above'],              ans: 2 },
+    { q: "The teddy bear is  _____  the toy box.\n(inside the box)",                 options: ['on', 'in', 'above', 'next to'],            ans: 1 },
+    { q: "The cinema is  _____  the bowling alley.\n(right beside it)",              options: ['above', 'behind', 'in front of', 'next to'], ans: 3 },
+    { q: "The kite is flying  _____  the rooftops.\n(up in the sky, over the rooftops)", options: ['in', 'on', 'under', 'above'],          ans: 3 },
+    { q: "The girl is standing  _____  the mirror.\n(facing the mirror)",            options: ['behind', 'in front of', 'above', 'in'],   ans: 1 },
+    { q: "The dog is sleeping  _____  the fireplace.\n(a short distance away)",      options: ['in', 'above', 'near', 'behind'],           ans: 2 },
+    { q: "The shoes are kept  _____  the door.\n(the door is in front of them)",     options: ['on', 'in front of', 'behind', 'above'],   ans: 2 },
+  ],
+  reading: [
+    { q: 'What month is the school concert?',                                        options: ['September', 'October', 'November', 'December'],                                            ans: 2, type: 'mc' },
+    { q: 'How many seats are there in the school hall?',                             options: ['One hundred', 'One hundred and fifty', 'Two hundred', 'Two hundred and fifty'],            ans: 2, type: 'mc' },
+    { q: 'What time does the concert start?',                                        options: ["Half past six", "Seven o'clock", "Half past seven", "Eight o'clock"],                      ans: 1, type: 'mc' },
+    { q: 'What is the play by Class 5D about?',                                      options: ['A young explorer', 'A young inventor', 'A young scientist', 'A young musician'],           ans: 1, type: 'mc' },
+    { q: 'Who helped Class 5D write the script?',                                    options: ['The school principal', 'A parent', 'Mrs. Levi', 'A Year 6 student'],                       ans: 2, type: 'mc' },
+    { q: 'How many students are in the play?',                                       options: ['Ten', 'Eleven', 'Twelve', 'Thirteen'],                                                      ans: 2, type: 'sa' },
+    { q: 'Where is the party held after the concert?',                               options: ['In the classroom', 'In the school hall', 'In the school garden', 'In the cafeteria'],      ans: 2, type: 'sa' },
+    { q: 'What instruments does the music class play?',                              options: ['Guitar, piano and drums', 'Guitar, keyboard and two violins', 'Flute, keyboard and guitar', 'Piano, violin and cello'], ans: 1, type: 'sa' },
+    { q: 'What time does the concert finish?',                                       options: ["Half past eight", "Nine o'clock", "Half past nine", "Quarter to ten"],                     ans: 2, type: 'sa' },
+    { q: 'What does the school principal do at the end?',                            options: ['Sings a song', 'Gives out medals', 'Thanks teachers and students', 'Takes a photo'],       ans: 2, type: 'sa' },
+    { q: '✅ TRUE or FALSE:\n"The concert is held on a Friday evening."',            options: ['TRUE ✓', 'FALSE ✗'],                                                                       ans: 0, type: 'tf' },
+    { q: '✅ TRUE or FALSE:\n"The students in the play wear black and white costumes."', options: ['TRUE ✓', 'FALSE ✗'],                                                                   ans: 1, type: 'tf' },
+  ]
+};
+
+const ET_READING_PASSAGE_6 = [
+  { heading: 'The School Concert', text: null },
+  { heading: null, text: "Every year in November, Sunrise School puts on a big concert for parents and families. This year the concert is on a Friday evening. There are two hundred seats in the school hall. The concert starts at seven o'clock." },
+  { heading: null, text: "Class 5D is performing a play about a young inventor. There are twelve students in the play. Their costumes are colourful and creative. Some children are dressed as robots and others are dressed as scientists. Mrs. Levi, their class teacher, helped them write the script." },
+  { heading: null, text: "The music class plays three songs. They play a guitar, a keyboard, and two violins. The audience claps loudly after each song. There are also two poems read by students from Year 6." },
+  { heading: null, text: "After the concert, there is a small party in the school garden. There are tables with snacks and drinks. The parents are talking and the children are running around. Some students are taking photos with their friends." },
+  { heading: null, text: "The concert finishes at half past nine. Everyone agrees it was the best concert yet. The school principal thanks all the teachers and students for their hard work." }
 ];

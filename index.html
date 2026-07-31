@@ -98,9 +98,17 @@
           <span class="grade-icon">📗</span>
           <span class="grade-label">כיתה ב׳</span>
         </button>
+        <button class="grade-option" onclick="selectGrade(this, 3)" data-grade="3">
+          <span class="grade-icon">📙</span>
+          <span class="grade-label">כיתה ג׳</span>
+        </button>
         <button class="grade-option" onclick="selectGrade(this, 5)" data-grade="5">
           <span class="grade-icon">📘</span>
           <span class="grade-label">כיתה ה׳</span>
+        </button>
+        <button class="grade-option" onclick="selectGrade(this, 6)" data-grade="6">
+          <span class="grade-icon">📕</span>
+          <span class="grade-label">כיתה ו׳</span>
         </button>
       </div>
       <p>איך קוראים לך?</p>
@@ -1064,7 +1072,7 @@
         <div class="game-container">
           <div class="dictation-header">
             <h2 style="direction:ltr; text-align:center;">📋 English Tests – 2026</h2>
-            <p style="color:#666; margin-bottom:1rem; direction:ltr; text-align:center;">Grade 5 &nbsp;|&nbsp; Choose a test to practise</p>
+            <p id="et-all-tests-subtitle" style="color:#666; margin-bottom:1rem; direction:ltr; text-align:center;">Grade 5 &nbsp;|&nbsp; Choose a test to practise</p>
           </div>
           <div style="display:flex; flex-direction:column; gap:14px;">
             <button class="feature-card" style="background:linear-gradient(135deg,#e3f2fd,#90caf9); padding:24px 20px; text-align:left; direction:ltr;" onclick="navigate('english-test-0626')">

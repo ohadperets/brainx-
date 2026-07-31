@@ -2577,8 +2577,9 @@ body.theme-pink .app-header {
 
 /* ===== GRADE SELECTOR ===== */
 .grade-selector {
-  display: flex;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
   justify-content: center;
   margin: 12px 0 20px;
 }
@@ -2586,13 +2587,14 @@ body.theme-pink .app-header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 16px 24px;
+  gap: 6px;
+  padding: 12px 8px;
   border: 3px solid #e2e8f0;
   border-radius: var(--radius);
   background: #f8fafc;
   cursor: pointer;
   transition: all 0.2s ease;
+  min-width: 0;
 }
 .grade-option:hover {
   border-color: var(--primary);
@@ -2604,12 +2606,13 @@ body.theme-pink .app-header {
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 .grade-icon {
-  font-size: 2rem;
+  font-size: 1.6rem;
 }
 .grade-label {
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--text);
+  white-space: nowrap;
 }
 .user-item-grade {
   font-size: 0.75rem;

@@ -390,7 +390,8 @@ function showUserSelectScreen() {
   } else {
     userList.innerHTML = users.map(user => {
       const userProgress = loadProgressForUser(user.id);
-      const gradeText = user.grade === 2 ? "כיתה ב׳" : "כיתה ה׳";
+      const gradeTexts = { 2: "כיתה ב׳", 3: "כיתה ג׳", 5: "כיתה ה׳", 6: "כיתה ו׳" };
+      const gradeText = gradeTexts[user.grade] || "כיתה ה׳";
       return `
         <div class="user-item" onclick="selectUser('${user.id}')">
           <div class="user-item-avatar">${user.avatar}</div>
@@ -510,7 +511,10 @@ function saveProfileData(prof) {
 // Get content data based on user's grade
 function getData() {
   const grade = profile?.grade || 5;
-  return grade === 2 ? APP_DATA_GRADE2 : APP_DATA;
+  if (grade === 2) return APP_DATA_GRADE2;
+  if (grade === 3) return APP_DATA_GRADE3;
+  if (grade === 6) return APP_DATA_GRADE6;
+  return APP_DATA;
 }
 
 function loadSettingsForUser(userId) {
@@ -676,7 +680,8 @@ function editProfile() {
 
 function updateUIWithProfile() {
   if (!profile) return;
-  const gradeName = profile.grade === 2 ? "כיתה ב׳" : "כיתה ה׳";
+  const gradeNames = { 2: "כיתה ב׳", 3: "כיתה ג׳", 5: "כיתה ה׳", 6: "כיתה ו׳" };
+  const gradeName = gradeNames[profile.grade] || "כיתה ה׳";
   document.getElementById('home-avatar').textContent = profile.avatar;
   document.getElementById('home-greeting').textContent = `שלום ${profile.name}!`;
   document.getElementById('streak-count').textContent = progress.streak || 0;
@@ -941,11 +946,11 @@ function navigate(screen, subject, skipHistory = false) {
     case 'dictation':
       document.getElementById('screen-dictation').classList.add('active');
       headerTitle.textContent = 'הכתבה באנגלית';
-      // Hide general dictation for grade 2 (only available for grade 5)
+      // Hide general dictation for grades 2/3 (only available for grades 5/6)
       const btnGeneralDictation = document.getElementById('btn-general-dictation');
       if (btnGeneralDictation) {
         const grade = profile?.grade || 5;
-        btnGeneralDictation.style.display = grade === 2 ? 'none' : '';
+        btnGeneralDictation.style.display = (grade === 2 || grade === 3) ? 'none' : '';
       }
       break;
 
@@ -1040,6 +1045,8 @@ function navigate(screen, subject, skipHistory = false) {
     case 'et-all-tests':
       document.getElementById('screen-et-all-tests').classList.add('active');
       headerTitle.textContent = 'English Tests';
+      { const sub = document.getElementById('et-all-tests-subtitle');
+        if (sub) sub.textContent = (profile?.grade === 6 ? 'Grade 6' : 'Grade 5') + '  |  Choose a test to practise'; }
       break;
 
     case 'english-test-0626':
@@ -1232,7 +1239,7 @@ function updateSubjectFeatures() {
 
   if (currentSubject === 'math') {
     const grade = profile?.grade || 5;
-    if (grade === 5) {
+    if (grade === 5 || grade === 6) {
       html += `
       <button class="feature-card" style="background:linear-gradient(135deg,#e8f5e9,#a5d6a7)" onclick="navigate('geometry-quiz')">
         <div class="feature-icon">📐</div>
@@ -1246,12 +1253,12 @@ function updateSubjectFeatures() {
         <div class="feature-desc" style="font-size:0.95rem">15.3.2026 - התכונן למבחן!</div>
       </button>`;
     }
-    if (grade === 2) {
+    if (grade === 2 || grade === 3) {
       html += `
       <button class="feature-card" style="background:linear-gradient(135deg,#fff9c4,#fff176)" onclick="navigate('multiplication-quiz')">
         <div class="feature-icon">✖️</div>
-        <div class="feature-name">לוח הכפל</div>
-        <div class="feature-desc">תרגול לוח הכפל 1-10</div>
+        <div class="feature-name">${grade === 3 ? 'לוח הכפל וחילוק' : 'לוח הכפל'}</div>
+        <div class="feature-desc">${grade === 3 ? 'תרגול לוח הכפל 1-12 וחילוק' : 'תרגול לוח הכפל 1-10'}</div>
       </button>`;
     }
   }
@@ -1274,12 +1281,12 @@ function updateSubjectFeatures() {
     </button>`;
 
     const grade = profile?.grade || 5;
-    if (grade === 5) {
+    if (grade === 5 || grade === 6) {
       html += `
       <button class="feature-card" style="grid-column: 1 / -1; background:linear-gradient(135deg,#e3f2fd,#90caf9); padding: 28px 16px;" onclick="navigate('et-all-tests')">
         <div class="feature-icon" style="font-size:2.5rem">📋</div>
         <div class="feature-name" style="font-size:1.2rem; font-weight:800; color:#0d47a1">English Tests – 2026</div>
-        <div class="feature-desc" style="font-size:0.88rem; color:#1565c0">3 Tests &bull; ⏰ Time &bull; 🔤 Pronouns &bull; ✏️ Grammar &bull; 📍 Prepositions &bull; 📖 Reading</div>
+        <div class="feature-desc" style="font-size:0.88rem; color:#1565c0">6 Tests &bull; ⏰ Time &bull; 🔤 Pronouns &bull; ✏️ Grammar &bull; 📍 Prepositions &bull; 📖 Reading</div>
       </button>`;
       html += `
       <button class="feature-card big-exam-card" style="grid-column: 1 / -1; background:linear-gradient(135deg,#ffd54f,#ffb300); padding: 32px 16px;" onclick="navigate('big-exam')">
@@ -1299,7 +1306,7 @@ function updateHomeProgress() {
     const el = document.getElementById(`progress-${subj}`);
     if (!el) return;
     const p = progress[subj];
-    const totalLessons = APP_DATA[subj].lessons.length;
+    const totalLessons = getData()[subj].lessons.length;
     const readLessons = p.lessonsRead.length;
     if (readLessons > 0 || p.quizAttempts > 0) {
       el.textContent = `⭐ ${p.quizBest}% | 📝 ${readLessons}/${totalLessons}`;
@@ -1370,26 +1377,34 @@ function openLesson(index) {
 function generateMathQuestions(grade, count = 10) {
   const questions = [];
   
-  if (grade === 2) {
-    // Grade 2: Simple addition/subtraction up to 20, shapes
+  if (grade === 2 || grade === 3) {
+    // Grade 2: Simple addition/subtraction up to 20, shapes. Grade 3: up to 100 plus multiplication.
+    const maxNum = grade === 3 ? 100 : 20;
     for (let i = 0; i < count; i++) {
-      const type = Math.floor(Math.random() * 4);
+      const type = Math.floor(Math.random() * (grade === 3 ? 5 : 4));
       let q;
       
       if (type === 0) {
-        // Addition up to 20
-        const a = Math.floor(Math.random() * 10) + 1;
-        const b = Math.floor(Math.random() * (20 - a)) + 1;
+        // Addition
+        const a = Math.floor(Math.random() * (maxNum / 2)) + 1;
+        const b = Math.floor(Math.random() * (maxNum - a)) + 1;
         const answer = a + b;
-        const options = generateOptions(answer, 1, 20);
+        const options = generateOptions(answer, 1, maxNum);
         q = { question: `${a} + ${b} = ?`, options, correct: options.indexOf(answer.toString()) };
       } else if (type === 1) {
-        // Subtraction from numbers up to 20
-        const a = Math.floor(Math.random() * 15) + 5;
+        // Subtraction
+        const a = Math.floor(Math.random() * (maxNum - 10)) + 10;
         const b = Math.floor(Math.random() * a) + 1;
         const answer = a - b;
-        const options = generateOptions(answer, 0, 20);
+        const options = generateOptions(answer, 0, maxNum);
         q = { question: `${a} - ${b} = ?`, options, correct: options.indexOf(answer.toString()) };
+      } else if (type === 4) {
+        // Grade 3 only: multiplication tables 1-12
+        const a = Math.floor(Math.random() * 12) + 1;
+        const b = Math.floor(Math.random() * 12) + 1;
+        const answer = a * b;
+        const options = generateOptions(answer, 1, 144);
+        q = { question: `${a} × ${b} = ?`, options, correct: options.indexOf(answer.toString()) };
       } else if (type === 2) {
         // Shape corners
         const shapes = [
@@ -1982,13 +1997,13 @@ function startMemory() {
   if (currentSubject === 'hebrew') {
     hintEl.textContent = '💡 חפש זוגות: יחיד ↔ רבים';
   } else if (currentSubject === 'english') {
-    if (grade === 2) {
+    if (grade === 2 || grade === 3) {
       hintEl.textContent = '💡 חפש זוגות: מילה ↔ תרגום';
     } else {
       hintEl.textContent = '💡 חפש זוגות: עבר ↔ הווה';
     }
   } else if (currentSubject === 'math') {
-    if (grade === 2) {
+    if (grade === 2 || grade === 3) {
       hintEl.textContent = '💡 חפש זוגות: תרגיל ↔ תוצאה';
     } else {
       hintEl.textContent = '💡 חפש זוגות: שבר ↔ עשרוני';
@@ -4606,7 +4621,7 @@ function renderProfileScreen() {
 
   stats.innerHTML = subjects.map(subj => {
     const p = progress[subj.key];
-    const totalLessons = APP_DATA[subj.key].lessons.length;
+    const totalLessons = getData()[subj.key].lessons.length;
     const readLessons = p.lessonsRead.length;
     const pct = totalLessons > 0 ? Math.round((readLessons / totalLessons) * 100) : 0;
     return `<div class="progress-subject-card">
@@ -4643,7 +4658,7 @@ function renderProgress() {
   const container = document.getElementById('progress-details');
   container.innerHTML = subjects.map(subj => {
     const p = progress[subj.key];
-    const totalLessons = APP_DATA[subj.key].lessons.length;
+    const totalLessons = getData()[subj.key].lessons.length;
     const readLessons = p.lessonsRead.length;
     const pct = totalLessons > 0 ? Math.round((readLessons / totalLessons) * 100) : 0;
 
@@ -5162,6 +5177,14 @@ let etCurrentTestId = 1;
 let etMenuRoute = 'english-test-0626';
 
 function etGetAllQuestions() {
+  if (profile?.grade === 6) {
+    if (etCurrentTestId === 2) return ET_QUESTIONS_G6_2;
+    if (etCurrentTestId === 3) return ET_QUESTIONS_G6_3;
+    if (etCurrentTestId === 4) return ET_QUESTIONS_G6_4;
+    if (etCurrentTestId === 5) return ET_QUESTIONS_G6_5;
+    if (etCurrentTestId === 6) return ET_QUESTIONS_G6_6;
+    return ET_QUESTIONS_G6_1;
+  }
   if (etCurrentTestId === 2) return ET_QUESTIONS_2;
   if (etCurrentTestId === 3) return ET_QUESTIONS_3;
   if (etCurrentTestId === 4) return ET_QUESTIONS_4;
@@ -5170,6 +5193,14 @@ function etGetAllQuestions() {
   return ET_QUESTIONS;
 }
 function etGetReadingPassage() {
+  if (profile?.grade === 6) {
+    if (etCurrentTestId === 2) return ET_READING_PASSAGE_G6_2;
+    if (etCurrentTestId === 3) return ET_READING_PASSAGE_G6_3;
+    if (etCurrentTestId === 4) return ET_READING_PASSAGE_G6_4;
+    if (etCurrentTestId === 5) return ET_READING_PASSAGE_G6_5;
+    if (etCurrentTestId === 6) return ET_READING_PASSAGE_G6_6;
+    return ET_READING_PASSAGE_G6_1;
+  }
   if (etCurrentTestId === 2) return ET_READING_PASSAGE_2;
   if (etCurrentTestId === 3) return ET_READING_PASSAGE_3;
   if (etCurrentTestId === 4) return ET_READING_PASSAGE_4;
@@ -5180,12 +5211,12 @@ function etGetReadingPassage() {
 function navigateBackToETMenu() { navigate(etMenuRoute); }
 
 function etGetScores() {
-  return JSON.parse(localStorage.getItem(`etScores-${etCurrentTestId}-${currentUserId}`) || '{}');
+  return JSON.parse(localStorage.getItem(`etScores-${profile?.grade === 6 ? 'g6-' : ''}${etCurrentTestId}-${currentUserId}`) || '{}');
 }
 function etSaveScore(partId, score) {
   const map = etGetScores();
   map[partId] = score;
-  localStorage.setItem(`etScores-${etCurrentTestId}-${currentUserId}`, JSON.stringify(map));
+  localStorage.setItem(`etScores-${profile?.grade === 6 ? 'g6-' : ''}${etCurrentTestId}-${currentUserId}`, JSON.stringify(map));
 }
 
 function updateETMenu() {
@@ -5888,3 +5919,429 @@ const ET_READING_PASSAGE_6 = [
   { heading: null, text: "After the concert, there is a small party in the school garden. There are tables with snacks and drinks. The parents are talking and the children are running around. Some students are taking photos with their friends." },
   { heading: null, text: "The concert finishes at half past nine. Everyone agrees it was the best concert yet. The school principal thanks all the teachers and students for their hard work." }
 ];
+
+// ===================================================================
+// GRADE 6 ENGLISH TESTS 2026 (6 tests)
+// ===================================================================
+
+// ===== GRADE 6 ENGLISH TEST 1 - Past Simple (irregular verbs) =====
+
+const ET_QUESTIONS_G6_1 = {
+  time: [
+    { q: '🕐  The clock shows  1:05\nWhat time is it?',                           options: ["It's five past one.",       "It's one o'clock.",        "It's five to one.",         "It's quarter past one."],   ans: 0 },
+    { q: '🕗  The clock shows  8:40\nWhat time is it?',                           options: ["It's twenty to nine.",      "It's twenty past eight.",   "It's forty past eight.",    "It's quarter to nine."],    ans: 0 },
+    { q: '⏰  The clock shows 10:20\nWhat time is it?',                           options: ["It's twenty to ten.",       "It's twenty past ten.",     "It's ten past ten.",        "It's half past ten."],      ans: 1 },
+    { q: '⏰  The clock shows  4:50\nWhat time is it?',                           options: ["It's ten to five.",         "It's fifty past four.",     "It's ten past five.",       "It's quarter to five."],    ans: 0 },
+    { q: 'The movie starts at 9:10.\nHow do you say this time in English?',        options: ["It's nine o'clock.",       "It's ten past nine.",       "It's ten to nine.",         "It's quarter past nine."],  ans: 1 },
+    { q: '🕕  The clock shows  5:00\nHow do you say this time in English?',        options: ["It's five past.",          "It's five o'clock.",        "It's half past five.",      "It's quarter past five."],  ans: 1 },
+    { q: 'Write the number: The word "fifteen" in digits is:',                    options: ['13', '14', '15', '16'],                                                                                        ans: 2 },
+    { q: 'Write the number: The word "twenty" in digits is:',                     options: ['12', '20', '21', '22'],                                                                                        ans: 1 },
+  ],
+  pronouns: [
+    { q: "Give the book to  _____ .  (to me)",                                    options: ['I', 'me', 'my', 'mine'],               ans: 1 },
+    { q: "This pencil case is  _____ .  (it belongs to me)",                      options: ['I', 'me', 'my', 'mine'],               ans: 3 },
+    { q: "We saw  _____  at the mall yesterday.  (them)",                         options: ['they', 'them', 'their', 'theirs'],     ans: 1 },
+    { q: "That backpack is  _____ , not mine.  (it belongs to him)",              options: ['he', 'him', 'his', 'he\'s'],           ans: 2 },
+    { q: "Can you help  _____  with my homework?  (me)",                          options: ['I', 'me', 'my', 'mine'],               ans: 1 },
+    { q: "The prize is  _____ !  (it belongs to us)",                             options: ['we', 'us', 'our', 'ours'],             ans: 3 },
+    { q: "I gave  _____  a present for her birthday.  (to her)",                  options: ['she', 'her', 'hers', 'herself'],       ans: 1 },
+    { q: "Is this jacket  _____ ?  (does it belong to you)",                      options: ['you', 'your', 'yours', 'you\'re'],     ans: 2 },
+  ],
+  grammar: [
+    { q: "Yesterday, I  _____  (go) to the zoo with my family.",                  options: ['go', 'goed', 'went', 'gone'],                        ans: 2, hint: 'Topic: Past Simple - irregular verbs' },
+    { q: "She  _____  (write) a letter to her grandmother last week.",            options: ['writed', 'wrote', 'written', 'writes'],              ans: 1, hint: 'Topic: Past Simple - irregular verbs' },
+    { q: "We  _____  (see) a great movie last Friday.",                           options: ['seen', 'saw', 'seed', 'see'],                        ans: 1, hint: 'Topic: Past Simple - irregular verbs' },
+    { q: "He  _____  (come) home late yesterday.",                                options: ['comed', 'came', 'come', 'coming'],                   ans: 1, hint: 'Topic: Past Simple - irregular verbs' },
+    { q: "They  _____  (eat) pizza for dinner two nights ago.",                   options: ['eated', 'ate', 'eaten', 'eats'],                     ans: 1, hint: 'Topic: Past Simple - irregular verbs' },
+    { q: "I  _____  (not/go) to school on Saturday.",                             options: ['not went', 'didn\'t went', 'didn\'t go', 'don\'t go'], ans: 2, hint: 'Topic: Past Simple - negative' },
+    { q: "She  _____  (not/have) time to finish her homework.",                   options: ['not had', 'didn\'t had', 'didn\'t have', 'doesn\'t have'], ans: 2, hint: 'Topic: Past Simple - negative' },
+    { q: "_____  you  _____  (see) the new movie yet?",                          options: ['Do / see', 'Did / see', 'Did / saw', 'Have / see'],  ans: 1, hint: 'Topic: Past Simple - questions' },
+    { q: "_____  they  _____  (go) to the party last night?",                     options: ['Do / go', 'Did / go', 'Did / went', 'Have / go'],    ans: 1, hint: 'Topic: Past Simple - questions' },
+    { q: "What time  _____  she  _____  (leave) the house this morning?",         options: ['did / leave', 'did / left', 'does / leave', 'has / left'], ans: 0, hint: 'Topic: Past Simple - questions' },
+  ],
+  prepositions: [
+    { q: "The library is  _____  the post office and the bank.\n(with one on each side)", options: ['between', 'among', 'behind', 'over'],  ans: 0 },
+    { q: "There is one winner  _____  all the players.\n(inside a group of many)",   options: ['between', 'among', 'above', 'across'],  ans: 1 },
+    { q: "The cat jumped  _____  the fence.\n(from one side to the other, over the top)", options: ['through', 'across', 'over', 'along'], ans: 2 },
+    { q: "We walked  _____  the tunnel to get to the station.\n(from one end to the other, inside it)", options: ['across', 'through', 'over', 'along'], ans: 1 },
+    { q: "The boat sailed  _____  the river.\n(along the length of it)",             options: ['along', 'across', 'through', 'between'], ans: 0 },
+    { q: "She walked  _____  the street to say hello.\n(from one side to the other)", options: ['along', 'through', 'across', 'among'],  ans: 2 },
+    { q: "The plane flew  _____  the clouds.\n(higher than the clouds)",             options: ['above', 'below', 'between', 'among'],   ans: 0 },
+    { q: "The keys fell  _____  the sofa cushions.\n(in the space between them)",     options: ['above', 'between', 'among', 'over'],   ans: 1 },
+  ],
+  reading: [
+    { q: 'What did Maya find in the attic?',                                       options: ['An old photo album', 'A treasure map', 'A broken clock', 'A box of letters'], ans: 1, type: 'mc' },
+    { q: 'Who drew the map, according to the story?',                              options: ["Maya's grandfather", "Maya's father", "A pirate", "Nobody knows"], ans: 0, type: 'mc' },
+    { q: 'Where did Maya and her brother go first?',                               options: ['To the old oak tree', 'To the beach', 'To the lighthouse', 'To the cave'], ans: 0, type: 'mc' },
+    { q: 'What did they find under the oak tree?',                                 options: ['Gold coins', 'A small wooden box', 'Nothing at all', 'A key'], ans: 3, type: 'mc' },
+    { q: 'What did the key open?',                                                 options: ["A door in the lighthouse", "An old chest in the cave", "The attic window", "A garden gate"], ans: 1, type: 'mc' },
+    { q: 'What was inside the chest?',                                             options: ['Old family photographs and letters', 'Gold and jewels', 'Nothing, it was empty', 'A second map'], ans: 0, type: 'sa' },
+    { q: 'How did Maya feel when she found the chest?',                            options: ['Scared and worried', 'Bored', 'Excited and happy', 'Angry'], ans: 2, type: 'sa' },
+    { q: 'What did Maya\'s brother do while she opened the chest?',                options: ['He held the flashlight', 'He went home', 'He read a book', 'He called their parents'], ans: 0, type: 'sa' },
+    { q: 'What did the family decide to do with the old photographs?',            options: ['Throw them away', 'Sell them', 'Put them in a new album', 'Hide them again'], ans: 2, type: 'sa' },
+    { q: 'What time did Maya and her brother finally go home?',                    options: ['Before lunch', 'In the afternoon', 'Just before sunset', 'The next morning'], ans: 2, type: 'sa' },
+    { q: '✅ TRUE or FALSE:\n"Maya found the map in the attic of her house."',      options: ['TRUE ✓', 'FALSE ✗'], ans: 0, type: 'tf' },
+    { q: '✅ TRUE or FALSE:\n"The chest was full of gold coins."',                  options: ['TRUE ✓', 'FALSE ✗'], ans: 1, type: 'tf' },
+  ]
+};
+
+const ET_READING_PASSAGE_G6_1 = [
+  { heading: 'The Treasure Map', text: null },
+  { heading: null, text: "Last summer, Maya went to help her parents clean the attic of their old house. While she was looking through some boxes, she found an old, folded piece of paper. It was a treasure map! Her grandfather had drawn it many years before, when he was a young boy living in the same house." },
+  { heading: null, text: "Maya called her brother, Dan, and together they studied the map carefully. The map showed a path from the house to an old oak tree at the edge of the garden. Excited, they grabbed a flashlight and went outside to follow the path." },
+  { heading: null, text: "Under the oak tree, they dug in the soft ground and found a small wooden box. Inside the box was an old rusty key. The map showed that the key opened something in a cave near the beach, so they walked there together." },
+  { heading: null, text: "In the cave, they found an old wooden chest. Maya's hands were shaking as she put the key in the lock. When she opened the chest, she found old family photographs and letters from many years ago. Dan held the flashlight while Maya looked through everything." },
+  { heading: null, text: "That evening, the whole family looked at the old photographs together. They decided to put them in a new photo album so everyone could enjoy them for years to come. Maya and Dan finally went home just before sunset, tired but very happy with their adventure." }
+];
+
+// ===== GRADE 6 ENGLISH TEST 2 - Future Simple (will) =====
+
+const ET_QUESTIONS_G6_2 = {
+  time: [
+    { q: '🕒  The clock shows  3:25\nWhat time is it?',                            options: ["It's twenty-five past three.", "It's twenty-five to four.", "It's quarter past three.", "It's half past three."], ans: 0 },
+    { q: '🕘  The clock shows  9:35\nWhat time is it?',                            options: ["It's thirty-five past nine.", "It's twenty-five to ten.",  "It's twenty-five past nine.", "It's quarter to ten."], ans: 1 },
+    { q: '⏰  The clock shows 11:10\nWhat time is it?',                            options: ["It's ten to eleven.",       "It's ten past eleven.",     "It's quarter past eleven.", "It's twenty past eleven."], ans: 1 },
+    { q: '⏰  The clock shows  2:55\nWhat time is it?',                            options: ["It's five to three.",       "It's fifty-five past two.", "It's five past three.",     "It's quarter to three."],  ans: 0 },
+    { q: 'The bus leaves at 7:20.\nHow do you say this time in English?',          options: ["It's seven o'clock.",       "It's twenty past seven.",   "It's twenty to seven.",     "It's quarter past seven."], ans: 1 },
+    { q: '🕓  The clock shows  4:00\nHow do you say this time in English?',        options: ["It's four past.",           "It's four o'clock.",        "It's half past four.",      "It's quarter past four."], ans: 1 },
+    { q: 'Write the number: The word "sixteen" in digits is:',                     options: ['15', '16', '17', '18'],                                                                                        ans: 1 },
+    { q: 'Write the number: The word "thirty" in digits is:',                      options: ['13', '20', '30', '33'],                                                                                        ans: 2 },
+  ],
+  pronouns: [
+    { q: "This umbrella is  _____ , not yours.  (it belongs to me)",               options: ['I', 'me', 'my', 'mine'],               ans: 3 },
+    { q: "The teacher gave  _____  extra homework.  (to us)",                      options: ['we', 'us', 'our', 'ours'],             ans: 1 },
+    { q: "Those seats are  _____ .  (they belong to them)",                        options: ['they', 'them', 'their', 'theirs'],     ans: 3 },
+    { q: "I saw  _____  at the concert last night.  (him)",                        options: ['he', 'him', 'his', 'himself'],         ans: 1 },
+    { q: "This trophy is  _____ !  (it belongs to her)",                           options: ['she', 'her', 'hers', 'herself'],       ans: 2 },
+    { q: "Can you give this note to  _____ ?  (to them)",                          options: ['they', 'them', 'their', 'theirs'],     ans: 1 },
+    { q: "Is this scarf  _____ ?  (does it belong to you)",                        options: ['you', 'your', 'yours', 'you\'re'],     ans: 2 },
+    { q: "We invited  _____  to our party.  (her)",                                options: ['she', 'her', 'hers', 'herself'],       ans: 1 },
+  ],
+  grammar: [
+    { q: "Tomorrow, I  _____  (visit) my grandparents.",                          options: ['visit', 'visited', 'will visit', 'am visit'],       ans: 2, hint: 'Topic: Future Simple - will' },
+    { q: "She  _____  (finish) her homework before dinner.",                      options: ['will finish', 'finishes', 'finished', 'finishing'], ans: 0, hint: 'Topic: Future Simple - will' },
+    { q: "We  _____  (travel) to Italy next summer.",                             options: ['travel', 'traveled', 'will travel', 'are travel'],  ans: 2, hint: 'Topic: Future Simple - will' },
+    { q: "He  _____  (not/come) to school tomorrow because he is sick.",          options: ['not will come', 'won\'t come', 'doesn\'t come', 'didn\'t come'], ans: 1, hint: 'Topic: Future Simple - negative' },
+    { q: "They  _____  (not/be) at the party next week.",                        options: ['won\'t be', 'not will be', 'don\'t be', 'aren\'t be'], ans: 0, hint: 'Topic: Future Simple - negative' },
+    { q: "I  _____  (not/forget) your birthday!",                                 options: ['not will forget', 'won\'t forget', 'don\'t forget', 'didn\'t forget'], ans: 1, hint: 'Topic: Future Simple - negative' },
+    { q: "_____  you  _____  (help) me with my project?",                        options: ['Do / help', 'Will / help', 'Are / help', 'Did / help'], ans: 1, hint: 'Topic: Future Simple - questions' },
+    { q: "_____  it  _____  (rain) tomorrow?",                                    options: ['Will / rain', 'Does / rain', 'Is / rain', 'Did / rain'], ans: 0, hint: 'Topic: Future Simple - questions' },
+    { q: "What time  _____  the movie  _____  (start)?",                         options: ['does / start', 'will / start', 'is / start', 'did / start'], ans: 1, hint: 'Topic: Future Simple - questions' },
+    { q: "I think it  _____  (be) sunny this weekend.",                          options: ['will be', 'is', 'was', 'being'],                     ans: 0, hint: 'Topic: Future Simple - predictions' },
+  ],
+  prepositions: [
+    { q: "The bakery is  _____  the bookstore and the coffee shop.\n(with one on each side)", options: ['between', 'among', 'across', 'along'], ans: 0 },
+    { q: "She hid the gift  _____  the pile of clothes.\n(inside a group of things)",  options: ['between', 'among', 'above', 'behind'],  ans: 1 },
+    { q: "We drove  _____  the bridge to reach the other side.\n(from one side to the other)", options: ['through', 'across', 'along', 'between'], ans: 1 },
+    { q: "The mouse ran  _____  the small hole in the wall.\n(from one side to the other, inside it)", options: ['across', 'through', 'along', 'over'], ans: 1 },
+    { q: "They walked  _____  the beach at sunset.\n(along the length of it)",       options: ['along', 'across', 'through', 'between'], ans: 0 },
+    { q: "The plane flew  _____  the ocean.\n(over the top of it)",                  options: ['above', 'along', 'through', 'between'],  ans: 0 },
+    { q: "The ball rolled  _____  the field to the goal.\n(across the length of it)", options: ['across', 'through', 'between', 'among'], ans: 0 },
+    { q: "The cat squeezed  _____  the narrow gap in the fence.\n(from one side to the other)", options: ['through', 'across', 'along', 'above'], ans: 0 },
+  ],
+  reading: [
+    { q: 'What will the school build next year?',                                  options: ['A new library', 'A science lab', 'A swimming pool', 'A music room'], ans: 1, type: 'mc' },
+    { q: 'When will the construction begin?',                                       options: ['This month', 'Next month', 'In the summer', 'Next year'], ans: 2, type: 'mc' },
+    { q: 'How long will the construction take?',                                    options: ['One month', 'Three months', 'Six months', 'One year'], ans: 2, type: 'mc' },
+    { q: 'What will students be able to do in the new lab?',                        options: ['Play sports', 'Do science experiments', 'Watch movies', 'Learn music'], ans: 1, type: 'mc' },
+    { q: 'Who will teach in the new lab?',                                          options: ['Mr. Cohen', 'A new science teacher', 'The school principal', 'Parent volunteers'], ans: 1, type: 'mc' },
+    { q: 'What will the students do to help plan the lab?',                         options: ['Vote on equipment', 'Paint the walls', 'Build furniture', 'Nothing at all'], ans: 0, type: 'sa' },
+    { q: 'Where will classes be held during construction?',                         options: ['At home', 'In temporary classrooms', 'At another school', 'Outside'], ans: 1, type: 'sa' },
+    { q: 'What will happen when the lab opens?',                                    options: ['A big celebration', 'Nothing special', 'A test for students', 'A holiday'], ans: 0, type: 'sa' },
+    { q: 'What equipment will the new lab have?',                                   options: ['Microscopes and computers', 'Only books', 'Only computers', 'Sports equipment'], ans: 0, type: 'sa' },
+    { q: 'How do the students feel about the new lab?',                             options: ['Bored', 'Worried', 'Excited', 'Confused'], ans: 2, type: 'sa' },
+    { q: '✅ TRUE or FALSE:\n"The new science lab will open in six months."',       options: ['TRUE ✓', 'FALSE ✗'], ans: 0, type: 'tf' },
+    { q: '✅ TRUE or FALSE:\n"Students will not be allowed to help plan the lab."',   options: ['TRUE ✓', 'FALSE ✗'], ans: 1, type: 'tf' },
+  ]
+};
+
+const ET_READING_PASSAGE_G6_2 = [
+  { heading: 'A New Science Lab', text: null },
+  { heading: null, text: "Next month, our school will begin an exciting new project. We will build a brand-new science lab! The old storage room next to the library will be turned into a modern space for science experiments." },
+  { heading: null, text: "The construction will take about three months, so the new lab will be ready by winter. During this time, some classes will be held in temporary classrooms in the yard. The teachers say this will not disturb our regular lessons too much." },
+  { heading: null, text: "The new lab will have microscopes, computers, and special tables for experiments. Mr. Cohen, our current science teacher, will not teach there alone - a new science teacher will join our school to help run the lab. Together, they will plan fun and exciting lessons for us." },
+  { heading: null, text: "Before the construction starts, all the students will vote on which equipment they think is most important. The teachers want everyone to feel like the new lab belongs to all of us, not just the teachers." },
+  { heading: null, text: "When the lab finally opens, the school will have a big celebration with games and snacks. Everyone is very excited, and many students already can't wait to do their first science experiment in the new room!" }
+];
+
+// ===== GRADE 6 ENGLISH TEST 3 - Comparatives and Superlatives =====
+
+const ET_QUESTIONS_G6_3 = {
+  time: [
+    { q: '🕐  The clock shows  1:05\nWhat time is it?',                           options: ["It's five past one.",       "It's five to one.",        "It's one o'clock.",         "It's quarter past one."],   ans: 0 },
+    { q: '🕝  The clock shows  2:40\nWhat time is it?',                           options: ["It's twenty to three.",     "It's twenty past two.",     "It's forty past two.",      "It's quarter to three."],   ans: 0 },
+    { q: '⏰  The clock shows  6:20\nWhat time is it?',                           options: ["It's twenty to six.",       "It's twenty past six.",     "It's quarter past six.",    "It's half past six."],      ans: 1 },
+    { q: '⏰  The clock shows  9:50\nWhat time is it?',                           options: ["It's ten to ten.",          "It's fifty past nine.",     "It's ten past ten.",        "It's quarter to ten."],     ans: 0 },
+    { q: 'The show begins at 5:15.\nHow do you say this time in English?',        options: ["It's five o'clock.",       "It's quarter past five.",  "It's quarter to five.",     "It's half past five."],     ans: 1 },
+    { q: '🕚  The clock shows 11:00\nHow do you say this time in English?',       options: ["It's eleven past.",         "It's eleven o'clock.",      "It's half past eleven.",    "It's quarter past eleven."], ans: 1 },
+    { q: 'Write the number: The word "eighteen" in digits is:',                   options: ['17', '18', '19', '80'],                                                                                        ans: 1 },
+    { q: 'Write the number: The word "forty" in digits is:',                      options: ['14', '40', '44', '4'],                                                                                         ans: 1 },
+  ],
+  pronouns: [
+    { q: "This jacket is too small for  _____ .  (for me)",                       options: ['I', 'me', 'my', 'mine'],               ans: 1 },
+    { q: "The dog wagged  _____  tail happily.  (belonging to it)",              options: ['it', 'its', 'it\'s', 'itself'],        ans: 1 },
+    { q: "We are proud of  _____  for winning the game.  (of them)",             options: ['they', 'them', 'their', 'theirs'],     ans: 1 },
+    { q: "This medal is  _____ , I earned it myself.  (belongs to me)",          options: ['I', 'me', 'my', 'mine'],               ans: 3 },
+    { q: "The teacher spoke to  _____  after class.  (to him)",                  options: ['he', 'him', 'his', 'himself'],         ans: 1 },
+    { q: "Those bicycles are  _____ , not ours.  (belong to them)",              options: ['they', 'them', 'their', 'theirs'],     ans: 3 },
+    { q: "I baked this cake for  _____ .  (for her)",                            options: ['she', 'her', 'hers', 'herself'],       ans: 1 },
+    { q: "Is this notebook  _____ ?  (does it belong to you)",                   options: ['you', 'your', 'yours', 'you\'re'],     ans: 2 },
+  ],
+  grammar: [
+    { q: "This book is  _____  than that one.  (interesting)",                   options: ['more interesting', 'interestinger', 'most interesting', 'interesting'], ans: 0, hint: 'Topic: Comparatives - long adjectives' },
+    { q: "Today is  _____  than yesterday.  (cold)",                             options: ['more cold', 'coldest', 'colder', 'cold'],           ans: 2, hint: 'Topic: Comparatives - short adjectives' },
+    { q: "This is the  _____  mountain in the country.  (tall)",                 options: ['more tall', 'tallest', 'taller', 'tall'],           ans: 1, hint: 'Topic: Superlatives - short adjectives' },
+    { q: "She is the  _____  student in the class.  (smart)",                    options: ['smartest', 'more smart', 'smarter', 'smart'],       ans: 0, hint: 'Topic: Superlatives - short adjectives' },
+    { q: "This is the  _____  song I have ever heard.  (beautiful)",             options: ['more beautiful', 'beautifulest', 'most beautiful', 'beautiful'], ans: 2, hint: 'Topic: Superlatives - long adjectives' },
+    { q: "My bag is  _____  than yours.  (heavy)",                               options: ['heavyer', 'heavier', 'more heavy', 'heaviest'],     ans: 1, hint: 'Topic: Comparatives - y adjectives' },
+    { q: "This puzzle is  _____  than the last one.  (difficult)",               options: ['difficulter', 'more difficult', 'most difficult', 'difficult'], ans: 1, hint: 'Topic: Comparatives - long adjectives' },
+    { q: "He runs  _____  than his brother.  (fast)",                            options: ['fast', 'faster', 'fastest', 'more fast'],           ans: 1, hint: 'Topic: Comparatives - short adjectives' },
+    { q: "That was the  _____  test of the year!  (easy)",                       options: ['easiest', 'more easy', 'easier', 'easy'],           ans: 0, hint: 'Topic: Superlatives - y adjectives' },
+    { q: "This is  _____  ice cream I have ever eaten.  (good)",                 options: ['the goodest', 'the better', 'the best', 'gooder'],  ans: 2, hint: 'Topic: Irregular superlatives' },
+  ],
+  prepositions: [
+    { q: "The pharmacy is  _____  the clinic and the dentist.\n(with one on each side)", options: ['between', 'among', 'above', 'along'], ans: 0 },
+    { q: "One student  _____  the whole class won first prize.\n(inside a group)",  options: ['between', 'among', 'across', 'over'],    ans: 1 },
+    { q: "They swam  _____  the lake to reach the island.\n(from one side to the other)", options: ['across', 'along', 'through', 'over'], ans: 0 },
+    { q: "The train travelled  _____  a long dark tunnel.\n(from one end to the other, inside it)", options: ['through', 'across', 'along', 'between'], ans: 0 },
+    { q: "The path goes  _____  the river all the way to town.\n(alongside it)",     options: ['along', 'across', 'through', 'among'], ans: 0 },
+    { q: "The bird flew  _____  the trees, higher than them.\n(higher than)",       options: ['above', 'below', 'between', 'among'],  ans: 0 },
+    { q: "He hid the coin  _____  the pile of leaves.\n(inside a group of things)",  options: ['between', 'among', 'above', 'behind'], ans: 1 },
+    { q: "The road runs  _____  the two towns.\n(connecting exactly two places)",    options: ['among', 'between', 'across', 'along'], ans: 1 },
+  ],
+  reading: [
+    { q: 'Which runner won the race?',                                            options: ['Noa', 'Ron', 'Yael', 'Tom'], ans: 2, type: 'mc' },
+    { q: 'How did Yael feel before the race?',                                     options: ['Confident', 'Nervous', 'Bored', 'Angry'], ans: 1, type: 'mc' },
+    { q: 'Who was the tallest runner in the race?',                                options: ['Noa', 'Ron', 'Yael', 'Tom'], ans: 3, type: 'mc' },
+    { q: 'What did the coach say was more important than winning?',                options: ['Speed', 'Trying your best', 'Being the tallest', 'Being popular'], ans: 1, type: 'mc' },
+    { q: 'How many runners competed in the race?',                                 options: ['Three', 'Four', 'Five', 'Six'], ans: 1, type: 'mc' },
+    { q: 'What was the weather like on the day of the race?',                      options: ['Rainy and cold', 'Sunny and warm', 'Windy and cloudy', 'Snowy'], ans: 1, type: 'sa' },
+    { q: 'Who was Yael\'s biggest supporter during the race?',                     options: ['Her teacher', 'Her mother', 'Her best friend', 'Her coach'], ans: 2, type: 'sa' },
+    { q: 'What prize did Yael receive for finishing the race?',                    options: ['A trophy', 'A medal', 'A certificate', 'A book'], ans: 1, type: 'sa' },
+    { q: 'How did Yael feel after finishing the race, even though she did not win?', options: ['Sad and disappointed', 'Proud of herself', 'Angry at the other runners', 'Tired but upset'], ans: 1, type: 'sa' },
+    { q: 'What did the coach tell all the runners at the end?',                    options: ['To train harder next time', 'That they were all winners for trying', 'To stop running', 'That the race was too easy'], ans: 1, type: 'sa' },
+    { q: '✅ TRUE or FALSE:\n"Yael was the fastest runner in the race."',           options: ['TRUE ✓', 'FALSE ✗'], ans: 1, type: 'tf' },
+    { q: '✅ TRUE or FALSE:\n"Yael\'s mother cheered for her during the race."',     options: ['TRUE ✓', 'FALSE ✗'], ans: 0, type: 'tf' },
+  ]
+};
+
+const ET_READING_PASSAGE_G6_3 = [
+  { heading: 'The Race', text: null },
+  { heading: null, text: "On a sunny and warm Saturday morning, four runners lined up for the biggest race of the school year: Noa, Ron, Yael and Tom. Yael felt more nervous than she had ever felt before. She had trained harder than everyone else, but she still worried she wasn't fast enough." },
+  { heading: null, text: "Tom was the tallest runner in the group, and everyone thought he had the longest legs and would be the fastest. Ron was known as the most confident runner in the school, always smiling before every race." },
+  { heading: null, text: "When the whistle blew, all four runners sprinted forward. Yael's mother cheered loudly from the side of the track, shouting her name again and again. Yael ran faster and faster, but Ron was still a little quicker than her." },
+  { heading: null, text: "In the end, Yael crossed the finish line in third place, right behind Ron and Noa. Even though she wasn't the fastest, she felt prouder than ever, because she knew she had given her very best effort." },
+  { heading: null, text: "The coach gathered all the runners together and gave each of them a small medal. \"Trying your best is more important than winning,\" he said with a warm smile. \"Today, you were all winners.\" Yael smiled, feeling proud of herself despite not finishing first." }
+];
+
+// ===== GRADE 6 ENGLISH TEST 4 - Present Perfect (have/has + past participle) =====
+
+const ET_QUESTIONS_G6_4 = {
+  time: [
+    { q: '🕐  The clock shows  1:05\nWhat time is it?',                            options: ["It's five past one.",       "It's one o'clock.",        "It's five to one.",         "It's quarter past one."],   ans: 0 },
+    { q: '🕔  The clock shows  5:35\nWhat time is it?',                            options: ["It's thirty-five past five.", "It's twenty-five to six.", "It's twenty-five past five.", "It's half past five."],  ans: 1 },
+    { q: '⏰  The clock shows  7:25\nWhat time is it?',                             options: ["It's twenty-five to eight.", "It's twenty-five past seven.", "It's quarter past seven.", "It's half past seven."], ans: 1 },
+    { q: '⏰  The clock shows 12:10\nWhat time is it?',                             options: ["It's ten to twelve.",       "It's ten past twelve.",     "It's quarter past twelve.", "It's twenty past twelve."], ans: 1 },
+    { q: 'The lesson ends at 3:50.\nHow do you say this time in English?',          options: ["It's three o'clock.",       "It's fifty past three.",   "It's ten to four.",         "It's quarter to four."],   ans: 2 },
+    { q: '🕝  The clock shows  2:00\nHow do you say this time in English?',         options: ["It's two past.",            "It's two o'clock.",        "It's half past two.",       "It's quarter past two."],  ans: 1 },
+    { q: 'Write the number: The word "seventeen" in digits is:',                    options: ['16', '17', '18', '70'],                                                                                       ans: 1 },
+    { q: 'Write the number: The word "fifty" in digits is:',                        options: ['15', '50', '55', '5'],                                                                                        ans: 1 },
+  ],
+  pronouns: [
+    { q: "The letter was written by  _____ .  (by me)",                            options: ['I', 'me', 'my', 'myself'],             ans: 1 },
+    { q: "They introduced  _____  to the new students.  (them - themselves)",      options: ['they', 'them', 'themselves', 'theirs'], ans: 2 },
+    { q: "She made the cake all by  _____ .  (by herself)",                        options: ['her', 'hers', 'herself', 'she'],       ans: 2 },
+    { q: "I taught  _____  how to play the guitar.  (myself)",                     options: ['me', 'my', 'myself', 'mine'],          ans: 2 },
+    { q: "He hurt  _____  while climbing the tree.  (himself)",                    options: ['him', 'his', 'himself', 'he'],         ans: 2 },
+    { q: "We enjoyed  _____  at the party.  (ourselves)",                          options: ['us', 'our', 'ourselves', 'ours'],      ans: 2 },
+    { q: "Please help  _____  to some cookies.  (yourself)",                       options: ['you', 'your', 'yours', 'yourself'],    ans: 3 },
+    { q: "The cat cleaned  _____  after eating.  (itself)",                        options: ['it', 'its', 'itself', 'it\'s'],        ans: 2 },
+  ],
+  grammar: [
+    { q: "I  _____  (finish) my homework already.",                               options: ['finish', 'finished', 'have finished', 'am finishing'], ans: 2, hint: 'Topic: Present Perfect - positive' },
+    { q: "She  _____  (visit) Paris three times.",                                options: ['visits', 'visited', 'has visited', 'is visiting'],  ans: 2, hint: 'Topic: Present Perfect - positive' },
+    { q: "We  _____  (never/see) such a big elephant.",                           options: ['have never seen', 'has never seen', 'never saw', 'are never seeing'], ans: 0, hint: 'Topic: Present Perfect - never' },
+    { q: "He  _____  (just/arrive) at the airport.",                              options: ['has just arrived', 'have just arrived', 'just arrived', 'is just arriving'], ans: 0, hint: 'Topic: Present Perfect - just' },
+    { q: "They  _____  (already/eat) dinner.",                                    options: ['have already eaten', 'has already eaten', 'already ate', 'are already eating'], ans: 0, hint: 'Topic: Present Perfect - already' },
+    { q: "I  _____  (not/read) that book yet.",                                   options: ['have not read', 'has not read', 'did not read', 'am not reading'], ans: 0, hint: 'Topic: Present Perfect - negative' },
+    { q: "She  _____  (not/finish) her project yet.",                             options: ['have not finished', 'has not finished', 'did not finished', 'is not finishing'], ans: 1, hint: 'Topic: Present Perfect - negative' },
+    { q: "_____  you ever  _____  (be) to London?",                              options: ['Do / be', 'Have / been', 'Did / be', 'Are / being'], ans: 1, hint: 'Topic: Present Perfect - questions' },
+    { q: "_____  she  _____  (finish) her homework yet?",                        options: ['Has / finished', 'Have / finished', 'Did / finish', 'Does / finish'], ans: 0, hint: 'Topic: Present Perfect - questions' },
+    { q: "How many books  _____  you  _____  (read) this year?",                 options: ['have / read', 'has / read', 'did / read', 'do / read'], ans: 0, hint: 'Topic: Present Perfect - questions' },
+  ],
+  prepositions: [
+    { q: "The gym is  _____  the pool and the changing rooms.\n(with one on each side)", options: ['between', 'among', 'above', 'along'], ans: 0 },
+    { q: "The best player  _____  the whole team scored the most goals.\n(inside a group)", options: ['between', 'among', 'across', 'behind'], ans: 1 },
+    { q: "They ran  _____  the finish line together.\n(across from one side to the other)", options: ['through', 'across', 'along', 'over'], ans: 1 },
+    { q: "The rabbit hopped  _____  the small hole in the fence.\n(from one side to the other, inside it)", options: ['through', 'across', 'along', 'above'], ans: 0 },
+    { q: "We walked  _____  the coast for two hours.\n(alongside it)",              options: ['along', 'across', 'through', 'between'], ans: 0 },
+    { q: "The kite flew  _____  the crowd of people.\n(higher than)",               options: ['above', 'below', 'among', 'between'],  ans: 0 },
+    { q: "She found her ring  _____  the pile of laundry.\n(inside a group of things)", options: ['between', 'among', 'above', 'behind'], ans: 1 },
+    { q: "The bridge connects the two islands  _____  them.\n(exactly two places)",  options: ['among', 'between', 'across', 'along'], ans: 1 },
+  ],
+  reading: [
+    { q: 'How many countries has Dana visited?',                                    options: ['Five', 'Seven', 'Ten', 'Twelve'], ans: 1, type: 'mc' },
+    { q: 'What has Dana always wanted to do?',                                      options: ['Become a doctor', 'Travel the world', 'Learn to swim', 'Write a book'], ans: 1, type: 'mc' },
+    { q: 'Which country has Dana not visited yet?',                                  options: ['Japan', 'Brazil', 'Australia', 'Egypt'], ans: 2, type: 'mc' },
+    { q: 'What has Dana learned from her travels?',                                  options: ['Only new languages', 'About different cultures and people', 'Nothing important', 'How to cook'], ans: 1, type: 'mc' },
+    { q: 'What has Dana just finished doing when the story begins?',                 options: ['Packing her bags', 'Eating breakfast', 'Writing in her journal', 'A phone call'], ans: 2, type: 'mc' },
+    { q: 'Has Dana ever been to Egypt?',                                             options: ['Yes, twice', 'No, never', 'Yes, once', 'The text doesn\'t say'], ans: 1, type: 'sa' },
+    { q: 'What has Dana already planned for her next trip?',                         options: ['A trip to Australia', 'A trip to the moon', 'Nothing yet', 'A trip back home'], ans: 0, type: 'sa' },
+    { q: 'How does Dana feel about her travels so far?',                             options: ['Disappointed', 'Grateful and happy', 'Bored', 'Confused'], ans: 1, type: 'sa' },
+    { q: 'What has Dana kept from every country she has visited?',                   options: ['A photo album', 'A small souvenir', 'A postcard collection', 'A journal entry'], ans: 1, type: 'sa' },
+    { q: 'Who has Dana never traveled with?',                                        options: ['Her best friend', 'Strangers', 'Her parents', 'Her brother'], ans: 1, type: 'sa' },
+    { q: '✅ TRUE or FALSE:\n"Dana has visited Japan and Brazil."',                    options: ['TRUE ✓', 'FALSE ✗'], ans: 0, type: 'tf' },
+    { q: '✅ TRUE or FALSE:\n"Dana has already been to Australia."',                   options: ['TRUE ✓', 'FALSE ✗'], ans: 1, type: 'tf' },
+  ]
+};
+
+const ET_READING_PASSAGE_G6_4 = [
+  { heading: 'Dana the Traveller', text: null },
+  { heading: null, text: "Dana has always wanted to travel the world, and so far, she has visited seven different countries! She has been to Japan, Brazil, France, Egypt, Italy, Spain, and Mexico. In each country, she has learned about the local culture, tasted new foods, and met interesting people." },
+  { heading: null, text: "This morning, Dana has just finished writing in her travel journal. She has kept a small souvenir from every trip - a stone from a beach in Brazil, a postcard from Japan, and a colourful scarf from Mexico." },
+  { heading: null, text: "Dana has never traveled with strangers - she always travels with her parents or her best friend, Lior. \"I have learned so much from every trip,\" Dana says. \"I have met people who speak different languages, and I have tried foods I never even knew existed!\"" },
+  { heading: null, text: "There is one country Dana has not visited yet - Australia. She has already planned her next trip there for next summer. \"I have saved money for two years for this trip,\" she said with a big smile." },
+  { heading: null, text: "Dana feels very grateful for all the amazing places she has seen. \"I have been so lucky,\" she says. \"Every trip has taught me something new about the world and about myself.\"" }
+];
+
+// ===== GRADE 6 ENGLISH TEST 5 - Modal Verbs (can/could/must/should) =====
+
+const ET_QUESTIONS_G6_5 = {
+  time: [
+    { q: '🕐  The clock shows  1:05\nWhat time is it?',                            options: ["It's five past one.",        "It's five to one.",         "It's one o'clock.",         "It's quarter past one."],  ans: 0 },
+    { q: '🕡  The clock shows  6:45\nWhat time is it?',                            options: ["It's forty-five past six.",  "It's quarter to seven.",    "It's quarter past six.",    "It's half past six."],     ans: 1 },
+    { q: '⏰  The clock shows  8:15\nWhat time is it?',                            options: ["It's quarter to eight.",     "It's quarter past eight.",  "It's half past eight.",     "It's fifteen to eight."],  ans: 1 },
+    { q: '⏰  The clock shows  3:30\nWhat time is it?',                            options: ["It's quarter past three.",   "It's quarter to three.",    "It's half past three.",     "It's three o'clock."],     ans: 2 },
+    { q: 'The train arrives at 6:05.\nHow do you say this time in English?',        options: ["It's six o'clock.",          "It's five past six.",       "It's five to six.",         "It's quarter past six."],  ans: 1 },
+    { q: '🕓  The clock shows  4:00\nHow do you say this time in English?',         options: ["It's four past.",            "It's four o'clock.",        "It's half past four.",      "It's quarter past four."], ans: 1 },
+    { q: 'Write the number: The word "nineteen" in digits is:',                     options: ['18', '19', '20', '90'],                                                                                       ans: 1 },
+    { q: 'Write the number: The word "sixty" in digits is:',                        options: ['16', '60', '66', '6'],                                                                                        ans: 1 },
+  ],
+  pronouns: [
+    { q: "The winner of the competition will be  _____ .  (them)",                 options: ['they', 'them', 'their', 'theirs'],     ans: 1 },
+    { q: "This decision is  _____  to make, not yours.  (belongs to me)",          options: ['I', 'me', 'my', 'mine'],               ans: 3 },
+    { q: "The teacher asked  _____  to be quiet.  (them)",                         options: ['they', 'them', 'their', 'theirs'],     ans: 1 },
+    { q: "That responsibility is  _____  now.  (belongs to us)",                   options: ['we', 'us', 'our', 'ours'],             ans: 3 },
+    { q: "I trust  _____  to do the right thing.  (him)",                          options: ['he', 'him', 'his', 'himself'],         ans: 1 },
+    { q: "The final choice is  _____  to make.  (belongs to her)",                 options: ['she', 'her', 'hers', 'herself'],       ans: 2 },
+    { q: "Please remind  _____  about the meeting.  (me)",                         options: ['I', 'me', 'my', 'mine'],               ans: 1 },
+    { q: "Is the final decision  _____  to make?  (does it belong to you)",        options: ['you', 'your', 'yours', 'you\'re'],     ans: 2 },
+  ],
+  grammar: [
+    { q: "You  _____  wash your hands before eating.  (obligation)",                options: ['can', 'could', 'must', 'may'],          ans: 2, hint: 'Topic: Modal verbs - must (obligation)' },
+    { q: "She  _____  swim very well when she was five.  (ability, past)",         options: ['can', 'could', 'must', 'should'],        ans: 1, hint: 'Topic: Modal verbs - could (past ability)' },
+    { q: "You  _____  study more before the test.  (advice)",                      options: ['can', 'could', 'must', 'should'],        ans: 3, hint: 'Topic: Modal verbs - should (advice)' },
+    { q: "_____  I borrow your pen, please?  (polite request)",                    options: ['Must', 'Should', 'Could', 'Have to'],    ans: 2, hint: 'Topic: Modal verbs - could (polite request)' },
+    { q: "Students  _____  not run in the hallways.  (prohibition)",               options: ['can', 'could', 'must', 'should'],        ans: 2, hint: 'Topic: Modal verbs - must not (prohibition)' },
+    { q: "He  _____  speak three languages fluently.  (ability, present)",         options: ['can', 'could', 'must', 'should'],        ans: 0, hint: 'Topic: Modal verbs - can (present ability)' },
+    { q: "You  _____  not talk during the exam.  (rule)",                          options: ['can', 'could', 'must', 'may'],           ans: 2, hint: 'Topic: Modal verbs - must not (rule)' },
+    { q: "We  _____  finish the project by Friday.  (necessity)",                  options: ['can', 'could', 'must', 'may'],           ans: 2, hint: 'Topic: Modal verbs - must (necessity)' },
+    { q: "_____  you help me carry these bags?  (asking for help)",               options: ['Must', 'Should', 'Can', 'Have to'],      ans: 2, hint: 'Topic: Modal verbs - can (asking for help)' },
+    { q: "You  _____  see a doctor if you feel sick.  (strong advice)",           options: ['can', 'could', 'must', 'should'],        ans: 3, hint: 'Topic: Modal verbs - should (strong advice)' },
+  ],
+  prepositions: [
+    { q: "The nurse's office is  _____  the classroom and the gym.\n(with one on each side)", options: ['between', 'among', 'above', 'along'], ans: 0 },
+    { q: "The prize was shared  _____  the five winners.\n(divided within a group)",  options: ['between', 'among', 'across', 'over'], ans: 1 },
+    { q: "The children ran  _____  the playground to the swings.\n(from one side to the other)", options: ['through', 'across', 'along', 'over'], ans: 1 },
+    { q: "The mice hid  _____  the walls of the old house.\n(inside, from end to end)", options: ['through', 'across', 'along', 'between'], ans: 0 },
+    { q: "We drove  _____  the coast to reach the town.\n(alongside it)",            options: ['along', 'across', 'through', 'among'], ans: 0 },
+    { q: "The plane flew  _____  the mountains.\n(higher than)",                      options: ['above', 'below', 'among', 'between'], ans: 0 },
+    { q: "He found his phone  _____  the couch cushions.\n(inside a group of things)", options: ['between', 'among', 'above', 'behind'], ans: 1 },
+    { q: "The fence stands exactly  _____  the two gardens.\n(exactly two places)",   options: ['among', 'between', 'across', 'along'], ans: 1 },
+  ],
+  reading: [
+    { q: 'What rule must all campers follow at the summer camp?',                     options: ['Wake up early', 'Wear a life jacket near water', 'Bring their own food', 'Speak only English'], ans: 1, type: 'mc' },
+    { q: 'What could the campers do during free time?',                               options: ['Only sleep', 'Choose their own activities', 'Nothing at all', 'Leave the camp'], ans: 1, type: 'mc' },
+    { q: 'What should campers do if they feel unwell?',                               options: ['Ignore it', 'Tell a counselor immediately', 'Go home alone', 'Wait until the next day'], ans: 1, type: 'mc' },
+    { q: 'What must campers do before every meal?',                                   options: ['Sing a song', 'Wash their hands', 'Make their beds', 'Write in a journal'], ans: 1, type: 'mc' },
+    { q: 'What activity could campers choose on rainy days?',                         options: ['Swimming', 'Arts and crafts', 'Hiking', 'Fishing'], ans: 1, type: 'mc' },
+    { q: 'Why must campers not swim alone?',                                          options: ['It is against the rules for safety', 'The water is too cold', 'There is no time', 'It is too far away'], ans: 0, type: 'sa' },
+    { q: 'What could campers bring from home for craft activities?',                  options: ['Old magazines', 'Musical instruments', 'Board games', 'Nothing was allowed'], ans: 0, type: 'sa' },
+    { q: 'Why should campers listen carefully to the camp counselors?',               options: ['To stay safe and have fun', 'Because it is required by law', 'To win a prize', 'No real reason given'], ans: 0, type: 'sa' },
+    { q: 'What must every camper do before leaving for a hike?',                      options: ['Bring a water bottle', 'Buy new shoes', 'Call their parents', 'Learn a new song'], ans: 0, type: 'sa' },
+    { q: 'How did most campers feel about the camp rules?',                           options: ['They understood they were for safety', 'They thought the rules were unfair', 'They ignored them completely', 'They complained every day'], ans: 0, type: 'sa' },
+    { q: '✅ TRUE or FALSE:\n"Campers can swim alone whenever they want."',              options: ['TRUE ✓', 'FALSE ✗'], ans: 1, type: 'tf' },
+    { q: '✅ TRUE or FALSE:\n"Campers must wash their hands before every meal."',        options: ['TRUE ✓', 'FALSE ✗'], ans: 0, type: 'tf' },
+  ]
+};
+
+const ET_READING_PASSAGE_G6_5 = [
+  { heading: 'Rules at Summer Camp', text: null },
+  { heading: null, text: "Every summer, hundreds of children go to Camp Sunshine for two exciting weeks. Before the fun begins, every camper must learn the camp rules. These rules help keep everyone safe and happy during their stay." },
+  { heading: null, text: "First, campers must wear a life jacket whenever they are near the lake. They can never swim alone - there must always be a lifeguard watching. If a camper feels unwell, they should tell a counselor immediately, so they can get help quickly." },
+  { heading: null, text: "Before every meal, campers must wash their hands. This simple rule helps prevent everyone from getting sick. During free time, campers could choose their own activities - some like hiking, others prefer arts and crafts, and some enjoy playing games with friends." },
+  { heading: null, text: "On rainy days, campers could not go swimming or hiking, so they chose arts and crafts instead. Some campers brought old magazines from home to use for their projects, and everyone had a wonderful time being creative together." },
+  { heading: null, text: "Before every hike, each camper must bring a water bottle to stay hydrated. Most campers understood that all these rules existed to keep them safe, not to make camp less fun. By the end of the summer, everyone agreed that following the rules made their adventure even better." }
+];
+
+// ===== GRADE 6 ENGLISH TEST 6 - Mixed Review (Past/Future/Comparatives/Present Perfect/Modals) =====
+
+const ET_QUESTIONS_G6_6 = {
+  time: [
+    { q: '🕐  The clock shows  1:05\nWhat time is it?',                            options: ["It's five past one.",        "It's one o'clock.",        "It's five to one.",         "It's quarter past one."],   ans: 0 },
+    { q: '🕗  The clock shows  8:25\nWhat time is it?',                            options: ["It's twenty-five to eight.", "It's twenty-five past eight.", "It's quarter past eight.", "It's half past eight."], ans: 1 },
+    { q: '⏰  The clock shows 10:40\nWhat time is it?',                            options: ["It's twenty to eleven.",     "It's twenty past ten.",     "It's forty past ten.",      "It's quarter to eleven."],  ans: 0 },
+    { q: '⏰  The clock shows  5:55\nWhat time is it?',                            options: ["It's five to six.",          "It's fifty-five past five.", "It's five past six.",       "It's quarter to six."],     ans: 0 },
+    { q: 'The party starts at 4:35.\nHow do you say this time in English?',        options: ["It's four o'clock.",         "It's twenty-five to five.", "It's thirty-five past four.", "It's quarter past four."], ans: 1 },
+    { q: '🕙  The clock shows 10:00\nHow do you say this time in English?',        options: ["It's ten past.",             "It's ten o'clock.",         "It's half past ten.",       "It's quarter past ten."],   ans: 1 },
+    { q: 'Write the number: The word "fourteen" in digits is:',                    options: ['13', '14', '15', '40'],                                                                                        ans: 1 },
+    { q: 'Write the number: The word "ninety" in digits is:',                      options: ['19', '90', '99', '9'],                                                                                         ans: 1 },
+  ],
+  pronouns: [
+    { q: "The photo was taken by  _____  last summer.  (me)",                      options: ['I', 'me', 'my', 'mine'],               ans: 1 },
+    { q: "The dog wagged  _____  tail when it saw us.  (belonging to it)",         options: ['it', 'its', 'it\'s', 'itself'],        ans: 1 },
+    { q: "We are grateful to  _____  for their help.  (them)",                     options: ['they', 'them', 'their', 'theirs'],     ans: 1 },
+    { q: "This trophy will be  _____  if we win.  (belongs to us)",                options: ['we', 'us', 'our', 'ours'],             ans: 3 },
+    { q: "I baked cookies just for  _____ .  (for myself)",                        options: ['me', 'my', 'myself', 'mine'],          ans: 2 },
+    { q: "The teacher praised  _____  for the good grade.  (her)",                 options: ['she', 'her', 'hers', 'herself'],       ans: 1 },
+    { q: "Is this backpack  _____ ?  (does it belong to you)",                     options: ['you', 'your', 'yours', 'you\'re'],     ans: 2 },
+    { q: "They organized the whole party by  _____ .  (themselves)",               options: ['they', 'them', 'themselves', 'theirs'], ans: 2 },
+  ],
+  grammar: [
+    { q: "Last year, we  _____  (go) on an amazing school trip.",                  options: ['go', 'goed', 'went', 'gone'],                        ans: 2, hint: 'Topic: Past Simple' },
+    { q: "Next week, I  _____  (start) a new hobby.",                              options: ['start', 'started', 'will start', 'am start'],        ans: 2, hint: 'Topic: Future Simple' },
+    { q: "This puzzle is  _____  than the last one.  (difficult)",                 options: ['difficulter', 'more difficult', 'most difficult', 'difficult'], ans: 1, hint: 'Topic: Comparatives' },
+    { q: "She is the  _____  singer in the choir.  (talented)",                    options: ['more talented', 'talentedest', 'most talented', 'talented'], ans: 2, hint: 'Topic: Superlatives' },
+    { q: "I  _____  (already/finish) my science project.",                        options: ['have already finished', 'has already finished', 'already finished', 'am already finishing'], ans: 0, hint: 'Topic: Present Perfect' },
+    { q: "He  _____  (never/travel) outside the country.",                        options: ['have never traveled', 'has never traveled', 'never traveled', 'is never traveling'], ans: 1, hint: 'Topic: Present Perfect' },
+    { q: "You  _____  finish your homework before playing outside.  (obligation)", options: ['can', 'could', 'must', 'may'],                       ans: 2, hint: 'Topic: Modal verbs - must' },
+    { q: "_____  you help me with this box?  (asking for help)",                  options: ['Must', 'Should', 'Can', 'Have to'],                  ans: 2, hint: 'Topic: Modal verbs - can' },
+    { q: "_____  she  _____  (finish) her homework yet?",                        options: ['Has / finished', 'Have / finished', 'Did / finish', 'Does / finish'], ans: 0, hint: 'Topic: Present Perfect - questions' },
+    { q: "_____  it  _____  (rain) tomorrow?",                                    options: ['Will / rain', 'Does / rain', 'Is / rain', 'Did / rain'],          ans: 0, hint: 'Topic: Future Simple - questions' },
+  ],
+  prepositions: [
+    { q: "The playground is  _____  the school and the parking lot.\n(with one on each side)", options: ['between', 'among', 'above', 'along'], ans: 0 },
+    { q: "The teacher chose one winner  _____  all the students.\n(inside a group)", options: ['between', 'among', 'across', 'over'], ans: 1 },
+    { q: "The children ran  _____  the field to the goal.\n(from one side to the other)", options: ['through', 'across', 'along', 'over'], ans: 1 },
+    { q: "The train went  _____  a long tunnel under the mountain.\n(from one end to the other, inside it)", options: ['through', 'across', 'along', 'between'], ans: 0 },
+    { q: "They walked  _____  the river on their way to school.\n(alongside it)",   options: ['along', 'across', 'through', 'among'], ans: 0 },
+    { q: "The balloon floated  _____  the buildings.\n(higher than)",                options: ['above', 'below', 'among', 'between'], ans: 0 },
+    { q: "She found her keys  _____  the pile of books.\n(inside a group of things)", options: ['between', 'among', 'above', 'behind'], ans: 1 },
+    { q: "The border lies exactly  _____  the two countries.\n(exactly two places)", options: ['among', 'between', 'across', 'along'], ans: 1 },
+  ],
+  reading: [
+    { q: 'What competition did Adam enter?',                                        options: ['A singing contest', 'A robot-building contest', 'A cooking contest', 'A running race'], ans: 1, type: 'mc' },
+    { q: 'How long has Adam been building robots?',                                  options: ['One month', 'Six months', 'Two years', 'Five years'], ans: 2, type: 'mc' },
+    { q: 'What will Adam\'s robot be able to do?',                                   options: ['Fly', 'Clean up small objects', 'Cook food', 'Talk'], ans: 1, type: 'mc' },
+    { q: 'Who has helped Adam the most with his robot?',                             options: ['His teacher', 'His older sister', 'A stranger', 'Nobody'], ans: 1, type: 'mc' },
+    { q: 'What must Adam finish before the competition?',                            options: ['A written report', 'A poster', 'A video', 'A song'], ans: 0, type: 'mc' },
+    { q: 'What is more important to Adam than winning?',                             options: ['Money', 'Learning new things', 'Being famous', 'Free time'], ans: 1, type: 'sa' },
+    { q: 'What could Adam\'s robot not do at first?',                                options: ['Move at all', 'Pick up small objects', 'Turn on', 'Make sounds'], ans: 1, type: 'sa' },
+    { q: 'What has Adam learned from his mistakes while building the robot?',         options: ['Nothing new', 'How to fix problems patiently', 'To give up easily', 'To copy others\' work'], ans: 1, type: 'sa' },
+    { q: 'How did Adam feel the day before the competition?',                        options: ['Bored', 'A little nervous but excited', 'Angry', 'Confused'], ans: 1, type: 'sa' },
+    { q: 'What did Adam\'s sister say to encourage him?',                            options: ['That he should give up', 'That he has worked harder than anyone', 'That the contest was not important', 'Nothing at all'], ans: 1, type: 'sa' },
+    { q: '✅ TRUE or FALSE:\n"Adam has been building robots for two years."',          options: ['TRUE ✓', 'FALSE ✗'], ans: 0, type: 'tf' },
+    { q: '✅ TRUE or FALSE:\n"Adam\'s robot could pick up small objects from the very first day."', options: ['TRUE ✓', 'FALSE ✗'], ans: 1, type: 'tf' },
+  ]
+};
+
+const ET_READING_PASSAGE_G6_6 = [
+  { heading: 'Adam\'s Robot', text: null },
+  { heading: null, text: "Adam has been building robots for two years, ever since his older sister gave him his first robotics kit. Next month, he will enter the biggest robot-building competition in the region. He must finish writing a report about his robot before the big day." },
+  { heading: null, text: "At first, Adam's robot could not even move properly, let alone pick up small objects. He tried many times and made lots of mistakes, but he never gave up. \"I have learned so much from my mistakes,\" Adam says. \"Each failure taught me how to fix problems more patiently.\"" },
+  { heading: null, text: "This year's robot is more advanced than any robot Adam has ever built. It will be able to clean up small objects and sort them by colour. His sister, who has helped him the most with coding, is very proud of how far he has come." },
+  { heading: null, text: "The night before the competition, Adam felt a little nervous but also very excited. His sister told him, \"You have worked harder than anyone else I know. No matter what happens tomorrow, you should be proud of yourself.\"" },
+  { heading: null, text: "For Adam, learning new things is more important than winning any prize. \"I love building robots because every day I discover something new,\" he said with a smile, getting ready for the biggest day of his robotics journey so far." }
+];
+
+

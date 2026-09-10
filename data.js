@@ -4312,6 +4312,21 @@ const APP_DATA_GRADE6 = {
   }
 };
 
+// ===== GRADE 6 DICTATION WORD BANK (הכתבה לכיתה ו׳) =====
+// Default seed list - editable dynamically from the admin panel (localStorage key: brainx-grade6-dictation)
+const DEFAULT_GRADE6_DICTATION_WORDS = [
+  { word: 'repeat', hebrewHint: 'לחזור' },
+  { word: 'below', hebrewHint: 'מתחת / למטה' },
+  { word: 'vocabulary', hebrewHint: 'אוצר מילים' },
+  { word: 'spell', hebrewHint: 'לאיית' },
+  { word: 'instructions', hebrewHint: 'הוראות' },
+  { word: 'find out', hebrewHint: 'לגלות' },
+  { word: 'raise', hebrewHint: 'להעלות, לגדל או העלאה' },
+  { word: 'complete', hebrewHint: 'להשלים / שלם' },
+  { word: 'dictionary', hebrewHint: 'מילון' },
+  { word: 'opposite', hebrewHint: 'הפך / מנוגד' }
+];
+
 
 
 

@@ -94,15 +94,15 @@
       <div class="modal-header">👋 ברוכים הבאים!</div>
       <p>באיזו כיתה אתה?</p>
       <div class="grade-selector" id="grade-selector">
-        <button class="grade-option selected" onclick="selectGrade(this, 2)" data-grade="2">
+        <button class="grade-option" style="display:none" onclick="selectGrade(this, 2)" data-grade="2">
           <span class="grade-icon">📗</span>
           <span class="grade-label">כיתה ב׳</span>
         </button>
-        <button class="grade-option" onclick="selectGrade(this, 3)" data-grade="3">
+        <button class="grade-option selected" onclick="selectGrade(this, 3)" data-grade="3">
           <span class="grade-icon">📙</span>
           <span class="grade-label">כיתה ג׳</span>
         </button>
-        <button class="grade-option" onclick="selectGrade(this, 5)" data-grade="5">
+        <button class="grade-option" style="display:none" onclick="selectGrade(this, 5)" data-grade="5">
           <span class="grade-icon">📘</span>
           <span class="grade-label">כיתה ה׳</span>
         </button>
@@ -167,13 +167,13 @@
           </div>
         </div>
 
-        <!-- Daily Challenge -->
-        <div class="daily-challenge-card" onclick="navigate('daily-challenge')">
+        <!-- Grade 6 Dictation -->
+        <div id="home-grade6-dictation-card" class="daily-challenge-card" style="display:none;" onclick="navigate('grade6-dictation')">
           <div class="dc-new-badge">חדש!</div>
-          <div class="dc-icon">📅</div>
+          <div class="dc-icon">🎓</div>
           <div class="dc-info">
-            <div class="dc-title">אתגר יומי</div>
-            <div class="dc-subtitle" id="dc-subtitle">לחץ כדי לשחק!</div>
+            <div class="dc-title">הכתבה לכיתה ו׳</div>
+            <div class="dc-subtitle">שמיעה, השלמת מילים והתאמה</div>
           </div>
           <div class="dc-arrow">←</div>
         </div>
@@ -204,17 +204,6 @@
             </div>
             <div class="subject-progress" id="progress-math"></div>
           </button>
-        </div>
-
-        <!-- Badges Preview -->
-        <div class="badges-preview" onclick="navigate('achievements')">
-          <div class="badges-title">🏆 הישגים</div>
-          <div class="badges-row" id="home-badges"></div>
-        </div>
-
-        <div class="daily-tip">
-          <div class="tip-icon">💡</div>
-          <div class="tip-text" id="daily-tip"></div>
         </div>
       </section>
 
@@ -529,7 +518,84 @@
               <div class="feature-name">הכתבה כללי</div>
               <div class="feature-desc">100 מילים רנדומליות</div>
             </button>
+            <button id="btn-grade6-dictation" class="feature-card" style="background:linear-gradient(135deg,#ede7f6,#d1c4e9); display:none;" onclick="navigate('grade6-dictation')">
+              <div class="feature-icon">🎓</div>
+              <div class="feature-name">הכתבה לכיתה ו׳</div>
+              <div class="feature-desc">מילות השבוע - שמיעה, השלמה והתאמה</div>
+            </button>
           </div>
+        </div>
+      </section>
+
+      <!-- Grade 6 Dictation - Menu Screen -->
+      <section id="screen-grade6-dictation" class="screen">
+        <div class="game-container">
+          <div class="dictation-header">
+            <h2>🎓 הכתבה לכיתה ו׳</h2>
+            <p style="color: #666; margin-bottom: 1rem;">בחר משחק לתרגול מילות השבוע:</p>
+          </div>
+          <div class="feature-grid">
+            <button class="feature-card" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb)" onclick="navigate('grade6-dict-write')">
+              <div class="feature-icon">🎧</div>
+              <div class="feature-name">הכתבה - שמיעה</div>
+              <div class="feature-desc">שמע או קרא רמז בעברית וכתוב</div>
+            </button>
+            <button class="feature-card" style="background:linear-gradient(135deg,#e0f7fa,#b2ebf2)" onclick="navigate('grade6-dict-complete')">
+              <div class="feature-icon">✏️</div>
+              <div class="feature-name">השלם את המילה</div>
+              <div class="feature-desc">השלם את האותיות החסרות</div>
+            </button>
+            <button class="feature-card" style="background:linear-gradient(135deg,#fff3e0,#ffe0b2)" onclick="startGrade6WordMatch()">
+              <div class="feature-icon">🔗</div>
+              <div class="feature-name">התאמה למשמעות</div>
+              <div class="feature-desc">חבר מילה באנגלית לפירוש בעברית</div>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Grade 6 Dictation - Write by Hearing/Hebrew Screen -->
+      <section id="screen-grade6-dict-write" class="screen">
+        <div class="game-container">
+          <div class="dictation-header">
+            <h2 id="grade6dw-title">🎧 הכתבה - שמיעה</h2>
+            <p class="dictation-week">שמע את המילה או קרא את הרמז בעברית וכתוב אותה באנגלית</p>
+          </div>
+          <div class="dictation-word-area">
+            <div class="dictation-prompt" id="grade6dw-prompt"></div>
+            <button class="btn-tts-inline" onclick="speakGrade6DictWriteWord()">🔊 שמע שוב</button>
+            <input type="text" id="grade6dw-input" class="text-input dictation-input" placeholder="הקלד את המילה באנגלית..." autocomplete="off" dir="ltr">
+            <button class="btn-primary" onclick="checkGrade6DictWrite()">בדוק ✓</button>
+          </div>
+          <div id="grade6dw-feedback" class="quiz-feedback hidden"></div>
+          <div class="dictation-progress">
+            <span id="grade6dw-counter"></span>
+            <div class="quiz-progress-bar"><div id="grade6dw-progress-fill" class="quiz-progress-fill"></div></div>
+          </div>
+          <div id="grade6dw-results" class="quiz-results hidden"></div>
+        </div>
+      </section>
+
+      <!-- Grade 6 Dictation - Complete the Word Screen -->
+      <section id="screen-grade6-dict-complete" class="screen">
+        <div class="game-container">
+          <div class="dictation-header">
+            <h2>✏️ השלם את המילה</h2>
+            <p class="dictation-week">השלם את האותיות החסרות לפי הפירוש בעברית</p>
+          </div>
+          <div class="dictation-word-area">
+            <div class="dictation-prompt" id="grade6c-prompt"></div>
+            <div class="hangman-word" id="grade6c-pattern" dir="ltr" style="direction:ltr;"></div>
+            <button class="btn-tts-inline" onclick="speakGrade6DictCompleteWord()">🔊 שמע את המילה</button>
+            <input type="text" id="grade6c-input" class="text-input dictation-input" placeholder="הקלד את המילה המלאה..." autocomplete="off" dir="ltr">
+            <button class="btn-primary" onclick="checkGrade6DictComplete()">בדוק ✓</button>
+          </div>
+          <div id="grade6c-feedback" class="quiz-feedback hidden"></div>
+          <div class="dictation-progress">
+            <span id="grade6c-counter"></span>
+            <div class="quiz-progress-bar"><div id="grade6c-progress-fill" class="quiz-progress-fill"></div></div>
+          </div>
+          <div id="grade6c-results" class="quiz-results hidden"></div>
         </div>
       </section>
 
@@ -994,6 +1060,10 @@
               <span class="admin-btn-icon">📝</span>
               <span class="admin-btn-text">ניהול הכתבות</span>
             </button>
+            <button class="admin-menu-btn" onclick="navigate('admin-grade6-dictation')">
+              <span class="admin-btn-icon">🎓</span>
+              <span class="admin-btn-text">ניהול הכתבה לכיתה ו׳</span>
+            </button>
             <button class="admin-menu-btn" onclick="navigate('admin-lessons')">
               <span class="admin-btn-icon">📚</span>
               <span class="admin-btn-text">ניהול שיעורים</span>
@@ -1060,6 +1130,30 @@
           </div>
           <div class="admin-section" style="margin-top:20px;">
             <button class="btn-secondary" onclick="clearAllDictationWords()" style="background:#fed7d7;color:#c53030;border-color:#fc8181;">🗑️ מחק הכל והתחל מחדש</button>
+          </div>
+          <button class="btn-secondary" onclick="navigate('admin-dashboard')" style="margin-top:20px">חזרה</button>
+        </div>
+      </section>
+
+      <!-- Admin Grade 6 Dictation Screen -->
+      <section id="screen-admin-grade6-dictation" class="screen">
+        <div class="admin-container">
+          <h2>🎓 ניהול הכתבה לכיתה ו׳</h2>
+          <p style="color:#666;text-align:center;margin-bottom:12px;">רשימת המילים כאן היא מאגר המילים המשותף לכל משחקי ההכתבה לכיתה ו׳ (שמיעה, השלמה והתאמה).</p>
+          <div class="admin-section">
+            <h3>מילים נוכחיות:</h3>
+            <div id="admin-g6-word-list" class="admin-word-list"></div>
+          </div>
+          <div class="admin-section">
+            <h3>הוסף מילה חדשה:</h3>
+            <div class="admin-add-word">
+              <input type="text" id="admin-g6-word-english" class="text-input" placeholder="מילה באנגלית" dir="ltr" autocomplete="off">
+              <input type="text" id="admin-g6-word-hebrew" class="text-input" placeholder="פירוש בעברית" autocomplete="off">
+              <button class="btn-primary" onclick="addGrade6DictationWord()">➕ הוסף</button>
+            </div>
+          </div>
+          <div class="admin-section" style="margin-top:20px;">
+            <button class="btn-secondary" onclick="clearAllGrade6DictationWords()" style="background:#fed7d7;color:#c53030;border-color:#fc8181;">🗑️ מחק הכל והתחל מחדש</button>
           </div>
           <button class="btn-secondary" onclick="navigate('admin-dashboard')" style="margin-top:20px">חזרה</button>
         </div>

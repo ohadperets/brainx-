@@ -425,7 +425,7 @@ function selectUser(userId) {
     updateUIWithProfile();
     updateHomeProgress();
     updateHomeBadges();
-    updateDailyChallengeCard();
+    updateHomeGrade6DictationCard();
     hideUserSelectScreen();
   }
 }
@@ -570,7 +570,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }, 2000);
 
   const tips = APP_DATA.tips;
-  document.getElementById('daily-tip').textContent = tips[Math.floor(Math.random() * tips.length)];
+  const dailyTipEl = document.getElementById('daily-tip');
+  if (dailyTipEl) dailyTipEl.textContent = tips[Math.floor(Math.random() * tips.length)];
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
@@ -603,11 +604,11 @@ function updateStreak() {
 
 // ===== PROFILE SYSTEM =====
 let isCreatingNewUser = false;
-let selectedGrade = 2;
+let selectedGrade = 3;
 
 function showProfileSetup(newUser = false) {
   isCreatingNewUser = newUser;
-  selectedGrade = 2; // Default to grade 2
+  selectedGrade = 3; // Default to grade 3 (grades 2 and 5 are hidden)
   const modal = document.getElementById('profile-setup');
   modal.classList.remove('hidden');
   
@@ -800,7 +801,7 @@ function navigate(screen, subject, skipHistory = false) {
       document.getElementById('nav-home').classList.add('active');
       updateHomeProgress();
       updateHomeBadges();
-      updateDailyChallengeCard();
+      updateHomeGrade6DictationCard();
       updateUIWithProfile();
       break;
 
@@ -952,6 +953,12 @@ function navigate(screen, subject, skipHistory = false) {
         const grade = profile?.grade || 5;
         btnGeneralDictation.style.display = (grade === 2 || grade === 3) ? 'none' : '';
       }
+      // Grade 6 dictation section only visible for grade 6
+      const btnGrade6Dictation = document.getElementById('btn-grade6-dictation');
+      if (btnGrade6Dictation) {
+        const grade6 = profile?.grade || 5;
+        btnGrade6Dictation.style.display = (grade6 === 6) ? '' : 'none';
+      }
       break;
 
     case 'dictation-general':
@@ -964,6 +971,23 @@ function navigate(screen, subject, skipHistory = false) {
       document.getElementById('screen-dictation-typing').classList.add('active');
       headerTitle.textContent = 'הכתבה';
       startDictation();
+      break;
+
+    case 'grade6-dictation':
+      document.getElementById('screen-grade6-dictation').classList.add('active');
+      headerTitle.textContent = 'הכתבה לכיתה ו׳';
+      break;
+
+    case 'grade6-dict-write':
+      document.getElementById('screen-grade6-dict-write').classList.add('active');
+      headerTitle.textContent = 'הכתבה - שמיעה';
+      startGrade6DictWrite();
+      break;
+
+    case 'grade6-dict-complete':
+      document.getElementById('screen-grade6-dict-complete').classList.add('active');
+      headerTitle.textContent = 'השלם את המילה';
+      startGrade6DictComplete();
       break;
 
     case 'word-match':
@@ -1169,6 +1193,12 @@ function navigate(screen, subject, skipHistory = false) {
       loadWeekWords();
       break;
 
+    case 'admin-grade6-dictation':
+      document.getElementById('screen-admin-grade6-dictation').classList.add('active');
+      headerTitle.textContent = 'ניהול הכתבה לכיתה ו׳';
+      loadGrade6DictationWords();
+      break;
+
     case 'admin-lessons':
       document.getElementById('screen-admin-lessons').classList.add('active');
       headerTitle.textContent = 'ניהול שיעורים';
@@ -1281,6 +1311,14 @@ function updateSubjectFeatures() {
     </button>`;
 
     const grade = profile?.grade || 5;
+    if (grade === 6) {
+      html += `
+      <button class="feature-card" style="background:linear-gradient(135deg,#ede7f6,#d1c4e9)" onclick="navigate('grade6-dictation')">
+        <div class="feature-icon">🎓</div>
+        <div class="feature-name">הכתבה לכיתה ו׳</div>
+        <div class="feature-desc">מילות השבוע - שמיעה, השלמה והתאמה</div>
+      </button>`;
+    }
     if (grade === 5 || grade === 6) {
       html += `
       <button class="feature-card" style="grid-column: 1 / -1; background:linear-gradient(135deg,#e3f2fd,#90caf9); padding: 28px 16px;" onclick="navigate('et-all-tests')">
@@ -1329,15 +1367,11 @@ function updateHomeBadges() {
   if (badges.length > 8) row.innerHTML += `<span class="badge-mini">+${badges.length - 8}</span>`;
 }
 
-function updateDailyChallengeCard() {
-  const sub = document.getElementById('dc-subtitle');
-  if (!sub) return;
-  const today = new Date().toDateString();
-  if (progress.dailyChallengeDate === today && progress.dailyChallengeScore !== null) {
-    sub.textContent = `✅ סיימת היום! ציון: ${progress.dailyChallengeScore}%`;
-  } else {
-    sub.textContent = 'לחץ כדי לשחק!';
-  }
+function updateHomeGrade6DictationCard() {
+  const card = document.getElementById('home-grade6-dictation-card');
+  if (!card) return;
+  const grade = profile?.grade || 5;
+  card.style.display = (grade === 6) ? '' : 'none';
 }
 
 // ===== LESSONS =====
@@ -3405,6 +3439,7 @@ function speakDictationWord() {
 
 function checkDictation() {
   if (dictationState.answered) {
+    if (dictationState.autoTimer) { clearTimeout(dictationState.autoTimer); dictationState.autoTimer = null; }
     // Move to next
     dictationState.current++;
     if (dictationState.current >= dictationState.words.length) {
@@ -3435,6 +3470,8 @@ function checkDictation() {
     } else {
       btn.textContent = 'סיום ←';
     }
+    // Auto-advance to the next word after a correct answer
+    dictationState.autoTimer = setTimeout(() => checkDictation(), 1500);
   } else {
     // Wrong
     dictationState.tries++;
@@ -3442,7 +3479,12 @@ function checkDictation() {
     
     if (dictationState.tries < 2) {
       // First try - give another chance
-      feedback.textContent = '❌ לא נכון, נסה שוב!';
+      const closeHTML = buildCloseWordFeedbackHTML(input, w.word);
+      if (closeHTML) {
+        feedback.innerHTML = `❗ כמעט! האות המודגשת לא נכונה: <span dir="ltr" style="font-family:monospace;font-size:1.2rem;letter-spacing:2px;">${closeHTML}</span>`;
+      } else {
+        feedback.textContent = '❌ לא נכון, נסה שוב!';
+      }
       feedback.className = 'quiz-feedback wrong';
       feedback.classList.remove('hidden');
       document.getElementById('dictation-input').value = '';
@@ -3505,12 +3547,19 @@ function showDictationResults() {
   }
 }
 
-// Handle Enter key in dictation
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && currentScreen === 'dictation') {
-    checkDictation();
-  }
-});
+// Enter key submits the answer in the word-typing games (dictation, grade 6 write/complete)
+function bindEnterToSubmit(inputId, submitFn) {
+  const el = document.getElementById(inputId);
+  if (el) el.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      submitFn();
+    }
+  });
+}
+bindEnterToSubmit('dictation-input', checkDictation);
+bindEnterToSubmit('grade6dw-input', checkGrade6DictWrite);
+bindEnterToSubmit('grade6c-input', checkGrade6DictComplete);
 
 // ===== GEOMETRY QUIZ =====
 let geoState = {};
@@ -4375,7 +4424,8 @@ function startGeneralWordMatch() {
     englishWords,
     selected: null,
     matched: 0,
-    total: words.length
+    total: words.length,
+    restartFnName: 'startGeneralWordMatch'
   };
 
   document.getElementById('match-score').textContent = '0';
@@ -4517,12 +4567,13 @@ function drawMatchLine(el1, el2) {
 
 function showMatchResults() {
   const result = document.getElementById('match-result');
+  const restartFn = matchState.restartFnName || 'startWordMatch';
   result.classList.remove('hidden');
   result.innerHTML = `
     <div class="results-emoji">🎉</div>
     <h2>כל הכבוד! חיברת את כל המילים!</h2>
     <p>+10 ⭐ כוכבים</p>
-    <button class="btn-primary" onclick="startWordMatch()">שחק שוב 🔄</button>
+    <button class="btn-primary" onclick="${restartFn}()">שחק שוב 🔄</button>
     <button class="btn-secondary" onclick="goBack()">חזרה</button>`;
 
   progress.stars += 10;
@@ -4737,6 +4788,28 @@ function shuffle(arr) {
   return arr;
 }
 
+// Compares a wrong-but-close typed word to the correct one letter by letter.
+// Returns highlighted HTML of the user's own input (never reveals the correct letters) or null if not "close enough".
+function buildCloseWordFeedbackHTML(input, correctWord) {
+  const a = (input || '').toLowerCase();
+  const b = (correctWord || '').toLowerCase();
+  if (!a.length || a.length !== b.length) return null;
+
+  let diffCount = 0;
+  const escapeHtml = ch => ch.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const html = input.split('').map((ch, i) => {
+    const wrong = a[i] !== b[i];
+    if (wrong) diffCount++;
+    return wrong
+      ? `<span style="color:#e53e3e;text-decoration:underline;text-decoration-thickness:2px;font-weight:800;">${escapeHtml(ch)}</span>`
+      : escapeHtml(ch);
+  }).join('');
+
+  const maxAllowedDiffs = Math.max(1, Math.ceil(b.length * 0.34));
+  if (diffCount === 0 || diffCount > maxAllowedDiffs) return null;
+  return html;
+}
+
 function hashCode(str) {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
@@ -4884,6 +4957,404 @@ function clearAllDictationWords() {
   
   saveCustomDictation([]);
   loadWeekWords();
+}
+
+// ===== GRADE 6 DICTATION (הכתבה לכיתה ו) - CUSTOM WORD BANK =====
+// Single shared, admin-editable word bank (localStorage) used by all 3 grade-6 dictation games.
+function getCustomGrade6Dictation() {
+  const stored = localStorage.getItem('brainx-grade6-dictation');
+  return stored ? JSON.parse(stored) : null;
+}
+
+function saveCustomGrade6Dictation(words) {
+  localStorage.setItem('brainx-grade6-dictation', JSON.stringify(words));
+}
+
+function getGrade6DictationWords() {
+  const custom = getCustomGrade6Dictation();
+  if (custom) return custom;
+  return DEFAULT_GRADE6_DICTATION_WORDS;
+}
+
+function loadGrade6DictationWords() {
+  const words = getGrade6DictationWords();
+  const listEl = document.getElementById('admin-g6-word-list');
+
+  if (!words || !words.length) {
+    listEl.innerHTML = '<p style="color:#999;text-align:center">אין מילים להכתבה</p>';
+    return;
+  }
+
+  listEl.innerHTML = words.map((w, i) => `
+    <div class="admin-word-item">
+      <div class="word-text">
+        <span class="english">${w.word}</span>
+        <span class="hebrew">${w.hebrewHint}</span>
+      </div>
+      <button class="admin-word-delete" onclick="deleteGrade6Word(${i})">✕</button>
+    </div>
+  `).join('');
+}
+
+function addGrade6DictationWord() {
+  const english = document.getElementById('admin-g6-word-english').value.trim();
+  const hebrew = document.getElementById('admin-g6-word-hebrew').value.trim();
+
+  if (!english || !hebrew) {
+    alert('נא למלא את שני השדות');
+    return;
+  }
+
+  let words = getGrade6DictationWords();
+  words = [...words, { word: english, hebrewHint: hebrew }];
+  saveCustomGrade6Dictation(words);
+
+  document.getElementById('admin-g6-word-english').value = '';
+  document.getElementById('admin-g6-word-hebrew').value = '';
+  loadGrade6DictationWords();
+}
+
+function deleteGrade6Word(wordIndex) {
+  if (!confirm('למחוק מילה זו?')) return;
+
+  let words = getGrade6DictationWords();
+  words = words.filter((_, i) => i !== wordIndex);
+  saveCustomGrade6Dictation(words);
+  loadGrade6DictationWords();
+}
+
+function clearAllGrade6DictationWords() {
+  if (!confirm('למחוק את כל המילים? תוכל להוסיף מילים חדשות אחר כך.')) return;
+
+  saveCustomGrade6Dictation([]);
+  loadGrade6DictationWords();
+}
+
+// ----- Game 1: Write by hearing / Hebrew meaning -----
+let grade6DictWriteState = {};
+
+function startGrade6DictWrite() {
+  const words = shuffle([...getGrade6DictationWords()]);
+  if (!words.length) {
+    alert('אין מילים להכתבה. בקש מהמורה להוסיף מילים.');
+    goBack();
+    return;
+  }
+
+  grade6DictWriteState = { words, current: 0, score: 0, answered: false, tries: 0 };
+
+  document.getElementById('grade6dw-results').classList.add('hidden');
+  document.getElementById('grade6dw-feedback').classList.add('hidden');
+  const wordArea = document.querySelector('#screen-grade6-dict-write .dictation-word-area');
+  if (wordArea) wordArea.style.display = '';
+  const counter = document.querySelector('#screen-grade6-dict-write .dictation-progress');
+  if (counter) counter.style.display = '';
+
+  renderGrade6DictWriteWord();
+}
+
+function renderGrade6DictWriteWord() {
+  const s = grade6DictWriteState;
+  const w = s.words[s.current];
+  const total = s.words.length;
+  const current = s.current + 1;
+
+  document.getElementById('grade6dw-counter').textContent = `מילה ${current} מתוך ${total}`;
+  document.getElementById('grade6dw-progress-fill').style.width = `${(current / total) * 100}%`;
+  document.getElementById('grade6dw-prompt').textContent = w.hebrewHint;
+  document.getElementById('grade6dw-input').value = '';
+  document.getElementById('grade6dw-feedback').classList.add('hidden');
+  s.answered = false;
+  s.tries = 0;
+
+  const btn = document.querySelector('#screen-grade6-dict-write .btn-primary');
+  if (btn) btn.textContent = 'בדוק ✓';
+
+  setTimeout(() => {
+    speak(w.word, 'en-US');
+    document.getElementById('grade6dw-input').focus();
+  }, 300);
+}
+
+function speakGrade6DictWriteWord() {
+  const w = grade6DictWriteState.words[grade6DictWriteState.current];
+  speak(w.word, 'en-US');
+}
+
+function checkGrade6DictWrite() {
+  const s = grade6DictWriteState;
+  if (s.answered) {
+    if (s.autoTimer) { clearTimeout(s.autoTimer); s.autoTimer = null; }
+    s.current++;
+    if (s.current >= s.words.length) {
+      showGrade6DictWriteResults();
+    } else {
+      renderGrade6DictWriteWord();
+    }
+    return;
+  }
+
+  const w = s.words[s.current];
+  const input = document.getElementById('grade6dw-input').value.trim().toLowerCase();
+  const feedback = document.getElementById('grade6dw-feedback');
+  const btn = document.querySelector('#screen-grade6-dict-write .btn-primary');
+
+  if (input === w.word.toLowerCase()) {
+    s.score++;
+    s.answered = true;
+    feedback.textContent = `✅ נכון! ${w.word}`;
+    feedback.className = 'quiz-feedback correct';
+    feedback.classList.remove('hidden');
+    playSound('correct');
+    showPointsPopup(20);
+    btn.textContent = s.current < s.words.length - 1 ? 'הבא →' : 'סיום ←';
+    // Auto-advance to the next word after a correct answer
+    s.autoTimer = setTimeout(() => checkGrade6DictWrite(), 1500);
+  } else {
+    s.tries++;
+    playSound('wrong');
+
+    if (s.tries < 2) {
+      const closeHTML = buildCloseWordFeedbackHTML(input, w.word);
+      if (closeHTML) {
+        feedback.innerHTML = `❗ כמעט! האות המודגשת לא נכונה: <span dir="ltr" style="font-family:monospace;font-size:1.2rem;letter-spacing:2px;">${closeHTML}</span>`;
+      } else {
+        feedback.textContent = '❌ לא נכון, נסה שוב!';
+      }
+      feedback.className = 'quiz-feedback wrong';
+      feedback.classList.remove('hidden');
+      document.getElementById('grade6dw-input').value = '';
+      document.getElementById('grade6dw-input').focus();
+    } else {
+      s.answered = true;
+      feedback.textContent = `❌ התשובה הנכונה: ${w.word}`;
+      feedback.className = 'quiz-feedback wrong';
+      feedback.classList.remove('hidden');
+      btn.textContent = s.current < s.words.length - 1 ? 'הבא →' : 'סיום ←';
+    }
+  }
+}
+
+function showGrade6DictWriteResults() {
+  const s = grade6DictWriteState;
+  const score = s.score;
+  const total = s.words.length;
+  const percent = Math.round((score / total) * 100);
+  const stars = getStarsRating(percent);
+
+  progress.stars += score * 2;
+  progress.dictationsCompleted = (progress.dictationsCompleted || 0) + 1;
+  saveProgress(progress);
+  saveHighScore('grade6-dict-write', percent);
+  updateStreak();
+  checkAchievements();
+
+  const wordArea = document.querySelector('#screen-grade6-dict-write .dictation-word-area');
+  if (wordArea) wordArea.style.display = 'none';
+  const counter = document.querySelector('#screen-grade6-dict-write .dictation-progress');
+  if (counter) counter.style.display = 'none';
+  document.getElementById('grade6dw-feedback').classList.add('hidden');
+
+  const results = document.getElementById('grade6dw-results');
+  results.classList.remove('hidden');
+  results.innerHTML = `
+    <div class="compact-result">
+      <span class="result-emoji">${percent >= 80 ? '🏆' : percent >= 50 ? '🌟' : '💪'}</span>
+      <div class="result-text"><strong>${percent >= 80 ? 'מצוין!' : percent >= 50 ? 'כל הכבוד!' : 'המשך לתרגל!'}</strong></div>
+      <div class="result-stars">${renderStars(stars)}</div>
+      <div class="result-score">${percent}%</div>
+      <p>${score} מתוך ${total} מילים +${score * 2} ⭐</p>
+      <div class="result-btns">
+        <button class="btn-sm btn-primary" onclick="startGrade6DictWrite()">🔄 שוב</button>
+        <button class="btn-sm btn-secondary" onclick="goBack()">← חזרה</button>
+      </div>
+    </div>`;
+
+  if (percent >= 70) {
+    playSound('win');
+    launchConfetti();
+  }
+}
+
+// ----- Game 2: Complete the word (masked letters) -----
+let grade6DictCompleteState = {};
+
+// Reveals the 1st, 4th, 7th... letters and masks the rest, e.g. "raise" -> "r**s*"
+function maskGrade6Word(word) {
+  return word.split('').map((ch, i) => (ch === ' ' ? ' ' : (i % 3 === 0 ? ch : '*'))).join('');
+}
+
+function startGrade6DictComplete() {
+  const words = shuffle([...getGrade6DictationWords()]);
+  if (!words.length) {
+    alert('אין מילים למשחק. בקש מהמורה להוסיף מילים.');
+    goBack();
+    return;
+  }
+
+  grade6DictCompleteState = { words, current: 0, score: 0, answered: false, tries: 0 };
+
+  document.getElementById('grade6c-results').classList.add('hidden');
+  document.getElementById('grade6c-feedback').classList.add('hidden');
+  const wordArea = document.querySelector('#screen-grade6-dict-complete .dictation-word-area');
+  if (wordArea) wordArea.style.display = '';
+  const counter = document.querySelector('#screen-grade6-dict-complete .dictation-progress');
+  if (counter) counter.style.display = '';
+
+  renderGrade6DictCompleteWord();
+}
+
+function renderGrade6DictCompleteWord() {
+  const s = grade6DictCompleteState;
+  const w = s.words[s.current];
+  const total = s.words.length;
+  const current = s.current + 1;
+
+  document.getElementById('grade6c-counter').textContent = `מילה ${current} מתוך ${total}`;
+  document.getElementById('grade6c-progress-fill').style.width = `${(current / total) * 100}%`;
+  document.getElementById('grade6c-prompt').textContent = w.hebrewHint;
+  document.getElementById('grade6c-pattern').textContent = maskGrade6Word(w.word);
+  document.getElementById('grade6c-input').value = '';
+  document.getElementById('grade6c-feedback').classList.add('hidden');
+  s.answered = false;
+  s.tries = 0;
+
+  const btn = document.querySelector('#screen-grade6-dict-complete .btn-primary');
+  if (btn) btn.textContent = 'בדוק ✓';
+
+  document.getElementById('grade6c-input').focus();
+}
+
+function speakGrade6DictCompleteWord() {
+  const w = grade6DictCompleteState.words[grade6DictCompleteState.current];
+  speak(w.word, 'en-US');
+}
+
+function checkGrade6DictComplete() {
+  const s = grade6DictCompleteState;
+  if (s.answered) {
+    if (s.autoTimer) { clearTimeout(s.autoTimer); s.autoTimer = null; }
+    s.current++;
+    if (s.current >= s.words.length) {
+      showGrade6DictCompleteResults();
+    } else {
+      renderGrade6DictCompleteWord();
+    }
+    return;
+  }
+
+  const w = s.words[s.current];
+  const input = document.getElementById('grade6c-input').value.trim().toLowerCase();
+  const feedback = document.getElementById('grade6c-feedback');
+  const btn = document.querySelector('#screen-grade6-dict-complete .btn-primary');
+
+  if (input === w.word.toLowerCase()) {
+    s.score++;
+    s.answered = true;
+    document.getElementById('grade6c-pattern').textContent = w.word;
+    feedback.textContent = `✅ נכון! ${w.word}`;
+    feedback.className = 'quiz-feedback correct';
+    feedback.classList.remove('hidden');
+    playSound('correct');
+    showPointsPopup(20);
+    btn.textContent = s.current < s.words.length - 1 ? 'הבא →' : 'סיום ←';
+    // Auto-advance to the next word after a correct answer
+    s.autoTimer = setTimeout(() => checkGrade6DictComplete(), 1500);
+  } else {
+    s.tries++;
+    playSound('wrong');
+
+    if (s.tries < 2) {
+      const closeHTML = buildCloseWordFeedbackHTML(input, w.word);
+      if (closeHTML) {
+        feedback.innerHTML = `❗ כמעט! האות המודגשת לא נכונה: <span dir="ltr" style="font-family:monospace;font-size:1.2rem;letter-spacing:2px;">${closeHTML}</span>`;
+      } else {
+        feedback.textContent = '❌ לא נכון, נסה שוב!';
+      }
+      feedback.className = 'quiz-feedback wrong';
+      feedback.classList.remove('hidden');
+      document.getElementById('grade6c-input').value = '';
+      document.getElementById('grade6c-input').focus();
+    } else {
+      s.answered = true;
+      document.getElementById('grade6c-pattern').textContent = w.word;
+      feedback.textContent = `❌ התשובה הנכונה: ${w.word}`;
+      feedback.className = 'quiz-feedback wrong';
+      feedback.classList.remove('hidden');
+      btn.textContent = s.current < s.words.length - 1 ? 'הבא →' : 'סיום ←';
+    }
+  }
+}
+
+function showGrade6DictCompleteResults() {
+  const s = grade6DictCompleteState;
+  const score = s.score;
+  const total = s.words.length;
+  const percent = Math.round((score / total) * 100);
+  const stars = getStarsRating(percent);
+
+  progress.stars += score * 2;
+  progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
+  saveProgress(progress);
+  saveHighScore('grade6-dict-complete', percent);
+  checkAchievements();
+
+  const wordArea = document.querySelector('#screen-grade6-dict-complete .dictation-word-area');
+  if (wordArea) wordArea.style.display = 'none';
+  const counter = document.querySelector('#screen-grade6-dict-complete .dictation-progress');
+  if (counter) counter.style.display = 'none';
+  document.getElementById('grade6c-feedback').classList.add('hidden');
+
+  const results = document.getElementById('grade6c-results');
+  results.classList.remove('hidden');
+  results.innerHTML = `
+    <div class="compact-result">
+      <span class="result-emoji">${percent >= 80 ? '🏆' : percent >= 50 ? '🌟' : '💪'}</span>
+      <div class="result-text"><strong>${percent >= 80 ? 'מצוין!' : percent >= 50 ? 'כל הכבוד!' : 'המשך לתרגל!'}</strong></div>
+      <div class="result-stars">${renderStars(stars)}</div>
+      <div class="result-score">${percent}%</div>
+      <p>${score} מתוך ${total} מילים +${score * 2} ⭐</p>
+      <div class="result-btns">
+        <button class="btn-sm btn-primary" onclick="startGrade6DictComplete()">🔄 שוב</button>
+        <button class="btn-sm btn-secondary" onclick="goBack()">← חזרה</button>
+      </div>
+    </div>`;
+
+  if (percent >= 70) {
+    playSound('win');
+    launchConfetti();
+  }
+}
+
+// ----- Game 3: Match word to Hebrew meaning (reuses the existing match screen/engine) -----
+function startGrade6WordMatch() {
+  const pool = getGrade6DictationWords().map(w => ({ hebrew: w.hebrewHint, english: w.word }));
+  shuffle(pool);
+  const words = pool.slice(0, Math.min(10, pool.length));
+
+  const hebrewWords = words.map(w => ({ text: w.hebrew, pairId: w.english }));
+  const englishWords = words.map(w => ({ text: w.english, pairId: w.english }));
+  shuffle(englishWords);
+
+  matchState = {
+    hebrewWords,
+    englishWords,
+    selected: null,
+    matched: 0,
+    total: words.length,
+    restartFnName: 'startGrade6WordMatch'
+  };
+
+  document.getElementById('match-score').textContent = '0';
+  document.getElementById('match-total').textContent = words.length;
+  document.getElementById('match-result').classList.add('hidden');
+  document.getElementById('match-lines').innerHTML = '';
+  renderMatchWords();
+
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-word-match').classList.add('active');
+  document.querySelector('.app-header h1').textContent = 'הכתבה לכיתה ו׳ - התאמה';
+  history.pushState({ screen: 'grade6-word-match' }, '', '');
 }
 
 // ===== FIREBASE CLOUD SYNC =====

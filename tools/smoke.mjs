@@ -106,7 +106,7 @@ function makeContext() {
 }
 
 // ---------- load the app ----------
-const SCRIPTS = ['version.js', 'core/timers.js', 'core/feedback.js', 'core/game-kit.js', 'core/rewards.js', 'data.js', 'content-imports.js', 'app.js'];
+const SCRIPTS = ['version.js', 'core/timers.js', 'core/feedback.js', 'core/game-kit.js', 'core/rewards.js', 'data.js', 'content-imports.js', 'app.js', 'core/games-extra.js'];
 const failures = [];
 
 function load(ctx) {
@@ -267,6 +267,32 @@ function run(grade) {
     const fb = exec(`ALL_SUBJECTS.map(s => getFillBlankSource(s).filter(q => !(q.options && q.options[q.answer] !== undefined)).length).join(',')`);
     if (fb !== '0,0,0') failures.push(`[g${grade}] fill-blank items whose answer is not among the options: ${fb}`);
   } catch (e) { failures.push(`[g${grade}] generators: ${e.message}`); }
+
+  // ---- v67: new games ----
+  try {
+    const bad = exec(`(() => { let bad = []; for (let i = 0; i < 1000; i++) { const q = makePattern(${grade});
+      const ok = q.options.length === 4 && new Set(q.options).size === 4 && q.options[q.correct] === String(q.answer) && q.seq[q.gap] === q.answer && (${grade} !== 3 || q.options.every(o => +o >= 0));
+      if (!ok) bad.push(JSON.stringify(q)); } return bad.slice(0, 2); })()`);
+    if (bad.length) failures.push(`[g${grade}] bad number patterns: ${bad.join(' | ')}`);
+    for (const s of ['hebrew', 'english']) {
+      const n = exec(`sentenceSource(${JSON.stringify(s)}).length`);
+      console.log(`grade ${grade}: ${n} ${s} sentences for the sentence builder`);
+      if (n >= 4) {
+        // play a perfect round: picking words in their original order must be judged correct
+        const r = exec(`(() => { navigate('home'); navigate('game-sentence', ${JSON.stringify(s)}); let right = 0;
+          for (let k = 0; k < sentenceState.sentences.length; k++) {
+            const order = sentenceState.words.map((x, idx) => [x.i, idx]).sort((a, b) => a[0] - b[0]).map(p => p[1]);
+            order.forEach(idx => sentencePick(idx)); const before = sentenceState.score; sentenceCheck(); if (sentenceState.score === before + 1) right++;
+            AutoAdvance.next(); }
+          return [right, sentenceState.sentences.length, !!lastFinishedGame]; })()`);
+        if (r[0] !== r[1]) failures.push(`[g${grade}/${s}] sentence builder judged ${r[0]}/${r[1]} perfect answers correct`);
+      }
+    }
+    const lt = exec(`(() => { navigate('home'); navigate('game-lightning'); startLightning(); for (let i = 0; i < 6; i++) answerLightning(lightningState.pool[lightningState.index].correct); lastFinishedGame = null; endLightning(); return [lightningState.correct, !!lastFinishedGame]; })()`);
+    if (lt[0] !== 1 || !lt[1]) failures.push(`[g${grade}] lightning round: correct=${lt[0]} finished=${lt[1]}`);
+    exec(`navigate('home')`);
+    if (exec('T.pending()')) failures.push(`[g${grade}] timers left after the new games`);
+  } catch (e) { failures.push(`[g${grade}] new games: ${e.message}`); }
 
   // auto-advance: Next must advance exactly once even with a pending timer
   try {

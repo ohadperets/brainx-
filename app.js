@@ -286,7 +286,7 @@ function showUserSelectScreen() {
       const userProgress = loadProgressForUser(user.id);
       const gradeText = GRADE_NAMES[normalizeGrade(user.grade)];
       return `
-        <div class="user-item" onclick="selectUser('${user.id}')">
+        <div class="user-item" role="button" tabindex="0" onclick="selectUser('${user.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectUser('${user.id}')}">
           <div class="user-item-avatar">${user.avatar}</div>
           <div class="user-item-info">
             <div class="user-item-name">${user.name}</div>
@@ -734,6 +734,7 @@ function stopScreenActivity() {
   if (typeof closeResultsCard === 'function') closeResultsCard();
   if (typeof raceState !== 'undefined' && raceState) { raceState.timer = null; raceState.active = false; }
   if (typeof speedMathState !== 'undefined' && speedMathState) { speedMathState.timer = null; speedMathState.active = false; }
+  if (typeof lightningState !== 'undefined' && lightningState) { lightningState.active = false; }
 }
 
 function navigate(screen, subject, skipHistory = false) {
@@ -784,6 +785,27 @@ function navigate(screen, subject, skipHistory = false) {
       updateHomeGrade6DictationCard();
       updateUIWithProfile();
       updateHomeHub();
+      break;
+
+    case 'game-patterns':
+      document.getElementById('screen-game-patterns').classList.add('active');
+      headerTitle.textContent = 'מה חסר?';
+      displayGameRecord('patterns', 'screen-game-patterns');
+      startPatterns();
+      break;
+
+    case 'game-sentence':
+      document.getElementById('screen-game-sentence').classList.add('active');
+      headerTitle.textContent = 'סדר את המשפט';
+      displayGameRecord('sentence-' + currentSubject, 'screen-game-sentence');
+      startSentence();
+      break;
+
+    case 'game-lightning':
+      document.getElementById('screen-game-lightning').classList.add('active');
+      headerTitle.textContent = 'מהיר ומדויק';
+      displayGameRecord('lightning', 'screen-game-lightning');
+      initLightning();
       break;
 
     case 'all-games':
@@ -857,6 +879,11 @@ function navigate(screen, subject, skipHistory = false) {
       // Fill in the blank: needs a source for the current subject
       const fillBtn = document.getElementById('game-fill-blank-btn');
       if (fillBtn) fillBtn.style.display = has(getFillBlankSource(currentSubject)) ? '' : 'none';
+      // New games
+      const patBtn = document.getElementById('game-patterns-btn');
+      if (patBtn) patBtn.style.display = currentSubject === 'math' ? '' : 'none';
+      const sentBtn = document.getElementById('game-sentence-btn');
+      if (sentBtn) sentBtn.style.display = currentSubject !== 'math' && sentenceSource(currentSubject).length >= 4 ? '' : 'none';
       break;
 
     case 'game-hangman':
@@ -6404,6 +6431,7 @@ const SUBJECT_META = {
   hebrew: { name: 'עברית', icon: '📖' },
   english: { name: 'אנגלית', icon: '🔤' },
   math: { name: 'מתמטיקה', icon: '🔢' },
+  mixed: { name: 'כל המקצועות', icon: '⚡' },
 };
 const hasItems = arr => Array.isArray(arr) && arr.length > 0;
 
@@ -6423,6 +6451,9 @@ const GAME_REGISTRY = [
   { route: 'game-word-problems', title: 'בעיות מילוליות', icon: '🧩', tone: 'blue', subjects: ['math'], has: d => hasItems(d.mathWordProblems) },
   { route: 'geometry-quiz', title: 'גאומטריה', icon: '📐', tone: 'green', subjects: ['math'], has: d => hasItems(d.math?.geometryQuiz) },
   { route: 'multiplication-quiz', title: 'לוח הכפל', icon: '✖️', tone: 'amber', subjects: ['math'], has: d => hasItems(d.math?.multiplicationQuiz) },
+  { route: 'game-patterns', title: 'מה חסר?', icon: '🔢', tone: 'purple', subjects: ['math'], has: () => true },
+  { route: 'game-sentence', title: 'סדר את המשפט', icon: '🧱', tone: 'teal', subjects: ['hebrew', 'english'], has: (d, s) => sentenceSource(s).length >= 4 },
+  { route: 'game-lightning', title: 'מהיר ומדויק', icon: '⚡', tone: 'amber', subjects: ['mixed'], has: () => true },
 ];
 
 function findGame(route) { return GAME_REGISTRY.find(g => g.route === route) || null; }
@@ -6469,7 +6500,8 @@ function updateHomeHub() {
     cont.classList.toggle('hidden', !ok);
     if (ok) {
       set('home-continue-icon', last.icon || '▶️');
-      set('home-continue-sub', `${last.title} · ${SUBJECT_META[last.subject]?.name || ''}`);
+      const subjName = findGame(last.route).subjects.includes('mixed') ? SUBJECT_META.mixed.name : (SUBJECT_META[last.subject]?.name || '');
+      set('home-continue-sub', `${last.title} · ${subjName}`);
     }
   }
 }
@@ -6478,12 +6510,12 @@ function updateHomeHub() {
 function renderAllGames() {
   const el = document.getElementById('all-games-list');
   if (!el) return;
-  el.innerHTML = ALL_SUBJECTS.map(subject => {
+  el.innerHTML = ['mixed', ...ALL_SUBJECTS].map(subject => {
     const games = availableGames(subject);
     if (!games.length) return '';
     return `<h3 class="section-title">${SUBJECT_META[subject].icon} ${SUBJECT_META[subject].name}</h3>
       <div class="feature-grid">${games.map(g => `
-        <button class="feature-card" data-tone="${g.tone}" onclick="navigate('${g.route}', '${subject}')">
+        <button class="feature-card" data-tone="${g.tone}" onclick="${subject === 'mixed' ? `navigate('${g.route}')` : `navigate('${g.route}', '${subject}')`}">
           <div class="feature-icon">${g.icon}</div>
           <div class="feature-name">${g.title}</div>
         </button>`).join('')}

@@ -112,7 +112,17 @@ const Feedback = (() => {
     try { navigator.vibrate && navigator.vibrate(HAPTICS[type]); } catch (e) { /* not supported */ }
   }
 
+  // Screen readers: announce the result of an answer
+  const ANNOUNCE = { correct: 'נכון!', wrong: 'לא נכון', levelup: 'עלית רמה!', record: 'שיא חדש!' };
+  function announce(type) {
+    const el = document.getElementById('sr-live');
+    if (!el || !ANNOUNCE[type]) return;
+    el.textContent = '';
+    setTimeout(() => { el.textContent = ANNOUNCE[type]; }, 30);
+  }
+
   function play(type) {
+    announce(type);
     vibrate(type);
     if (!prefs.sound || !SOUNDS[type]) return;
     if (!ensure()) return;

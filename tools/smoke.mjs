@@ -106,7 +106,7 @@ function makeContext() {
 }
 
 // ---------- load the app ----------
-const SCRIPTS = ['version.js', 'core/timers.js', 'core/feedback.js', 'data.js', 'content-imports.js', 'app.js'];
+const SCRIPTS = ['version.js', 'core/timers.js', 'core/feedback.js', 'core/game-kit.js', 'data.js', 'content-imports.js', 'app.js'];
 const failures = [];
 
 function load(ctx) {
@@ -181,6 +181,54 @@ function run(grade) {
   }
   exec(`navigate('home')`);
 
+  // every migrated game must end on the shared results card and award 0–3 stars
+  const endings = [
+    // [route, subject, end call, grades]
+    ['quiz', 'hebrew', 'showQuizResults()', [3, 6]],
+    ['balloon-pop', 'english', 'endBalloonPop()', [3, 6]],
+    ['game-race', 'english', 'endRace()', [3, 6]],
+    ['game-scramble', 'hebrew', 'endScramble()', [3, 6]],
+    ['game-speed-math', 'math', 'endSpeedMath()', [3, 6]],
+    ['game-fill-blank', 'hebrew', 'endFillBlank()', [3, 6]],
+    ['game-true-false', 'math', 'endTrueFalse()', [3, 6]],
+    ['game-match-drag', 'english', 'endMatchDrag()', [3, 6]],
+    ['game-spelling', 'english', 'endSpelling()', [6]],
+    ['game-word-problems', 'math', 'endWordProblems()', [6]],
+    ['geometry-quiz', 'math', 'showGeoResults()', [6]],
+    ['multiplication-quiz', 'math', 'showMulResults()', [3]],
+    ['big-exam-grammar', 'english', 'showGrammarResults()', [6]],
+    ['math-big-natural', 'math', 'showMathNaturalResults()', [6]],
+  ];
+  let endingsChecked = 0;
+  for (const [route, subject, endCall, grades] of endings) {
+    if (!grades.includes(grade)) continue;
+    endingsChecked++;
+    try {
+      const r = exec(`(() => {
+        navigate('home'); navigate(${JSON.stringify(route)}, ${JSON.stringify(subject)});
+        lastFinishedGame = null;
+        const before = progress.stars;
+        ${endCall};
+        return [!!lastFinishedGame, progress.stars - before, !!document.getElementById('results-overlay')];
+      })()`);
+      if (!r[0]) failures.push(`[g${grade}] ${endCall} did not call finishGame()`);
+      if (r[1] < 0 || r[1] > 3 || Number.isNaN(r[1])) failures.push(`[g${grade}] ${endCall} awarded ${r[1]} stars (expected 0–3)`);
+    } catch (e) { failures.push(`[g${grade}] ${endCall}: ${e.message}`); }
+  }
+  exec(`navigate('home')`);
+
+  // star rule
+  try {
+    const got = exec('[starsFor(0), starsFor(49), starsFor(50), starsFor(74), starsFor(75), starsFor(89), starsFor(90), starsFor(100)].join(",")');
+    if (got !== '0,0,1,1,2,2,3,3') failures.push(`[g${grade}] starsFor thresholds wrong: ${got}`);
+  } catch (e) { failures.push(`[g${grade}] starsFor: ${e.message}`); }
+
+  // sound settings: defaults load for legacy users and mute persists
+  try {
+    const r = exec(`(() => { const a = settings.sound; toggleSound(); const b = loadSettings().sound; toggleSound(); return [a, b, loadSettings().sound]; })()`);
+    if (r.join(',') !== 'true,false,true') failures.push(`[g${grade}] mute toggle/persist wrong: ${r}`);
+  } catch (e) { failures.push(`[g${grade}] sound settings: ${e.message}`); }
+
   // auto-advance: Next must advance exactly once even with a pending timer
   try {
     const r = exec(`(() => { let n = 0; AutoAdvance.schedule(2000, () => n++); AutoAdvance.next(); AutoAdvance.next(); return [n, T.pending()]; })()`);
@@ -194,7 +242,7 @@ function run(grade) {
   } catch (e) { failures.push(`[g${grade}] progress: ${e.message}`); }
 
   if (ctx.__errors.length) ctx.__errors.slice(0, 5).forEach(e => failures.push(`[g${grade}] console.error: ${e}`));
-  console.log(`grade ${grade}: opened ${opened} route×subject combinations (${routes.length} routes)`);
+  console.log(`grade ${grade}: opened ${opened} route×subject combinations (${routes.length} routes), ended ${endingsChecked} games`);
 }
 
 run(3);

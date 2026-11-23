@@ -3430,3 +3430,63 @@ body.theme-pink .app-header {
 /* ===== Version footer ===== */
 .app-version-footer { text-align: center; font-size: 0.72rem; color: #a0aec0; padding: 16px 0 8px; user-select: text; }
 
+
+/* ===== Shared results card (core/game-kit.js) ===== */
+.results-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+  background: rgba(20, 24, 40, 0.55);
+  animation: rc-fade 200ms ease-out;
+}
+.results-card {
+  width: 100%; max-width: 380px;
+  background: var(--card-bg, #fff);
+  color: var(--text, #2d3748);
+  border-radius: 20px;
+  padding: 24px 20px 20px;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  animation: rc-rise 320ms cubic-bezier(.2, .8, .2, 1);
+}
+.rc-game { font-size: 0.85rem; font-weight: 600; color: var(--text-light, #718096); letter-spacing: 0.02em; }
+.rc-emoji { font-size: 3rem; line-height: 1.2; margin-top: 4px; }
+.rc-title { font-size: 1.5rem; font-weight: 800; margin: 4px 0 2px; }
+.rc-summary { font-size: 0.95rem; color: var(--text-light, #718096); margin-bottom: 4px; }
+.rc-stars { display: flex; justify-content: center; gap: 10px; margin: 12px 0 16px; direction: ltr; }
+.rc-star { font-size: 2.6rem; line-height: 1; color: #e2e8f0; transform: scale(0.6); opacity: 0.6; }
+.rc-star.on { color: #f6b93b; animation: rc-star-in 420ms cubic-bezier(.2, .8, .2, 1.4) forwards; opacity: 0; }
+.rc-stats { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; }
+.rc-stat { flex: 1; background: var(--bg, #f5f7fb); border-radius: 12px; padding: 10px 6px; min-width: 0; }
+.rc-stat-value { font-size: 1.1rem; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rc-stat-label { font-size: 0.78rem; color: var(--text-light, #718096); margin-top: 2px; }
+.rc-best { font-size: 0.95rem; color: var(--text-light, #718096); margin-bottom: 14px; }
+.rc-best-new { color: #c05621; font-weight: 800; }
+.rc-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.results-btn {
+  min-height: 48px; border-radius: 12px; border: 1px solid #e2e8f0;
+  background: var(--card-bg, #fff); color: var(--text, #2d3748);
+  font: inherit; font-weight: 700; font-size: 1rem; cursor: pointer;
+}
+.results-btn:active { transform: scale(0.97); }
+.results-btn-primary { grid-column: 1 / -1; background: var(--primary, #667eea); border-color: transparent; color: #fff; }
+.results-btn:focus-visible { outline: 3px solid var(--primary, #667eea); outline-offset: 2px; }
+
+@keyframes rc-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes rc-rise { from { opacity: 0; transform: translateY(24px) scale(0.96); } to { opacity: 1; transform: none; } }
+@keyframes rc-star-in { 0% { opacity: 0; transform: scale(0.3) rotate(-30deg); } 70% { opacity: 1; transform: scale(1.2) rotate(6deg); } 100% { opacity: 1; transform: scale(1) rotate(0); } }
+
+/* ===== Settings: sound & haptics ===== */
+.settings-group { background: var(--card-bg, #fff); border-radius: 14px; padding: 4px 14px; margin-bottom: 8px; box-shadow: var(--shadow); }
+.setting-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; font-weight: 600; }
+.setting-row + .setting-row { border-top: 1px solid #edf2f7; }
+.setting-row input[type="range"] { width: 50%; accent-color: var(--primary, #667eea); }
+.switch { appearance: none; -webkit-appearance: none; width: 48px; height: 28px; border-radius: 999px; background: #cbd5e0; position: relative; cursor: pointer; transition: background 200ms; flex-shrink: 0; }
+.switch::after { content: ''; position: absolute; top: 3px; inset-inline-start: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: inset-inline-start 200ms; }
+.switch:checked { background: var(--primary, #667eea); }
+.switch:checked::after { inset-inline-start: 23px; }
+.switch:focus-visible { outline: 3px solid var(--primary, #667eea); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .results-overlay, .results-card, .rc-star.on { animation: none; opacity: 1; transform: none; }
+}

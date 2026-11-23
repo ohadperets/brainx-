@@ -14,147 +14,13 @@ let dailyChallengeState = {};
 let currentUserId = null;
 
 // ===== SOUND EFFECTS =====
-// audioCtx / ensureAudio() live in core/feedback.js (created on first tap).
-
-function playSound(type) {
-  try {
-    if (!ensureAudio()) return;
-    const now = audioCtx.currentTime;
-    
-    switch(type) {
-      case 'correct': {
-        // Happy cheerful ascending chime - like getting a star!
-        const notes = [523, 659, 784, 1047]; // C5, E5, G5, C6 - major chord arpeggio
-        notes.forEach((freq, i) => {
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          osc.type = 'sine';
-          osc.connect(gain);
-          gain.connect(audioCtx.destination);
-          osc.frequency.value = freq;
-          const startTime = now + i * 0.08;
-          gain.gain.setValueAtTime(0, startTime);
-          gain.gain.linearRampToValueAtTime(0.25, startTime + 0.02);
-          gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.25);
-          osc.start(startTime);
-          osc.stop(startTime + 0.3);
-        });
-        break;
-      }
-      case 'wrong': {
-        // Gentle "oops" sound - descending soft buzz, not harsh
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.frequency.setValueAtTime(330, now);
-        osc.frequency.linearRampToValueAtTime(220, now + 0.3);
-        gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(0.2, now + 0.02);
-        gain.gain.linearRampToValueAtTime(0.15, now + 0.15);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
-        osc.start(now);
-        osc.stop(now + 0.4);
-        break;
-      }
-      case 'win': {
-        // Victory fanfare - happy celebratory sound!
-        const melody = [523, 659, 784, 880, 1047, 1319, 1568]; // ascending victory scale
-        melody.forEach((freq, i) => {
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          osc.type = 'sine';
-          osc.connect(gain);
-          gain.connect(audioCtx.destination);
-          osc.frequency.value = freq;
-          const startTime = now + i * 0.1;
-          gain.gain.setValueAtTime(0, startTime);
-          gain.gain.linearRampToValueAtTime(0.2, startTime + 0.02);
-          gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.35);
-          osc.start(startTime);
-          osc.stop(startTime + 0.4);
-        });
-        // Add a sparkle at the end
-        setTimeout(() => {
-          [1760, 2093, 2637].forEach((freq, i) => {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.frequency.value = freq;
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.25);
-          });
-        }, 600);
-        break;
-      }
-      case 'record': {
-        // Amazing achievement sound - magical sparkle cascade
-        const notes = [523, 659, 784, 1047, 1319, 1568, 2093];
-        notes.forEach((freq, i) => {
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          osc.type = 'sine';
-          osc.connect(gain);
-          gain.connect(audioCtx.destination);
-          osc.frequency.value = freq;
-          const startTime = now + i * 0.07;
-          gain.gain.setValueAtTime(0, startTime);
-          gain.gain.linearRampToValueAtTime(0.2, startTime + 0.02);
-          gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.25);
-          osc.start(startTime);
-          osc.stop(startTime + 0.3);
-        });
-        break;
-      }
-      case 'points': {
-        // Quick happy "ding!" for points
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.frequency.setValueAtTime(880, now);
-        osc.frequency.setValueAtTime(1175, now + 0.05);
-        gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(0.15, now + 0.01);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-        osc.start(now);
-        osc.stop(now + 0.2);
-        break;
-      }
-      case 'levelup': {
-        // Level up - triumphant ascending scale
-        const notes = [392, 494, 587, 784, 988, 1175];
-        notes.forEach((freq, i) => {
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          osc.type = 'sine';
-          osc.connect(gain);
-          gain.connect(audioCtx.destination);
-          osc.frequency.value = freq;
-          const startTime = now + i * 0.09;
-          gain.gain.setValueAtTime(0, startTime);
-          gain.gain.linearRampToValueAtTime(0.18, startTime + 0.02);
-          gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.2);
-          osc.start(startTime);
-          osc.stop(startTime + 0.25);
-        });
-        break;
-      }
-    }
-  } catch (e) { console.log('Sound error:', e); }
-}
+// playSound(), Feedback and the AudioContext live in core/feedback.js.
 
 // Points popup
 function showPointsPopup(points, x, y) {
   const popup = document.createElement('div');
   popup.className = 'points-popup';
-  popup.innerHTML = `+${points} ⭐`;
+  popup.textContent = `+${points}`;
   popup.style.left = (x || window.innerWidth / 2) + 'px';
   popup.style.top = (y || window.innerHeight / 2) + 'px';
   document.body.appendChild(popup);
@@ -201,14 +67,24 @@ function showRecordBanner() {
 // ===== GLOBAL RECORDS (Firebase Firestore) =====
 let globalRecordsCache = {};
 
+// Records are per grade: records/{gameId}_g3 and records/{gameId}_g6.
+// Records saved before grades were separated (records/{gameId}) were set by the older
+// grade, so grade 6 falls back to them until a grade-6 record is saved.
+function recordDocId(gameId) {
+  return `${gameId}_g${normalizeGrade(profile?.grade)}`;
+}
+
 async function loadGlobalRecord(gameId, forceRefresh = false) {
-  if (!forceRefresh && globalRecordsCache[gameId]) return globalRecordsCache[gameId];
+  const docId = recordDocId(gameId);
+  if (!forceRefresh && globalRecordsCache[docId]) return globalRecordsCache[docId];
   if (!window.firebaseReady || !window.firebaseDB) return null;
   try {
-    const docRef = window.firebaseDoc(window.firebaseDB, 'records', gameId);
-    const docSnap = await window.firebaseGetDoc(docRef);
+    let docSnap = await window.firebaseGetDoc(window.firebaseDoc(window.firebaseDB, 'records', docId));
+    if (!docSnap.exists() && normalizeGrade(profile?.grade) === 6) {
+      docSnap = await window.firebaseGetDoc(window.firebaseDoc(window.firebaseDB, 'records', gameId));
+    }
     if (docSnap.exists()) {
-      globalRecordsCache[gameId] = docSnap.data();
+      globalRecordsCache[docId] = docSnap.data();
       return docSnap.data();
     }
   } catch (e) { console.error('Load global record error:', e); }
@@ -231,9 +107,10 @@ async function checkAndSaveGlobalRecord(gameId, score) {
       userId: currentUserId,
       date: window.firebaseServerTimestamp()
     };
-    const docRef = window.firebaseDoc(window.firebaseDB, 'records', gameId);
-    await window.firebaseSetDoc(docRef, recordData);
-    globalRecordsCache[gameId] = { ...recordData, date: new Date() };
+    const docId = recordDocId(gameId);
+    const docRef = window.firebaseDoc(window.firebaseDB, 'records', docId);
+    await window.firebaseSetDoc(docRef, { ...recordData, grade: normalizeGrade(profile?.grade) });
+    globalRecordsCache[docId] = { ...recordData, date: new Date() };
     showGlobalRecordBanner(prof?.name || 'תלמיד');
     return true;
   } catch (e) { console.error('Save global record error:', e); }
@@ -437,6 +314,7 @@ function selectUser(userId) {
     progress = loadProgress();
     settings = loadSettings();
     applyTheme(settings.theme);
+    applySoundSettings(settings);
     updateStreak();
     updateUIWithProfile();
     updateHomeProgress();
@@ -563,15 +441,45 @@ function textDir(text, fallback = 'rtl') {
   return he >= la ? 'rtl' : 'ltr';
 }
 
+const DEFAULT_SETTINGS = { theme: 'default', sound: true, volume: 0.7, haptics: true };
+
 function loadSettingsForUser(userId) {
   try {
     const data = localStorage.getItem('brainx-settings-' + userId);
-    return data ? JSON.parse(data) : { theme: 'default' };
-  } catch { return { theme: 'default' }; }
+    return { ...DEFAULT_SETTINGS, ...(data ? JSON.parse(data) : {}) };
+  } catch { return { ...DEFAULT_SETTINGS }; }
+}
+
+// Push sound/haptics settings to the feedback engine and refresh the header toggle.
+function applySoundSettings(s) {
+  Feedback.configure({ sound: s.sound !== false, volume: s.volume ?? 0.7, haptics: s.haptics !== false });
+  const btn = document.getElementById('btn-sound');
+  if (btn) {
+    btn.textContent = s.sound !== false ? '🔊' : '🔇';
+    btn.title = s.sound !== false ? 'השתק צלילים' : 'הפעל צלילים';
+    btn.setAttribute('aria-pressed', String(s.sound === false));
+  }
+  const soundToggle = document.getElementById('setting-sound');
+  if (soundToggle) soundToggle.checked = s.sound !== false;
+  const hapticsToggle = document.getElementById('setting-haptics');
+  if (hapticsToggle) hapticsToggle.checked = s.haptics !== false;
+  const volume = document.getElementById('setting-volume');
+  if (volume) volume.value = Math.round((s.volume ?? 0.7) * 100);
+}
+
+function updateSoundSetting(key, value) {
+  settings = { ...settings, [key]: value };
+  saveSettings(settings);
+  applySoundSettings(settings);
+  if (key !== 'haptics' && settings.sound) playSound('correct');
+}
+
+function toggleSound() {
+  updateSoundSetting('sound', !(settings.sound !== false));
 }
 
 function loadSettings() {
-  if (!currentUserId) return { theme: 'default' };
+  if (!currentUserId) return { ...DEFAULT_SETTINGS };
   return loadSettingsForUser(currentUserId);
 }
 
@@ -772,18 +680,20 @@ function renderThemeGrid() {
 }
 
 // ===== TEXT-TO-SPEECH (for dictation) =====
-function speak(text, lang) {
+function speak(text, lang, rate = 0.9) {
   if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
   
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = lang || 'en-US';
-  utter.rate = 0.9;
+  utter.rate = rate;
   
-  // Try to find a matching voice for the language
+  // Try to find a matching voice for the language (some systems label Hebrew "iw")
   const voices = window.speechSynthesis.getVoices();
   const langCode = (lang || 'en-US').substring(0, 2);
-  const matchingVoice = voices.find(v => v.lang.startsWith(langCode));
+  const codes = langCode === 'he' ? ['he', 'iw'] : [langCode];
+  const matchingVoice = voices.find(v => v.lang === (lang || 'en-US'))
+    || voices.find(v => codes.some(c => v.lang.toLowerCase().startsWith(c)));
   if (matchingVoice) {
     utter.voice = matchingVoice;
   }
@@ -807,6 +717,7 @@ function goHome() {
 // Stop everything that belongs to the screen being left (timers, game clocks, speech).
 function stopScreenActivity() {
   T.clearAll();
+  if (typeof closeResultsCard === 'function') closeResultsCard();
   if (typeof raceState !== 'undefined' && raceState) { raceState.timer = null; raceState.active = false; }
   if (typeof speedMathState !== 'undefined' && speedMathState) { speedMathState.timer = null; speedMathState.active = false; }
 }
@@ -1726,11 +1637,7 @@ function showQuizResults() {
   if (percent > progress[currentSubject].quizBest) {
     progress[currentSubject].quizBest = percent;
   }
-  progress.stars += score;
   saveProgress(progress);
-  checkAchievements();
-  saveHighScore('quiz-' + currentSubject, percent);
-  updateStreak();
 
   let emoji, title;
   if (percent >= 90) { emoji = '🏆'; title = 'מדהים! מצוין!'; }
@@ -1741,12 +1648,10 @@ function showQuizResults() {
   document.getElementById('results-emoji').textContent = emoji;
   document.getElementById('results-title').textContent = title;
   document.getElementById('results-score').textContent = `${percent}%`;
-  document.getElementById('results-details').innerHTML = `ענית נכון על ${score} מתוך ${total} שאלות<br>${renderStars(stars)} +${score} ⭐ כוכבים!`;
+  document.getElementById('results-details').innerHTML = `ענית נכון על ${score} מתוך ${total} שאלות<br>${renderStars(starsFor(percent))}`;
 
-  if (percent >= 70) {
-    playSound('win');
-    launchConfetti();
-  }
+  finishGame({ gameId: 'quiz-' + currentSubject, title: 'חידון', correct: score, total,
+               score: percent, scoreLabel: 'אחוז הצלחה', replay: startQuiz });
 }
 
 function restartQuiz() { startQuiz(); }
@@ -1936,23 +1841,12 @@ function endBalloonPop() {
   const total = s.questions.length;
   
   // Only update progress for regular subjects
-  if (progress[currentSubject]) {
-    progress[currentSubject].flashcardsCompleted++;
-    progress.stars += correct;
-    progress.balloonGames = (progress.balloonGames || 0) + 1;
-    saveProgress(progress);
-    checkAchievements();
-  } else {
-    // AI content - just add stars
-    progress.stars += correct;
-    progress.balloonGames = (progress.balloonGames || 0) + 1;
-    saveProgress(progress);
-  }
+  if (progress[currentSubject]) progress[currentSubject].flashcardsCompleted++;
+  progress.balloonGames = (progress.balloonGames || 0) + 1;
+  saveProgress(progress);
   
-  const percent = Math.round((correct / total) * 100);
-  const stars = getStarsRating(percent);
-  saveHighScore('balloon-' + currentSubject, s.score);
-  updateStreak();
+  const percent = total ? Math.round((correct / total) * 100) : 0;
+  const stars = starsFor(percent);
   
   const title = s.lives > 0 ? '🎉 כל הכבוד!' : '💪 נסה שוב!';
   document.getElementById('balloon-result-title').textContent = title;
@@ -1960,14 +1854,11 @@ function endBalloonPop() {
   document.getElementById('balloon-summary').innerHTML = `
     🎯 ניקוד: ${s.score} נקודות<br>
     ${renderStars(stars)}<br>
-    ✅ תשובות נכונות: ${correct} מתוך ${total}<br>
-    +${correct} ⭐ כוכבים!
+    ✅ תשובות נכונות: ${correct} מתוך ${total}
   `;
-  
-  if (correct > total / 2) {
-    playSound('win');
-    launchConfetti();
-  }
+
+  finishGame({ gameId: 'balloon-' + currentSubject, title: 'פיצוץ בלונים', correct, total,
+               score: s.score, scoreLabel: 'נקודות', replay: startBalloonPop });
 }
 
 function restartBalloonPop() { startBalloonPop(); }
@@ -2036,8 +1927,8 @@ function renderHangman() {
   const result = document.getElementById('hangman-result');
   if (revealed && !s.won) {
     s.won = true;
-    const stars = getStarsRating((s.lives / 6) * 100);
-    const isRecord = saveHighScore('hangman-' + currentSubject, s.lives);
+    const mistakes = 6 - s.lives;
+    const stars = Math.max(1, 3 - Math.floor(mistakes / 2));
     result.classList.remove('hidden');
     result.innerHTML = `<div class="compact-result">
       <span class="result-emoji">${stars === 3 ? '🏆' : '🎉'}</span>
@@ -2048,14 +1939,12 @@ function renderHangman() {
         <button class="btn-sm btn-secondary" onclick="goBack()">← חזרה</button>
       </div>
     </div>`;
-    progress.stars += stars;
     progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
     progress.hangmanWins = (progress.hangmanWins || 0) + 1;
     saveProgress(progress);
-    playSound('win');
-    checkAchievements();
-    launchConfetti();
-    showPointsPopup(stars * 10);
+    finishGame({ gameId: 'hangman-' + currentSubject, title: 'תלייה', stars,
+                 pct: Math.round((s.lives / 6) * 100), summary: `המילה: ${s.word}`,
+                 score: s.lives, scoreLabel: 'חיים שנשארו', replay: startHangman });
   } else if (s.lives <= 0 && !s.lost) {
     s.lost = true;
     result.classList.remove('hidden');
@@ -2070,7 +1959,7 @@ function renderHangman() {
     progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
     saveProgress(progress);
     playSound('wrong');
-    checkAchievements();
+    finishGame({ title: 'תלייה', stars: 0, pct: 0, summary: `המילה הייתה: ${s.word}`, replay: startHangman });
   }
 }
 
@@ -2091,9 +1980,9 @@ function guessLetter(letter) {
 
 // ===== MEMORY GAME =====
 function startMemory() {
-  const allPairs = getData().memory[currentSubject];
-  // Limit to 10 pairs (20 cards) to avoid scroll
-  const pairs = allPairs.slice(0, 10);
+  const allPairs = [...(getData().memory[currentSubject] || [])];
+  // A different random set of up to 10 pairs (20 cards) each round
+  const pairs = shuffle(allPairs).slice(0, 10);
   let cards = [];
   pairs.forEach(([a, b], i) => {
     cards.push({ id: i * 2, pairId: i, text: a, flipped: false, matched: false });
@@ -2180,8 +2069,8 @@ function flipMemoryCard(index) {
       renderMemoryGrid();
 
       if (memoryState.matchedPairs === memoryState.totalPairs) {
-        setTimeout(() => {
-          const stars = getStarsRating(100 - memoryState.moves * 3);
+        T.after(() => {
+          const stars = starsFor(memoryState.moves ? (memoryState.totalPairs / memoryState.moves) * 100 : 100);
           const result = document.getElementById('memory-result');
           result.classList.remove('hidden');
           result.innerHTML = `<div class="compact-result">
@@ -2193,16 +2082,13 @@ function flipMemoryCard(index) {
               <button class="btn-sm btn-secondary" onclick="goBack()">← חזרה</button>
             </div>
           </div>`;
-          const starsEarned = Math.max(1, 6 - Math.floor(memoryState.moves / 3));
-          progress.stars += starsEarned;
           progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
           progress.memoryGames = (progress.memoryGames || 0) + 1;
           saveProgress(progress);
-          saveHighScore('memory-' + currentSubject, 100 - memoryState.moves);
-          playSound('win');
-          checkAchievements();
-          launchConfetti();
-          updateStreak();
+          finishGame({ gameId: 'memory-' + currentSubject, title: 'זיכרון',
+                       pct: memoryState.moves ? (memoryState.totalPairs / memoryState.moves) * 100 : 100,
+                       summary: `מצאת ${memoryState.totalPairs} זוגות ב-${memoryState.moves} מהלכים`,
+                       score: 100 - memoryState.moves, scoreLabel: 'ניקוד', replay: startMemory });
         }, 500);
       }
     } else {
@@ -2420,10 +2306,9 @@ function endRace() {
   result.classList.remove('hidden');
   document.getElementById('race-options').innerHTML = '';
 
-  const stars = Math.min(raceState.score, 10);
-  const starsRating = getStarsRating(raceState.score * 10);
+  const racePct = timedPct('race', raceState.score);
+  const starsRating = starsFor(racePct);
   const raceKey = currentSubject + 'race';
-  saveHighScore(raceKey, raceState.score);
   
   result.innerHTML = `<div class="compact-result">
     <span class="result-emoji">${raceState.score >= 10 ? '🏆' : raceState.score >= 5 ? '🌟' : '💪'}</span>
@@ -2435,18 +2320,14 @@ function endRace() {
     </div>
   </div>`;
 
-  progress.stars += stars;
   progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
   if (currentSubject === 'math') {
     progress.mathRaces = (progress.mathRaces || 0) + 1;
   }
   saveProgress(progress);
-  updateStreak();
-  checkAchievements();
-  if (raceState.score >= 10) {
-    playSound('win');
-    launchConfetti();
-  }
+  finishGame({ gameId: raceKey, title: 'מרוץ ידע', pct: racePct,
+               summary: `${raceState.score} תשובות נכונות ב-30 שניות`,
+               score: raceState.score, scoreLabel: 'תשובות נכונות', replay: startRace });
 }
 
 // ===== WORD SCRAMBLE GAME =====
@@ -2531,7 +2412,7 @@ function checkScrambleAnswer() {
 
 function endScramble() {
   const s = scrambleState;
-  const stars = getStarsRating(s.score);
+  const stars = starsFor(s.words.length ? s.score / s.words.length * 10 : 0);
   const result = document.getElementById('scramble-result');
   result.classList.remove('hidden');
   
@@ -2545,12 +2426,9 @@ function endScramble() {
     </div>
   </div>`;
   
-  progress.stars += stars;
   progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
   saveProgress(progress);
-  saveHighScore('scramble-' + currentSubject, s.score);
-  if (s.score >= 80) { playSound('win'); launchConfetti(); }
-  checkAchievements();
+  finishGame({ gameId: 'scramble-' + currentSubject, title: 'ערבוב מילים', correct: Math.round(s.score / 10), total: s.words.length, score: s.score, scoreLabel: 'נקודות', replay: startScramble });
 }
 
 // ===== MATH SPEED CHALLENGE GAME =====
@@ -2643,7 +2521,7 @@ function endSpeedMath() {
   
   const s = speedMathState;
   const score = s.correct * 10;
-  const stars = getStarsRating(score);
+  const stars = starsFor(timedPct('speed-math', s.correct));
   const result = document.getElementById('speed-math-result');
   result.classList.remove('hidden');
   
@@ -2657,12 +2535,9 @@ function endSpeedMath() {
     </div>
   </div>`;
   
-  progress.stars += stars;
   progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
   saveProgress(progress);
-  saveHighScore('speed-math', s.correct);
-  if (s.correct >= 10) { playSound('win'); launchConfetti(); }
-  checkAchievements();
+  finishGame({ gameId: 'speed-math', title: 'מתמטיקה מהירה', pct: timedPct('speed-math', s.correct), summary: `${s.correct} נכונות, ${s.wrong} שגיאות ב-60 שניות`, score: s.correct, scoreLabel: 'תשובות נכונות', replay: () => { initSpeedMath(); startSpeedMath(); } });
 }
 
 // ===== FILL IN THE BLANK GAME =====
@@ -2681,14 +2556,14 @@ function startFillBlank() {
     }));
   } else if (currentSubject === 'math') {
     // Create math fill-in-blank from fractions
-    questions = (data.mathBigExam?.fractions || []).slice(0, 10).map(q => ({
+    questions = shuffle([...(data.mathBigExam?.fractions || [])]).slice(0, 10).map(q => ({
       sentence: q.question,
       options: q.options,
       answer: q.correct
     }));
   } else {
     // Hebrew - use quiz questions
-    questions = (data.hebrew?.quiz || []).slice(0, 10).map(q => ({
+    questions = shuffle([...(data.hebrew?.quiz || [])]).slice(0, 10).map(q => ({
       sentence: q.question,
       options: q.options,
       answer: q.correct
@@ -2745,7 +2620,7 @@ function selectFillBlank(index) {
 
 function endFillBlank() {
   const s = fillBlankState;
-  const stars = getStarsRating(s.score);
+  const stars = starsFor(s.questions.length ? s.score / s.questions.length * 10 : 0);
   const result = document.getElementById('fill-blank-result');
   result.classList.remove('hidden');
   
@@ -2759,12 +2634,9 @@ function endFillBlank() {
     </div>
   </div>`;
   
-  progress.stars += stars;
   progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
   saveProgress(progress);
-  saveHighScore('fill-blank-' + currentSubject, s.score);
-  if (s.score >= 80) { playSound('win'); launchConfetti(); }
-  checkAchievements();
+  finishGame({ gameId: 'fill-blank-' + currentSubject, title: 'השלם את החסר', correct: Math.round(s.score / 10), total: s.questions.length, score: s.score, scoreLabel: 'נקודות', replay: startFillBlank });
 }
 
 // ===== TRUE OR FALSE GAME =====
@@ -2889,7 +2761,7 @@ function answerTrueFalse(answer) {
 
 function endTrueFalse() {
   const s = trueFalseState;
-  const stars = getStarsRating(s.score);
+  const stars = starsFor(s.questions.length ? s.score / s.questions.length * 10 : 0);
   const result = document.getElementById('true-false-result');
   result.classList.remove('hidden');
   
@@ -2903,12 +2775,9 @@ function endTrueFalse() {
     </div>
   </div>`;
   
-  progress.stars += stars;
   progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
   saveProgress(progress);
-  saveHighScore('true-false-' + currentSubject, s.score);
-  if (s.score >= 80) { playSound('win'); launchConfetti(); }
-  checkAchievements();
+  finishGame({ gameId: 'true-false-' + currentSubject, title: 'נכון או לא', correct: Math.round(s.score / 10), total: s.questions.length, score: s.score, scoreLabel: 'נקודות', replay: startTrueFalse });
 }
 
 // ===== MATCH DRAG GAME =====
@@ -3003,13 +2872,10 @@ function endMatchDrag() {
     </div>
   </div>`;
   
-  progress.stars += stars;
   progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
   saveProgress(progress);
-  saveHighScore('match-drag-' + currentSubject, s.pairs.length * 20);
-  playSound('win');
-  launchConfetti();
-  checkAchievements();
+  finishGame({ gameId: 'match-drag-' + currentSubject, title: 'התאמה', correct: s.pairs.length, total: s.pairs.length,
+               score: s.pairs.length * 20, scoreLabel: 'נקודות', replay: startMatchDrag });
 }
 
 // ===== SPELLING BEE GAME =====
@@ -3053,12 +2919,7 @@ function renderSpelling() {
 }
 
 function playSpellingWord() {
-  if ('speechSynthesis' in window) {
-    const utterance = new SpeechSynthesisUtterance(spellingState.currentWord);
-    utterance.lang = currentSubject === 'english' ? 'en-US' : 'he-IL';
-    utterance.rate = 0.8;
-    speechSynthesis.speak(utterance);
-  }
+  speak(spellingState.currentWord, currentSubject === 'english' ? 'en-US' : 'he-IL', 0.8);
 }
 
 function checkSpellingAnswer() {
@@ -3082,7 +2943,7 @@ function checkSpellingAnswer() {
 
 function endSpelling() {
   const s = spellingState;
-  const stars = getStarsRating(s.score);
+  const stars = starsFor(s.words.length ? s.score / s.words.length * 10 : 0);
   const result = document.getElementById('spelling-result');
   result.classList.remove('hidden');
   
@@ -3096,12 +2957,9 @@ function endSpelling() {
     </div>
   </div>`;
   
-  progress.stars += stars;
   progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
   saveProgress(progress);
-  saveHighScore('spelling-' + currentSubject, s.score);
-  if (s.score >= 80) { playSound('win'); launchConfetti(); }
-  checkAchievements();
+  finishGame({ gameId: 'spelling-' + currentSubject, title: 'איות', correct: Math.round(s.score / 10), total: s.words.length, score: s.score, scoreLabel: 'נקודות', replay: startSpelling });
 }
 
 // ===== READING COMPREHENSION (הבנת הנקרא) =====
@@ -3174,7 +3032,7 @@ function endReadingComp() {
   const s = rcState;
   const maxScore = s.passage.questions.length * 10;
   const pct = Math.round((s.score / maxScore) * 100);
-  const stars = pct >= 90 ? 3 : pct >= 60 ? 2 : pct >= 30 ? 1 : 0;
+  const stars = starsFor(pct);
   const result = document.getElementById('rc-result');
   result.classList.remove('hidden');
   document.getElementById('rc-options').innerHTML = '';
@@ -3190,12 +3048,9 @@ function endReadingComp() {
     </div>
   </div>`;
 
-  progress.stars += stars;
   progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
   saveProgress(progress);
-  saveHighScore('reading-comp-' + s.passage.id, s.score);
-  if (pct >= 80) { playSound('win'); launchConfetti(); }
-  checkAchievements();
+  finishGame({ gameId: 'reading-comp-' + s.passage.id, title: 'הבנת הנקרא', correct: Math.round(s.score / 10), total: s.passage.questions.length, score: s.score, scoreLabel: 'נקודות', replay: () => startReadingPassage(getData().readingComprehension.indexOf(s.passage)) });
 }
 
 // ===== WORD PROBLEMS GAME (בעיות מילוליות) =====
@@ -3257,7 +3112,7 @@ function answerWordProblem(btn, chosen) {
 
 function endWordProblems() {
   const s = wordProblemsState;
-  const stars = getStarsRating(s.score);
+  const stars = starsFor(s.questions.length ? s.score / s.questions.length * 10 : 0);
   const result = document.getElementById('wp-result');
   result.classList.remove('hidden');
   document.getElementById('wp-options').innerHTML = '';
@@ -3273,12 +3128,9 @@ function endWordProblems() {
     </div>
   </div>`;
 
-  progress.stars += stars;
   progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
   saveProgress(progress);
-  saveHighScore('word-problems-math', s.score);
-  if (s.score >= 80) { playSound('win'); launchConfetti(); }
-  checkAchievements();
+  finishGame({ gameId: 'word-problems-math', title: 'בעיות מילוליות', correct: Math.round(s.score / 10), total: s.questions.length, score: s.score, scoreLabel: 'נקודות', replay: startWordProblems });
 }
 
 // ===== DAILY CHALLENGE =====
@@ -3374,9 +3226,8 @@ function nextDailyChallenge() {
 
     progress.dailyChallengeDate = new Date().toDateString();
     progress.dailyChallengeScore = percent;
-    progress.stars += score * 2;
     saveProgress(progress);
-    checkAchievements();
+    finishGame({ title: 'אתגר יומי', correct: score, total, summary: 'חזרו מחר לאתגר חדש!' });
 
     const container = document.getElementById('daily-challenge-container');
     container.innerHTML = `
@@ -3388,7 +3239,6 @@ function nextDailyChallenge() {
         <button class="btn-secondary" onclick="goBack()">חזרה</button>
       </div>`;
 
-    if (percent >= 60) launchConfetti();
   } else {
     renderDailyChallengeQuestion();
   }
@@ -3601,12 +3451,10 @@ function showDictationResults() {
   const percent = Math.round((score / total) * 100);
   const stars = getStarsRating(percent);
 
-  progress.stars += score * 2;
   progress.dictationsCompleted = (progress.dictationsCompleted || 0) + 1;
   saveProgress(progress);
-  saveHighScore('dictation', percent);
-  updateStreak();
-  checkAchievements();
+  finishGame({ gameId: 'dictation', title: dictationState.weekTitle || 'הכתבה', correct: score, total,
+               score: percent, scoreLabel: 'אחוז הצלחה' });
 
   // Hide word area
   const wordArea = document.querySelector('.dictation-word-area');
@@ -3629,11 +3477,6 @@ function showDictationResults() {
         <button class="btn-sm btn-secondary" onclick="goBack()">← חזרה</button>
       </div>
     </div>`;
-
-  if (percent >= 70) {
-    playSound('win');
-    launchConfetti();
-  }
 }
 
 // Enter key submits the answer in the word-typing games (dictation, grade 6 write/complete)
@@ -3729,6 +3572,8 @@ function showGeoResults() {
   results.classList.remove('hidden');
   document.getElementById('geo-results-title').textContent = pct >= 80 ? '🎉 כל הכבוד!' : pct >= 50 ? '👍 לא רע!' : '💪 תנסה שוב!';
   document.getElementById('geo-results-text').textContent = `ענית נכון על ${s.score} מתוך ${s.questions.length} (${pct}%)`;
+  finishGame({ gameId: 'geometry', title: 'גאומטריה', correct: s.score, total: s.questions.length,
+               score: pct, scoreLabel: 'אחוז הצלחה', replay: startGeometryQuiz });
 }
 
 // ===== MULTIPLICATION QUIZ =====
@@ -3808,6 +3653,8 @@ function showMulResults() {
   results.classList.remove('hidden');
   document.getElementById('mul-results-title').textContent = pct >= 80 ? '🎉 כל הכבוד!' : pct >= 50 ? '👍 לא רע!' : '💪 תנסה שוב!';
   document.getElementById('mul-results-text').textContent = `ענית נכון על ${s.score} מתוך ${s.questions.length} (${pct}%)`;
+  finishGame({ gameId: 'multiplication', title: 'לוח הכפל', correct: s.score, total: s.questions.length,
+               score: pct, scoreLabel: 'אחוז הצלחה', replay: startMultiplicationQuiz });
 }
 
 // ===== BIG EXAM PREP =====
@@ -3894,6 +3741,8 @@ function showGrammarResults() {
   results.classList.remove('hidden');
   document.getElementById('grammar-results-title').textContent = pct >= 80 ? '🎉 כל הכבוד!' : pct >= 50 ? '👍 לא רע!' : '💪 תנסה שוב!';
   document.getElementById('grammar-results-text').textContent = `ענית נכון על ${s.score} מתוך ${s.questions.length} (${pct}%)`;
+  finishGame({ gameId: 'bigexam-grammar', title: 'Grammar', correct: s.score, total: s.questions.length,
+               score: pct, scoreLabel: 'אחוז הצלחה', replay: startBigExamGrammar });
 }
 
 // --- READING ---
@@ -3973,6 +3822,8 @@ function showReadingResults() {
   results.classList.remove('hidden');
   document.getElementById('reading-results-title').textContent = pct >= 80 ? '🎉 כל הכבוד!' : pct >= 50 ? '👍 לא רע!' : '💪 תנסה שוב!';
   document.getElementById('reading-results-text').textContent = `ענית נכון על ${s.score} מתוך ${s.questions.length} (${pct}%)`;
+  finishGame({ gameId: 'bigexam-reading', title: 'Reading', correct: s.score, total: s.questions.length,
+               score: pct, scoreLabel: 'אחוז הצלחה', replay: startBigExamReading });
 }
 
 // --- WRITING (a/an) ---
@@ -4048,6 +3899,8 @@ function showWritingResults() {
   results.classList.remove('hidden');
   document.getElementById('writing-results-title').textContent = pct >= 80 ? '🎉 כל הכבוד!' : pct >= 50 ? '👍 לא רע!' : '💪 תנסה שוב!';
   document.getElementById('writing-results-text').textContent = `ענית נכון על ${s.score} מתוך ${s.questions.length} (${pct}%)`;
+  finishGame({ gameId: 'bigexam-writing', title: 'Writing', correct: s.score, total: s.questions.length,
+               score: pct, scoreLabel: 'אחוז הצלחה', replay: startBigExamWriting });
 }
 
 // --- VOCABULARY (word match for exam) ---
@@ -4239,6 +4092,8 @@ function showMathNaturalResults() {
   results.classList.remove('hidden');
   document.getElementById('math-natural-results-title').textContent = pct >= 80 ? '🎉 כל הכבוד!' : pct >= 50 ? '👍 לא רע!' : '💪 תנסה שוב!';
   document.getElementById('math-natural-results-text').textContent = `ענית נכון על ${s.score} מתוך ${s.questions.length} (${pct}%)`;
+  finishGame({ gameId: 'mathbig-natural', title: 'מספרים טבעיים', correct: s.score, total: s.questions.length,
+               score: pct, scoreLabel: 'אחוז הצלחה', replay: startMathBigNatural });
 }
 
 // Fractions Quiz
@@ -4323,6 +4178,8 @@ function showMathFractionsResults() {
   results.classList.remove('hidden');
   document.getElementById('math-fractions-results-title').textContent = pct >= 80 ? '🎉 כל הכבוד!' : pct >= 50 ? '👍 לא רע!' : '💪 תנסה שוב!';
   document.getElementById('math-fractions-results-text').textContent = `ענית נכון על ${s.score} מתוך ${s.questions.length} (${pct}%)`;
+  finishGame({ gameId: 'mathbig-fractions', title: 'שברים', correct: s.score, total: s.questions.length,
+               score: pct, scoreLabel: 'אחוז הצלחה', replay: startMathBigFractions });
 }
 
 // Decimals Quiz
@@ -4407,6 +4264,8 @@ function showMathDecimalsResults() {
   results.classList.remove('hidden');
   document.getElementById('math-decimals-results-title').textContent = pct >= 80 ? '🎉 כל הכבוד!' : pct >= 50 ? '👍 לא רע!' : '💪 תנסה שוב!';
   document.getElementById('math-decimals-results-text').textContent = `ענית נכון על ${s.score} מתוך ${s.questions.length} (${pct}%)`;
+  finishGame({ gameId: 'mathbig-decimals', title: 'מספרים עשרוניים', correct: s.score, total: s.questions.length,
+               score: pct, scoreLabel: 'אחוז הצלחה', replay: startMathBigDecimals });
 }
 
 // Geometry Quiz (Math Big Exam)
@@ -4491,6 +4350,8 @@ function showMathGeometryResults() {
   results.classList.remove('hidden');
   document.getElementById('math-geometry-results-title').textContent = pct >= 80 ? '🎉 כל הכבוד!' : pct >= 50 ? '👍 לא רע!' : '💪 תנסה שוב!';
   document.getElementById('math-geometry-results-text').textContent = `ענית נכון על ${s.score} מתוך ${s.questions.length} (${pct}%)`;
+  finishGame({ gameId: 'mathbig-geometry', title: 'גאומטריה', correct: s.score, total: s.questions.length,
+               score: pct, scoreLabel: 'אחוז הצלחה', replay: startMathBigGeometry });
 }
 
 // ===== WORD MATCHING GAME =====
@@ -4624,15 +4485,18 @@ function selectMatchWord(el) {
     }
 
     matchState.matched++;
+    playSound('correct');
     document.getElementById('match-score').textContent = matchState.matched;
     matchState.selected = null;
 
     // Check if done
     if (matchState.matched === matchState.total) {
-      setTimeout(showMatchResults, 500);
+      T.after(showMatchResults, 500);
     }
   } else {
     // Wrong match
+    matchState.mistakes = (matchState.mistakes || 0) + 1;
+    playSound('wrong');
     el.classList.add('wrong');
     prev.element.classList.add('wrong');
     setTimeout(() => {
@@ -4673,15 +4537,16 @@ function showMatchResults() {
   result.innerHTML = `
     <div class="results-emoji">🎉</div>
     <h2>כל הכבוד! חיברת את כל המילים!</h2>
-    <p>+10 ⭐ כוכבים</p>
     <button class="btn-primary" onclick="${restartFn}()">שחק שוב 🔄</button>
     <button class="btn-secondary" onclick="goBack()">חזרה</button>`;
 
-  progress.stars += 10;
   progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
   saveProgress(progress);
-  checkAchievements();
-  launchConfetti();
+  // wrong attempts lower the accuracy (each pair counts once)
+  const attempts = matchState.total + (matchState.mistakes || 0);
+  finishGame({ title: 'חבר מילים', correct: matchState.total, total: matchState.total,
+               pct: attempts ? (matchState.total / attempts) * 100 : 100,
+               replay: typeof window[restartFn] === 'function' ? window[restartFn] : undefined });
 }
 
 // ===== ACHIEVEMENTS =====
@@ -4878,6 +4743,7 @@ function resetProgress() {
 // ===== SETTINGS =====
 function renderSettings() {
   renderThemeGrid();
+  applySoundSettings(settings);
 }
 
 // ===== UTILITIES =====
@@ -5243,12 +5109,10 @@ function showGrade6DictWriteResults() {
   const percent = Math.round((score / total) * 100);
   const stars = getStarsRating(percent);
 
-  progress.stars += score * 2;
   progress.dictationsCompleted = (progress.dictationsCompleted || 0) + 1;
   saveProgress(progress);
-  saveHighScore('grade6-dict-write', percent);
-  updateStreak();
-  checkAchievements();
+  finishGame({ gameId: 'grade6-dict-write', title: 'הכתבה - שמיעה', correct: score, total,
+               score: percent, scoreLabel: 'אחוז הצלחה' });
 
   const wordArea = document.querySelector('#screen-grade6-dict-write .dictation-word-area');
   if (wordArea) wordArea.style.display = 'none';
@@ -5270,11 +5134,6 @@ function showGrade6DictWriteResults() {
         <button class="btn-sm btn-secondary" onclick="goBack()">← חזרה</button>
       </div>
     </div>`;
-
-  if (percent >= 70) {
-    playSound('win');
-    launchConfetti();
-  }
 }
 
 // ----- Game 2: Complete the word (masked letters) -----
@@ -5394,11 +5253,10 @@ function showGrade6DictCompleteResults() {
   const percent = Math.round((score / total) * 100);
   const stars = getStarsRating(percent);
 
-  progress.stars += score * 2;
   progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
   saveProgress(progress);
-  saveHighScore('grade6-dict-complete', percent);
-  checkAchievements();
+  finishGame({ gameId: 'grade6-dict-complete', title: 'השלם את המילה', correct: score, total,
+               score: percent, scoreLabel: 'אחוז הצלחה' });
 
   const wordArea = document.querySelector('#screen-grade6-dict-complete .dictation-word-area');
   if (wordArea) wordArea.style.display = 'none';
@@ -5420,11 +5278,6 @@ function showGrade6DictCompleteResults() {
         <button class="btn-sm btn-secondary" onclick="goBack()">← חזרה</button>
       </div>
     </div>`;
-
-  if (percent >= 70) {
-    playSound('win');
-    launchConfetti();
-  }
 }
 
 // ----- Game 3: Match word to Hebrew meaning (reuses the existing match screen/engine) -----
@@ -5895,7 +5748,8 @@ function showETResults(partId) {
   }
 
   if (resEl) resEl.classList.remove('hidden');
-  if (pct >= 80) { playSound('win'); launchConfetti(); }
+  finishGame({ gameId: `et${etCurrentTestId}-${partId}`, title: ET_PART_META[partId].title, correct, total,
+               score, scoreLabel: `מתוך ${maxPts} נק׳`, replay: () => restartETPart(partId) });
 }
 
 function restartETPart(partId) {
@@ -6053,7 +5907,8 @@ function showETReadingResults() {
   `;
   resEl.classList.remove('hidden');
 
-  if (pct >= 80) { playSound('win'); launchConfetti(); }
+  finishGame({ gameId: `et${etCurrentTestId}-reading`, title: 'Reading Comprehension', correct, total,
+               score, scoreLabel: `מתוך ${maxPts} נק׳`, replay: startETReading });
 }
 
 // ===================================================================

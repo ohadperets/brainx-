@@ -135,6 +135,7 @@
         <h1 id="header-title">BrainX</h1>
       </div>
       <div class="header-right">
+        <button id="btn-sound" class="btn-header-icon" onclick="toggleSound()" title="השתק צלילים" aria-label="צלילים" aria-pressed="false">🔊</button>
         <button id="btn-user" class="btn-header-icon" onclick="showUserSwitch()" title="החלף משתמש">
           <span>👤</span>
         </button>
@@ -1014,6 +1015,21 @@
         <div class="settings-container">
           <h3 class="section-title">🎨 ערכת נושא</h3>
           <div class="theme-grid" id="theme-grid"></div>
+          <h3 class="section-title">🔊 צלילים ורטט</h3>
+          <div class="settings-group">
+            <label class="setting-row">
+              <span>צלילים</span>
+              <input type="checkbox" id="setting-sound" class="switch" checked onchange="updateSoundSetting('sound', this.checked)">
+            </label>
+            <label class="setting-row">
+              <span>עוצמה</span>
+              <input type="range" id="setting-volume" min="0" max="100" step="5" value="70" onchange="updateSoundSetting('volume', this.value / 100)">
+            </label>
+            <label class="setting-row">
+              <span>רטט (בטלפונים תומכים)</span>
+              <input type="checkbox" id="setting-haptics" class="switch" checked onchange="updateSoundSetting('haptics', this.checked)">
+            </label>
+          </div>
           <h3 class="section-title"> פרופיל</h3>
           <button class="btn-secondary" onclick="editProfile()">✏️ ערוך פרופיל</button>
           <button class="btn-secondary" onclick="showUserSwitch()" style="margin-top:12px">🔄 החלף משתמש</button>
@@ -1422,6 +1438,7 @@
   <script src="version.js"></script>
   <script src="core/timers.js"></script>
   <script src="core/feedback.js"></script>
+  <script src="core/game-kit.js"></script>
   <script src="data.js"></script>
   <script src="content-imports.js"></script>
   <script src="app.js"></script>

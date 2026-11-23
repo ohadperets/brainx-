@@ -1,0 +1,1419 @@
+{
+  "dataset": "BrainX Grades 3 and 6 seed content",
+  "version": "1.0",
+  "language": "he-IL",
+  "importPolicy": "draft_only_review_before_publish",
+  "schemaNote": "Adapter must map this neutral schema to the existing BrainX database/API. Do not assume these are its native field names.",
+  "sourceTags": {
+    "prior_grade6_materials": "Topics grounded in previously provided Grade 6 practice materials; newly authored questions, not verbatim imports.",
+    "curriculum_enrichment": "General grade-appropriate enrichment; not verified as current teacher syllabus."
+  },
+  "questions": [
+    {
+      "id": "bx-6-english-0001",
+      "grade": 6,
+      "subject": "English",
+      "topic": "Present Simple",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "She ___ to school every day.",
+      "correctAnswer": "goes",
+      "explanation": "She is third-person singular, so go becomes goes.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "go",
+        "goes",
+        "going",
+        "is go"
+      ]
+    },
+    {
+      "id": "bx-6-english-0002",
+      "grade": 6,
+      "subject": "English",
+      "topic": "Present Simple",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "They ___ football on Sundays.",
+      "correctAnswer": "play",
+      "explanation": "They takes the base form play.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "plays",
+        "play",
+        "playing",
+        "does play"
+      ]
+    },
+    {
+      "id": "bx-6-english-0003",
+      "grade": 6,
+      "subject": "English",
+      "topic": "Present Simple",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "My brother ___ like fish.",
+      "correctAnswer": "doesn’t",
+      "explanation": "Use doesn’t with he/she/it.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "don’t",
+        "doesn’t",
+        "isn’t",
+        "aren’t"
+      ]
+    },
+    {
+      "id": "bx-6-english-0004",
+      "grade": 6,
+      "subject": "English",
+      "topic": "Present Simple",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "___ you live in Israel?",
+      "correctAnswer": "Do",
+      "explanation": "Use Do with you.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "Does",
+        "Are",
+        "Do",
+        "Is"
+      ]
+    },
+    {
+      "id": "bx-6-english-0005",
+      "grade": 6,
+      "subject": "English",
+      "topic": "Present Simple",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "Where ___ your father work?",
+      "correctAnswer": "does",
+      "explanation": "Your father is third-person singular.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "do",
+        "does",
+        "is",
+        "are"
+      ]
+    },
+    {
+      "id": "bx-6-english-0006",
+      "grade": 6,
+      "subject": "English",
+      "topic": "Present Simple",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "He ___ TV in the evening.",
+      "correctAnswer": "watches",
+      "explanation": "Add -es to watch.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "watch",
+        "watches",
+        "watchs",
+        "watching"
+      ]
+    },
+    {
+      "id": "bx-6-english-0007",
+      "grade": 6,
+      "subject": "English",
+      "topic": "Present Simple",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "We ___ English on Mondays.",
+      "correctAnswer": "study",
+      "explanation": "We takes the base verb.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "studies",
+        "study",
+        "studys",
+        "studying"
+      ]
+    },
+    {
+      "id": "bx-6-english-0008",
+      "grade": 6,
+      "subject": "English",
+      "topic": "Present Simple",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "Mika ___ English every day.",
+      "correctAnswer": "studies",
+      "explanation": "Consonant + y becomes -ies.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "study",
+        "studies",
+        "studys",
+        "studying"
+      ]
+    },
+    {
+      "id": "bx-6-english-0009",
+      "grade": 6,
+      "subject": "English",
+      "topic": "Present Simple",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "___ does she get up? At seven.",
+      "correctAnswer": "When",
+      "explanation": "When asks about time.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "Who",
+        "Why",
+        "When",
+        "Where"
+      ]
+    },
+    {
+      "id": "bx-6-english-0010",
+      "grade": 6,
+      "subject": "English",
+      "topic": "Present Simple",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "___ is your best friend?",
+      "correctAnswer": "Who",
+      "explanation": "Who asks about a person.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "What",
+        "Who",
+        "Where",
+        "Why"
+      ]
+    },
+    {
+      "id": "bx-6-english-0011",
+      "grade": 6,
+      "subject": "English",
+      "topic": "Present Simple",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "Dad ___ a bicycle.",
+      "correctAnswer": "has",
+      "explanation": "He/she/it has.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "have",
+        "has",
+        "having",
+        "haves"
+      ]
+    },
+    {
+      "id": "bx-6-english-0012",
+      "grade": 6,
+      "subject": "English",
+      "topic": "Present Simple",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "We ___ our rooms on Friday.",
+      "correctAnswer": "clean",
+      "explanation": "We uses the base verb.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "cleans",
+        "clean",
+        "cleanes",
+        "cleaning"
+      ]
+    },
+    {
+      "id": "bx-6-english-0013",
+      "grade": 6,
+      "subject": "English",
+      "topic": "Unit 1 vocabulary",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "Choose the meaning of “afraid”.",
+      "correctAnswer": "scared",
+      "explanation": "“afraid” means “scared”.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "happy",
+        "scared",
+        "full",
+        "comfortable"
+      ]
+    },
+    {
+      "id": "bx-6-english-0014",
+      "grade": 6,
+      "subject": "English",
+      "topic": "Unit 1 vocabulary",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "Choose the meaning of “arrive”.",
+      "correctAnswer": "reach a place",
+      "explanation": "“arrive” means “reach a place”.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "leave",
+        "reach a place",
+        "forget",
+        "invite"
+      ]
+    },
+    {
+      "id": "bx-6-english-0015",
+      "grade": 6,
+      "subject": "English",
+      "topic": "Unit 1 vocabulary",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "Choose the meaning of “competition”.",
+      "correctAnswer": "contest",
+      "explanation": "“competition” means “contest”.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "contest",
+        "reason",
+        "date",
+        "pocket"
+      ]
+    },
+    {
+      "id": "bx-6-english-0016",
+      "grade": 6,
+      "subject": "English",
+      "topic": "Unit 1 vocabulary",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "Choose the meaning of “instead”.",
+      "correctAnswer": "in place of",
+      "explanation": "“instead” means “in place of”.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "almost",
+        "against",
+        "in place of",
+        "several"
+      ]
+    },
+    {
+      "id": "bx-6-english-0017",
+      "grade": 6,
+      "subject": "English",
+      "topic": "Unit 1 vocabulary",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "Choose the meaning of “several”.",
+      "correctAnswer": "a few",
+      "explanation": "“several” means “a few”.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "none",
+        "a few",
+        "a thousand",
+        "one"
+      ]
+    },
+    {
+      "id": "bx-6-english-0018",
+      "grade": 6,
+      "subject": "English",
+      "topic": "Unit 1 vocabulary",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "Choose the meaning of “comfortable”.",
+      "correctAnswer": "relaxed and at ease",
+      "explanation": "“comfortable” means “relaxed and at ease”.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "afraid",
+        "relaxed and at ease",
+        "late",
+        "empty"
+      ]
+    },
+    {
+      "id": "bx-6-english-0019",
+      "grade": 6,
+      "subject": "English",
+      "topic": "Unit 1 vocabulary",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "Choose the meaning of “make a mistake”.",
+      "correctAnswer": "do something wrong",
+      "explanation": "“make a mistake” means “do something wrong”.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "do something wrong",
+        "win",
+        "collect",
+        "arrive"
+      ]
+    },
+    {
+      "id": "bx-6-english-0020",
+      "grade": 6,
+      "subject": "English",
+      "topic": "Unit 1 vocabulary",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "Choose the meaning of “get better”.",
+      "correctAnswer": "recover",
+      "explanation": "“get better” means “recover”.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "leave",
+        "recover",
+        "miss",
+        "hit"
+      ]
+    },
+    {
+      "id": "bx-6-math-0021",
+      "grade": 6,
+      "subject": "Math",
+      "topic": "Arithmetic / fractions / geometry",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "18 - 3 × 4 = ?",
+      "correctAnswer": "6",
+      "explanation": "בדקו את סדר הפעולות או השתמשו בנוסחה המתאימה.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "60",
+        "6",
+        "48",
+        "12"
+      ]
+    },
+    {
+      "id": "bx-6-math-0022",
+      "grade": 6,
+      "subject": "Math",
+      "topic": "Arithmetic / fractions / geometry",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "(18 - 6) × 3 + 4 = ?",
+      "correctAnswer": "40",
+      "explanation": "בדקו את סדר הפעולות או השתמשו בנוסחה המתאימה.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "40",
+        "22",
+        "48",
+        "30"
+      ]
+    },
+    {
+      "id": "bx-6-math-0023",
+      "grade": 6,
+      "subject": "Math",
+      "topic": "Arithmetic / fractions / geometry",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "3/4 of 28 = ?",
+      "correctAnswer": "21",
+      "explanation": "בדקו את סדר הפעולות או השתמשו בנוסחה המתאימה.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "7",
+        "14",
+        "21",
+        "24"
+      ]
+    },
+    {
+      "id": "bx-6-math-0024",
+      "grade": 6,
+      "subject": "Math",
+      "topic": "Arithmetic / fractions / geometry",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "2/5 of 45 = ?",
+      "correctAnswer": "18",
+      "explanation": "בדקו את סדר הפעולות או השתמשו בנוסחה המתאימה.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "9",
+        "18",
+        "20",
+        "25"
+      ]
+    },
+    {
+      "id": "bx-6-math-0025",
+      "grade": 6,
+      "subject": "Math",
+      "topic": "Arithmetic / fractions / geometry",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "Perimeter of a rectangle: length 8 cm, width 5 cm = ?",
+      "correctAnswer": "26 cm",
+      "explanation": "בדקו את סדר הפעולות או השתמשו בנוסחה המתאימה.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "13 cm",
+        "26 cm",
+        "40 cm",
+        "20 cm"
+      ]
+    },
+    {
+      "id": "bx-6-math-0026",
+      "grade": 6,
+      "subject": "Math",
+      "topic": "Arithmetic / fractions / geometry",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "Area of a rectangle: 8 cm by 5 cm = ?",
+      "correctAnswer": "40 cm²",
+      "explanation": "בדקו את סדר הפעולות או השתמשו בנוסחה המתאימה.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "13 cm²",
+        "26 cm²",
+        "40 cm²",
+        "80 cm²"
+      ]
+    },
+    {
+      "id": "bx-6-math-0027",
+      "grade": 6,
+      "subject": "Math",
+      "topic": "Arithmetic / fractions / geometry",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "Area of a triangle: base 10 cm, height 6 cm = ?",
+      "correctAnswer": "30 cm²",
+      "explanation": "בדקו את סדר הפעולות או השתמשו בנוסחה המתאימה.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "16 cm²",
+        "30 cm²",
+        "60 cm²",
+        "20 cm²"
+      ]
+    },
+    {
+      "id": "bx-6-math-0028",
+      "grade": 6,
+      "subject": "Math",
+      "topic": "Arithmetic / fractions / geometry",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "Area of a parallelogram: base 9 cm, height 4 cm = ?",
+      "correctAnswer": "36 cm²",
+      "explanation": "בדקו את סדר הפעולות או השתמשו בנוסחה המתאימה.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "13 cm²",
+        "26 cm²",
+        "36 cm²",
+        "18 cm²"
+      ]
+    },
+    {
+      "id": "bx-6-math-0029",
+      "grade": 6,
+      "subject": "Math",
+      "topic": "Arithmetic / fractions / geometry",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "3,596 + 4,728 = ?",
+      "correctAnswer": "8324",
+      "explanation": "בדקו את סדר הפעולות או השתמשו בנוסחה המתאימה.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "8224",
+        "8324",
+        "8424",
+        "8323"
+      ]
+    },
+    {
+      "id": "bx-6-math-0030",
+      "grade": 6,
+      "subject": "Math",
+      "topic": "Arithmetic / fractions / geometry",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "326 × 24 = ?",
+      "correctAnswer": "7824",
+      "explanation": "בדקו את סדר הפעולות או השתמשו בנוסחה המתאימה.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "7624",
+        "7824",
+        "7924",
+        "7842"
+      ]
+    },
+    {
+      "id": "bx-6-math-0031",
+      "grade": 6,
+      "subject": "Math",
+      "topic": "Arithmetic / fractions / geometry",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "8,736 ÷ 12 = ?",
+      "correctAnswer": "728",
+      "explanation": "בדקו את סדר הפעולות או השתמשו בנוסחה המתאימה.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "708",
+        "728",
+        "738",
+        "782"
+      ]
+    },
+    {
+      "id": "bx-6-math-0032",
+      "grade": 6,
+      "subject": "Math",
+      "topic": "Arithmetic / fractions / geometry",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "A shop had 240 pencils, sold 85 and received 60. How many now? = ?",
+      "correctAnswer": "215",
+      "explanation": "בדקו את סדר הפעולות או השתמשו בנוסחה המתאימה.",
+      "sourceTag": "prior_grade6_materials",
+      "status": "draft",
+      "options": [
+        "155",
+        "195",
+        "215",
+        "385"
+      ]
+    },
+    {
+      "id": "bx-6-hebrew-0033",
+      "grade": 6,
+      "subject": "Hebrew",
+      "topic": "הבנת הנקרא",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "מהו הרעיון המרכזי של טקסט?",
+      "correctAnswer": "המסר העיקרי של הטקסט",
+      "explanation": "שימו לב למשמעות ולתפקיד המילים במשפט.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "שם הדמות",
+        "המסר העיקרי של הטקסט",
+        "המילה הראשונה",
+        "מספר השורות"
+      ]
+    },
+    {
+      "id": "bx-6-hebrew-0034",
+      "grade": 6,
+      "subject": "Hebrew",
+      "topic": "חלקי דיבר",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "איזו מילה היא פועל?",
+      "correctAnswer": "רצה",
+      "explanation": "שימו לב למשמעות ולתפקיד המילים במשפט.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "מהיר",
+        "רצה",
+        "שולחן",
+        "ירוק"
+      ]
+    },
+    {
+      "id": "bx-6-hebrew-0035",
+      "grade": 6,
+      "subject": "Hebrew",
+      "topic": "זמני הפועל",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "מהו זמן הפועל ״כתבתי״?",
+      "correctAnswer": "עבר",
+      "explanation": "שימו לב למשמעות ולתפקיד המילים במשפט.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "עבר",
+        "הווה",
+        "עתיד",
+        "ציווי"
+      ]
+    },
+    {
+      "id": "bx-6-hebrew-0036",
+      "grade": 6,
+      "subject": "Hebrew",
+      "topic": "יחיד ורבים",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "מהי צורת הרבים של ״ילדה״?",
+      "correctAnswer": "ילדות",
+      "explanation": "שימו לב למשמעות ולתפקיד המילים במשפט.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "ילדים",
+        "ילדות",
+        "ילדיםות",
+        "ילדהים"
+      ]
+    },
+    {
+      "id": "bx-6-hebrew-0037",
+      "grade": 6,
+      "subject": "Hebrew",
+      "topic": "קשרים לוגיים",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "איזה משפט כולל סיבה ותוצאה?",
+      "correctAnswer": "ירד גשם ולכן נשארנו בבית.",
+      "explanation": "שימו לב למשמעות ולתפקיד המילים במשפט.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "הספר על המדף.",
+        "ירד גשם ולכן נשארנו בבית.",
+        "הילד הגבוה רץ.",
+        "מחר יום שלישי."
+      ]
+    },
+    {
+      "id": "bx-6-hebrew-0038",
+      "grade": 6,
+      "subject": "Hebrew",
+      "topic": "אוצר מילים",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "מהו הניגוד של ״נדיב״?",
+      "correctAnswer": "קמצן",
+      "explanation": "שימו לב למשמעות ולתפקיד המילים במשפט.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "אמיץ",
+        "קמצן",
+        "חכם",
+        "עליז"
+      ]
+    },
+    {
+      "id": "bx-6-hebrew-0039",
+      "grade": 6,
+      "subject": "Hebrew",
+      "topic": "חלקי דיבר",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "איזו מילה היא שם תואר?",
+      "correctAnswer": "מרתק",
+      "explanation": "שימו לב למשמעות ולתפקיד המילים במשפט.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "קרא",
+        "ספר",
+        "מרתק",
+        "אתמול"
+      ]
+    },
+    {
+      "id": "bx-6-hebrew-0040",
+      "grade": 6,
+      "subject": "Hebrew",
+      "topic": "הסקת מסקנות",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "איזו שאלה דורשת הסקת מסקנה?",
+      "correctAnswer": "מדוע לדעתך הדמות שתקה?",
+      "explanation": "שימו לב למשמעות ולתפקיד המילים במשפט.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "מה שם הדמות?",
+        "כמה ילדים הופיעו?",
+        "מדוע לדעתך הדמות שתקה?",
+        "באיזה יום התרחש הסיפור?"
+      ]
+    },
+    {
+      "id": "bx-3-math-0041",
+      "grade": 3,
+      "subject": "Math",
+      "topic": "לוח הכפל",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "7 × 8 = ?",
+      "correctAnswer": "56",
+      "explanation": "נסו לפתור ואז לבדוק בעזרת הפעולה ההפוכה.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "54",
+        "56",
+        "58",
+        "64"
+      ]
+    },
+    {
+      "id": "bx-3-math-0042",
+      "grade": 3,
+      "subject": "Math",
+      "topic": "חילוק",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "63 ÷ 9 = ?",
+      "correctAnswer": "7",
+      "explanation": "נסו לפתור ואז לבדוק בעזרת הפעולה ההפוכה.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "6",
+        "7",
+        "8",
+        "9"
+      ]
+    },
+    {
+      "id": "bx-3-math-0043",
+      "grade": 3,
+      "subject": "Math",
+      "topic": "חיבור",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "345 + 278 = ?",
+      "correctAnswer": "623",
+      "explanation": "נסו לפתור ואז לבדוק בעזרת הפעולה ההפוכה.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "613",
+        "623",
+        "633",
+        "523"
+      ]
+    },
+    {
+      "id": "bx-3-math-0044",
+      "grade": 3,
+      "subject": "Math",
+      "topic": "חיסור",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "800 - 365 = ?",
+      "correctAnswer": "435",
+      "explanation": "נסו לפתור ואז לבדוק בעזרת הפעולה ההפוכה.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "425",
+        "435",
+        "445",
+        "535"
+      ]
+    },
+    {
+      "id": "bx-3-math-0045",
+      "grade": 3,
+      "subject": "Math",
+      "topic": "ערך המקום",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "מהו ערך הספרה 6 במספר 6,284?",
+      "correctAnswer": "6000",
+      "explanation": "נסו לפתור ואז לבדוק בעזרת הפעולה ההפוכה.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "6",
+        "60",
+        "600",
+        "6000"
+      ]
+    },
+    {
+      "id": "bx-3-math-0046",
+      "grade": 3,
+      "subject": "Math",
+      "topic": "שברים",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "מהו חצי מ-18?",
+      "correctAnswer": "9",
+      "explanation": "נסו לפתור ואז לבדוק בעזרת הפעולה ההפוכה.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "6",
+        "8",
+        "9",
+        "12"
+      ]
+    },
+    {
+      "id": "bx-3-math-0047",
+      "grade": 3,
+      "subject": "Math",
+      "topic": "שברים",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "מהו רבע מ-20?",
+      "correctAnswer": "5",
+      "explanation": "נסו לפתור ואז לבדוק בעזרת הפעולה ההפוכה.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "4",
+        "5",
+        "10",
+        "15"
+      ]
+    },
+    {
+      "id": "bx-3-math-0048",
+      "grade": 3,
+      "subject": "Math",
+      "topic": "סדרות",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "מהו המספר הבא: 5, 10, 15, 20, __?",
+      "correctAnswer": "25",
+      "explanation": "נסו לפתור ואז לבדוק בעזרת הפעולה ההפוכה.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "21",
+        "24",
+        "25",
+        "30"
+      ]
+    },
+    {
+      "id": "bx-3-math-0049",
+      "grade": 3,
+      "subject": "Math",
+      "topic": "בעיות מילוליות",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "לנועה היו 24 מדבקות. היא חילקה אותן שווה בשווה ל-4 חברים. כמה קיבל כל חבר?",
+      "correctAnswer": "6",
+      "explanation": "נסו לפתור ואז לבדוק בעזרת הפעולה ההפוכה.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "4",
+        "5",
+        "6",
+        "8"
+      ]
+    },
+    {
+      "id": "bx-3-math-0050",
+      "grade": 3,
+      "subject": "Math",
+      "topic": "זמן",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "השעה 14:30. מה תהיה השעה בעוד שעה?",
+      "correctAnswer": "15:30",
+      "explanation": "נסו לפתור ואז לבדוק בעזרת הפעולה ההפוכה.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "14:45",
+        "15:00",
+        "15:30",
+        "16:30"
+      ]
+    },
+    {
+      "id": "bx-3-math-0051",
+      "grade": 3,
+      "subject": "Math",
+      "topic": "גאומטריה",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "למלבן צלעות באורך 4 ו-6 ס״מ. מה ההיקף?",
+      "correctAnswer": "20",
+      "explanation": "נסו לפתור ואז לבדוק בעזרת הפעולה ההפוכה.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "10",
+        "20",
+        "24",
+        "12"
+      ]
+    },
+    {
+      "id": "bx-3-math-0052",
+      "grade": 3,
+      "subject": "Math",
+      "topic": "השוואת מספרים",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "איזה מספר גדול יותר?",
+      "correctAnswer": "407",
+      "explanation": "נסו לפתור ואז לבדוק בעזרת הפעולה ההפוכה.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "370",
+        "407",
+        "399",
+        "400"
+      ]
+    },
+    {
+      "id": "bx-3-hebrew-0053",
+      "grade": 3,
+      "subject": "Hebrew",
+      "topic": "הפכים",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "מהי המילה ההפוכה ל״גדול״?",
+      "correctAnswer": "קטן",
+      "explanation": "קראו את השאלה ובחרו בתשובה המתאימה.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "ארוך",
+        "קטן",
+        "גבוה",
+        "רחב"
+      ]
+    },
+    {
+      "id": "bx-3-hebrew-0054",
+      "grade": 3,
+      "subject": "Hebrew",
+      "topic": "יחיד ורבים",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "מהו הרבים של ״ספר״?",
+      "correctAnswer": "ספרים",
+      "explanation": "קראו את השאלה ובחרו בתשובה המתאימה.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "ספרות",
+        "ספרים",
+        "ספרותים",
+        "ספרה"
+      ]
+    },
+    {
+      "id": "bx-3-hebrew-0055",
+      "grade": 3,
+      "subject": "Hebrew",
+      "topic": "חלקי דיבר",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "איזו מילה היא פועל?",
+      "correctAnswer": "קפץ",
+      "explanation": "קראו את השאלה ובחרו בתשובה המתאימה.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "כדור",
+        "קפץ",
+        "כחול",
+        "גדול"
+      ]
+    },
+    {
+      "id": "bx-3-hebrew-0056",
+      "grade": 3,
+      "subject": "Hebrew",
+      "topic": "זכר ונקבה",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "מהו הנקבה של ״תלמיד״?",
+      "correctAnswer": "תלמידה",
+      "explanation": "קראו את השאלה ובחרו בתשובה המתאימה.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "תלמידים",
+        "תלמידה",
+        "תלמידות",
+        "לימוד"
+      ]
+    },
+    {
+      "id": "bx-3-hebrew-0057",
+      "grade": 3,
+      "subject": "Hebrew",
+      "topic": "סימני פיסוק",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "איזה סימן מופיע בסוף משפט שאלה?",
+      "correctAnswer": "?",
+      "explanation": "קראו את השאלה ובחרו בתשובה המתאימה.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        ".",
+        "!",
+        "?",
+        ","
+      ]
+    },
+    {
+      "id": "bx-3-hebrew-0058",
+      "grade": 3,
+      "subject": "Hebrew",
+      "topic": "זמני הפועל",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "מהו הזמן של הפועל ״אכל״?",
+      "correctAnswer": "עבר",
+      "explanation": "קראו את השאלה ובחרו בתשובה המתאימה.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "עבר",
+        "הווה",
+        "עתיד",
+        "ציווי"
+      ]
+    },
+    {
+      "id": "bx-3-hebrew-0059",
+      "grade": 3,
+      "subject": "Hebrew",
+      "topic": "בניית משפטים",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "איזה משפט כתוב בסדר הגיוני?",
+      "correctAnswer": "הילדה קראה ספר.",
+      "explanation": "קראו את השאלה ובחרו בתשובה המתאימה.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "ספר קראה הילדה.",
+        "קראה הילדה ספר.",
+        "הילדה קראה ספר.",
+        "ילדה הספר קראה."
+      ]
+    },
+    {
+      "id": "bx-3-hebrew-0060",
+      "grade": 3,
+      "subject": "Hebrew",
+      "topic": "אוצר מילים",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "איזו מילה מתארת צבע?",
+      "correctAnswer": "אדום",
+      "explanation": "קראו את השאלה ובחרו בתשובה המתאימה.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "ריצה",
+        "אדום",
+        "אוכל",
+        "שינה"
+      ]
+    },
+    {
+      "id": "bx-3-hebrew-0061",
+      "grade": 3,
+      "subject": "Hebrew",
+      "topic": "הפכים",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "מהו ההפך של ״שמח״?",
+      "correctAnswer": "עצוב",
+      "explanation": "קראו את השאלה ובחרו בתשובה המתאימה.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "עליז",
+        "עצוב",
+        "נעים",
+        "נחמד"
+      ]
+    },
+    {
+      "id": "bx-3-hebrew-0062",
+      "grade": 3,
+      "subject": "Hebrew",
+      "topic": "צלילים",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "איזו מילה מתחרזת עם ״אור״?",
+      "correctAnswer": "קור",
+      "explanation": "קראו את השאלה ובחרו בתשובה המתאימה.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "מים",
+        "קור",
+        "ילד",
+        "בית"
+      ]
+    },
+    {
+      "id": "bx-3-english-0063",
+      "grade": 3,
+      "subject": "English",
+      "topic": "Animals",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "Choose the word for כלב.",
+      "correctAnswer": "dog",
+      "explanation": "Read the question and choose the correct answer.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "cat",
+        "dog",
+        "bird",
+        "fish"
+      ]
+    },
+    {
+      "id": "bx-3-english-0064",
+      "grade": 3,
+      "subject": "English",
+      "topic": "Home",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "Choose the word for בית.",
+      "correctAnswer": "house",
+      "explanation": "Read the question and choose the correct answer.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "school",
+        "house",
+        "book",
+        "tree"
+      ]
+    },
+    {
+      "id": "bx-3-english-0065",
+      "grade": 3,
+      "subject": "English",
+      "topic": "Basic sentences",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "I ___ happy.",
+      "correctAnswer": "am",
+      "explanation": "Read the question and choose the correct answer.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "is",
+        "are",
+        "am",
+        "be"
+      ]
+    },
+    {
+      "id": "bx-3-english-0066",
+      "grade": 3,
+      "subject": "English",
+      "topic": "Basic sentences",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "She ___ my friend.",
+      "correctAnswer": "is",
+      "explanation": "Read the question and choose the correct answer.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "am",
+        "are",
+        "is",
+        "be"
+      ]
+    },
+    {
+      "id": "bx-3-english-0067",
+      "grade": 3,
+      "subject": "English",
+      "topic": "Plural nouns",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "Choose the plural of cat.",
+      "correctAnswer": "cats",
+      "explanation": "Read the question and choose the correct answer.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "cates",
+        "cats",
+        "caties",
+        "cat"
+      ]
+    },
+    {
+      "id": "bx-3-english-0068",
+      "grade": 3,
+      "subject": "English",
+      "topic": "Colors",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "Which word means אדום?",
+      "correctAnswer": "red",
+      "explanation": "Read the question and choose the correct answer.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "blue",
+        "green",
+        "red",
+        "yellow"
+      ]
+    },
+    {
+      "id": "bx-3-english-0069",
+      "grade": 3,
+      "subject": "English",
+      "topic": "Days",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "Which word means יום שני?",
+      "correctAnswer": "Monday",
+      "explanation": "Read the question and choose the correct answer.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "Sunday",
+        "Monday",
+        "Friday",
+        "Tuesday"
+      ]
+    },
+    {
+      "id": "bx-3-english-0070",
+      "grade": 3,
+      "subject": "English",
+      "topic": "Food",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "Which word is a fruit?",
+      "correctAnswer": "apple",
+      "explanation": "Read the question and choose the correct answer.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "chair",
+        "apple",
+        "table",
+        "pencil"
+      ]
+    },
+    {
+      "id": "bx-3-english-0071",
+      "grade": 3,
+      "subject": "English",
+      "topic": "Numbers",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "Complete: one, two, ___.",
+      "correctAnswer": "three",
+      "explanation": "Read the question and choose the correct answer.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "four",
+        "five",
+        "three",
+        "ten"
+      ]
+    },
+    {
+      "id": "bx-3-english-0072",
+      "grade": 3,
+      "subject": "English",
+      "topic": "School vocabulary",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "Choose the word for ספר.",
+      "correctAnswer": "book",
+      "explanation": "Read the question and choose the correct answer.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "pen",
+        "bag",
+        "book",
+        "desk"
+      ]
+    },
+    {
+      "id": "bx-3-english-0073",
+      "grade": 3,
+      "subject": "English",
+      "topic": "Simple sentences",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "Which sentence is correct?",
+      "correctAnswer": "I like apples.",
+      "explanation": "Read the question and choose the correct answer.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "I likes apples.",
+        "I like apples.",
+        "I liking apples.",
+        "I am like apples."
+      ]
+    },
+    {
+      "id": "bx-3-english-0074",
+      "grade": 3,
+      "subject": "English",
+      "topic": "Actions",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "question": "Which word means לשחק?",
+      "correctAnswer": "play",
+      "explanation": "Read the question and choose the correct answer.",
+      "sourceTag": "curriculum_enrichment",
+      "status": "draft",
+      "options": [
+        "sleep",
+        "play",
+        "read",
+        "eat"
+      ]
+    }
+  ]
+}

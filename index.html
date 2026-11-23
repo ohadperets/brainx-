@@ -94,17 +94,9 @@
       <div class="modal-header">👋 ברוכים הבאים!</div>
       <p>באיזו כיתה אתה?</p>
       <div class="grade-selector" id="grade-selector">
-        <button class="grade-option" style="display:none" onclick="selectGrade(this, 2)" data-grade="2">
-          <span class="grade-icon">📗</span>
-          <span class="grade-label">כיתה ב׳</span>
-        </button>
         <button class="grade-option selected" onclick="selectGrade(this, 3)" data-grade="3">
           <span class="grade-icon">📙</span>
           <span class="grade-label">כיתה ג׳</span>
-        </button>
-        <button class="grade-option" style="display:none" onclick="selectGrade(this, 5)" data-grade="5">
-          <span class="grade-icon">📘</span>
-          <span class="grade-label">כיתה ה׳</span>
         </button>
         <button class="grade-option" onclick="selectGrade(this, 6)" data-grade="6">
           <span class="grade-icon">📕</span>
@@ -1166,7 +1158,7 @@
         <div class="game-container">
           <div class="dictation-header">
             <h2 style="direction:ltr; text-align:center;">📋 English Tests – 2026</h2>
-            <p id="et-all-tests-subtitle" style="color:#666; margin-bottom:1rem; direction:ltr; text-align:center;">Grade 5 &nbsp;|&nbsp; Choose a test to practise</p>
+            <p id="et-all-tests-subtitle" style="color:#666; margin-bottom:1rem; direction:ltr; text-align:center;">Grade 6 &nbsp;|&nbsp; Choose a test to practise</p>
           </div>
           <div style="display:flex; flex-direction:column; gap:14px;">
             <button class="feature-card" style="background:linear-gradient(135deg,#e3f2fd,#90caf9); padding:24px 20px; text-align:left; direction:ltr;" onclick="navigate('english-test-0626')">
@@ -1211,7 +1203,7 @@
         <div class="game-container">
           <div class="dictation-header">
             <h2 style="direction:ltr; text-align:center;">📋 English Test – June 2026</h2>
-            <p style="color:#666; margin-bottom:0.5rem; direction:ltr; text-align:center;">Grade 5 &nbsp;|&nbsp; 100 Points Total</p>
+            <p style="color:#666; margin-bottom:0.5rem; direction:ltr; text-align:center;">Grade 6 &nbsp;|&nbsp; 100 Points Total</p>
             <div id="et-total-score" style="background:linear-gradient(135deg,#1565c0,#0d47a1);color:white;padding:8px 20px;border-radius:20px;font-weight:700;display:none;text-align:center;margin:8px auto;max-width:240px;font-size:1.1rem;"></div>
           </div>
           <div class="feature-grid" id="et-parts-grid"></div>
@@ -1378,8 +1370,28 @@
       <!-- Admin Quiz Screen (placeholder) -->
       <section id="screen-admin-quiz" class="screen">
         <div class="admin-container">
-          <h2>❓ ניהול חידונים</h2>
-          <p style="color:#666;text-align:center;margin:40px 0">בקרוב...</p>
+          <h2>❓ ניהול חידונים — סקירת שאלות מיובאות</h2>
+          <p class="import-help">שאלות מיובאות נשמרות כטיוטות ואינן מוצגות לתלמידים עד לפרסום. התשובה הנכונה מסומנת בירוק.</p>
+          <div class="import-filters">
+            <select id="admin-import-grade" onchange="renderAdminImportReview()">
+              <option value="all">כל הכיתות</option>
+              <option value="3">כיתה ג׳</option>
+              <option value="6">כיתה ו׳</option>
+            </select>
+            <select id="admin-import-subject" onchange="renderAdminImportReview()">
+              <option value="all">כל המקצועות</option>
+              <option value="hebrew">עברית</option>
+              <option value="english">אנגלית</option>
+              <option value="math">מתמטיקה</option>
+            </select>
+            <select id="admin-import-status" onchange="renderAdminImportReview()">
+              <option value="draft">טיוטות</option>
+              <option value="published">מפורסמות</option>
+              <option value="all">הכל</option>
+            </select>
+          </div>
+          <p id="admin-import-summary" class="import-summary"></p>
+          <div id="admin-import-list"></div>
           <button class="btn-secondary" onclick="navigate('admin-dashboard')">חזרה</button>
         </div>
       </section>
@@ -1411,6 +1423,7 @@
   </div>
 
   <script src="data.js"></script>
+  <script src="content-imports.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

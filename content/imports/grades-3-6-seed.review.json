@@ -1,0 +1,243 @@
+{
+  "reviewedAt": "2026-11-23",
+  "reviewer": "Claude (pending human review)",
+  "summary": "All 74 answers were checked by hand. One item is ambiguous (rejected), one had broken wording (fixed). Generic explanations were replaced with specific ones; geometry and word-problem items were routed to the existing geometry quiz and word-problems game.",
+  "reject": {
+    "bx-3-hebrew-0059": "Ambiguous: the distractor 'קראה הילדה ספר.' is also grammatical (verb-first literary Hebrew), so two options are correct."
+  },
+  "edit": {
+    "bx-6-math-0021": {
+      "explanation": "קודם כפל: 3 × 4 = 12, ואז חיסור: 18 − 12 = 6.",
+      "topic": "סדר פעולות",
+      "note": "specific worked explanation"
+    },
+    "bx-6-math-0022": {
+      "explanation": "קודם סוגריים: 18 − 6 = 12. אחר כך כפל: 12 × 3 = 36. לבסוף חיבור: 36 + 4 = 40.",
+      "topic": "סדר פעולות",
+      "note": "specific worked explanation"
+    },
+    "bx-6-math-0023": {
+      "explanation": "רבע מ-28 הוא 28 ÷ 4 = 7, ושלושה רבעים הם 7 × 3 = 21.",
+      "topic": "שבר מכמות",
+      "note": "specific worked explanation"
+    },
+    "bx-6-math-0024": {
+      "explanation": "חמישית מ-45 היא 45 ÷ 5 = 9, ושתי חמישיות הן 9 × 2 = 18.",
+      "topic": "שבר מכמות",
+      "note": "specific worked explanation"
+    },
+    "bx-6-math-0025": {
+      "explanation": "היקף מלבן = 2 × (אורך + רוחב) = 2 × (8 + 5) = 26 ס״מ.",
+      "topic": "היקף ושטח",
+      "target": "math.geometryQuiz",
+      "note": "worked explanation; routed to existing geometry quiz"
+    },
+    "bx-6-math-0026": {
+      "explanation": "שטח מלבן = אורך × רוחב = 8 × 5 = 40 סמ״ר.",
+      "topic": "היקף ושטח",
+      "target": "math.geometryQuiz",
+      "note": "worked explanation; routed to existing geometry quiz"
+    },
+    "bx-6-math-0027": {
+      "explanation": "שטח משולש = (בסיס × גובה) ÷ 2 = (10 × 6) ÷ 2 = 30 סמ״ר.",
+      "topic": "היקף ושטח",
+      "target": "math.geometryQuiz",
+      "note": "worked explanation; routed to existing geometry quiz"
+    },
+    "bx-6-math-0028": {
+      "explanation": "שטח מקבילית = בסיס × גובה = 9 × 4 = 36 סמ״ר.",
+      "topic": "היקף ושטח",
+      "target": "math.geometryQuiz",
+      "note": "worked explanation; routed to existing geometry quiz"
+    },
+    "bx-6-math-0029": {
+      "explanation": "חיבור במאונך: 3,596 + 4,728 = 8,324. בדיקה: 8,324 − 4,728 = 3,596.",
+      "topic": "ארבע פעולות חשבון",
+      "note": "specific worked explanation"
+    },
+    "bx-6-math-0030": {
+      "explanation": "326 × 20 = 6,520 ו-326 × 4 = 1,304. ביחד: 6,520 + 1,304 = 7,824.",
+      "topic": "ארבע פעולות חשבון",
+      "note": "specific worked explanation"
+    },
+    "bx-6-math-0031": {
+      "explanation": "בדיקה בעזרת כפל: 728 × 12 = 8,736.",
+      "topic": "ארבע פעולות חשבון",
+      "note": "specific worked explanation"
+    },
+    "bx-6-math-0032": {
+      "question": "A shop had 240 pencils. It sold 85 and then received 60 more. How many pencils does it have now?",
+      "explanation": "240 − 85 = 155, ואז 155 + 60 = 215.",
+      "topic": "בעיות מילוליות",
+      "target": "mathWordProblems",
+      "note": "fixed wording (removed stray '= ?'); worked explanation; routed to word problems"
+    },
+    "bx-3-math-0042": {
+      "explanation": "9 × 7 = 63, לכן 63 ÷ 9 = 7.",
+      "note": "specific worked explanation"
+    },
+    "bx-3-math-0043": {
+      "explanation": "345 + 278 = 623. בדיקה: 623 − 278 = 345.",
+      "note": "specific worked explanation"
+    },
+    "bx-3-math-0044": {
+      "explanation": "800 − 365 = 435. בדיקה: 435 + 365 = 800.",
+      "note": "specific worked explanation"
+    },
+    "bx-3-math-0045": {
+      "explanation": "הספרה 6 נמצאת במקום האלפים, ולכן ערכה 6,000.",
+      "note": "specific worked explanation"
+    },
+    "bx-3-math-0046": {
+      "explanation": "חצי זה לחלק ל-2: 18 ÷ 2 = 9.",
+      "note": "specific worked explanation"
+    },
+    "bx-3-math-0047": {
+      "explanation": "רבע זה לחלק ל-4: 20 ÷ 4 = 5.",
+      "note": "specific worked explanation"
+    },
+    "bx-3-math-0048": {
+      "explanation": "הסדרה עולה ב-5 בכל פעם: 20 + 5 = 25.",
+      "note": "specific worked explanation"
+    },
+    "bx-3-math-0049": {
+      "explanation": "מחלקים שווה בשווה: 24 ÷ 4 = 6.",
+      "note": "specific worked explanation"
+    },
+    "bx-3-math-0050": {
+      "explanation": "מוסיפים שעה אחת: 14:30 ← 15:30.",
+      "note": "specific worked explanation"
+    },
+    "bx-3-math-0051": {
+      "options": [
+        "10 ס״מ",
+        "20 ס״מ",
+        "24 ס״מ",
+        "12 ס״מ"
+      ],
+      "correctAnswer": "20 ס״מ",
+      "explanation": "היקף = סכום כל הצלעות: 4 + 6 + 4 + 6 = 20 ס״מ.",
+      "note": "added units to options; worked explanation"
+    },
+    "bx-3-math-0052": {
+      "explanation": "407 גדול מ-400, ואילו 370 ו-399 קטנים מ-400.",
+      "note": "specific worked explanation"
+    },
+    "bx-6-hebrew-0033": {
+      "explanation": "הרעיון המרכזי הוא המסר העיקרי שהכותב רוצה להעביר — לא פרט אחד מתוך הטקסט.",
+      "note": "specific explanation"
+    },
+    "bx-6-hebrew-0034": {
+      "explanation": "פועל מתאר פעולה. ״רצה״ היא פעולה; ״מהיר״ ו״ירוק״ הם שמות תואר, ״שולחן״ הוא שם עצם.",
+      "note": "specific explanation"
+    },
+    "bx-6-hebrew-0035": {
+      "explanation": "הסיומת ״־תי״ מציינת פעולה שכבר קרתה בגוף ראשון — זמן עבר.",
+      "note": "specific explanation"
+    },
+    "bx-6-hebrew-0036": {
+      "explanation": "שם עצם בנקבה המסתיים ב״־ה״ מקבל ברבים סיומת ״־ות״: ילדה ← ילדות.",
+      "note": "specific explanation"
+    },
+    "bx-6-hebrew-0037": {
+      "explanation": "המילה ״ולכן״ מקשרת בין סיבה (ירד גשם) לתוצאה (נשארנו בבית).",
+      "note": "specific explanation"
+    },
+    "bx-6-hebrew-0038": {
+      "explanation": "נדיב הוא מי שנותן בקלות; ההפך שלו הוא קמצן — מי שלא אוהב לתת.",
+      "note": "specific explanation"
+    },
+    "bx-6-hebrew-0039": {
+      "explanation": "שם תואר מתאר שם עצם: ספר מרתק. ״קרא״ הוא פועל, ״ספר״ שם עצם, ״אתמול״ תיאור זמן.",
+      "note": "specific explanation"
+    },
+    "bx-6-hebrew-0040": {
+      "explanation": "התשובה לא כתובה במפורש בטקסט — צריך להסיק אותה מהרמזים. לכן ״מדוע לדעתך…״ דורשת הסקה.",
+      "note": "specific explanation"
+    },
+    "bx-3-hebrew-0053": {
+      "explanation": "ההפך של גדול הוא קטן.",
+      "note": "specific explanation"
+    },
+    "bx-3-hebrew-0054": {
+      "explanation": "ספר הוא שם עצם בזכר, וברבים מוסיפים ״־ים״: ספרים.",
+      "note": "specific explanation"
+    },
+    "bx-3-hebrew-0055": {
+      "explanation": "פועל הוא מילה של פעולה — ״קפץ״ זה משהו שעושים.",
+      "note": "specific explanation"
+    },
+    "bx-3-hebrew-0056": {
+      "explanation": "לצורת הנקבה מוסיפים ״־ה״: תלמיד ← תלמידה.",
+      "note": "specific explanation"
+    },
+    "bx-3-hebrew-0057": {
+      "explanation": "בסוף משפט שאלה שמים סימן שאלה (?).",
+      "note": "specific explanation"
+    },
+    "bx-3-hebrew-0058": {
+      "explanation": "״אכל״ מספר על משהו שכבר קרה — זמן עבר.",
+      "note": "specific explanation"
+    },
+    "bx-3-hebrew-0060": {
+      "explanation": "אדום הוא צבע. שאר המילים הן פעולות או דברים.",
+      "note": "specific explanation"
+    },
+    "bx-3-hebrew-0061": {
+      "explanation": "ההפך של שמח הוא עצוב. ״עליז״ דומה ל״שמח״.",
+      "note": "specific explanation"
+    },
+    "bx-3-hebrew-0062": {
+      "explanation": "״אור״ ו״קור״ נגמרות באותו צליל: ־וֹר.",
+      "note": "specific explanation"
+    },
+    "bx-3-english-0063": {
+      "explanation": "dog = כלב. cat = חתול, bird = ציפור, fish = דג.",
+      "note": "specific explanation"
+    },
+    "bx-3-english-0064": {
+      "explanation": "house = בית. school = בית ספר.",
+      "note": "specific explanation"
+    },
+    "bx-3-english-0065": {
+      "explanation": "With I we use am: I am happy.",
+      "note": "specific explanation"
+    },
+    "bx-3-english-0066": {
+      "explanation": "With she / he / it we use is: She is my friend.",
+      "note": "specific explanation"
+    },
+    "bx-3-english-0067": {
+      "explanation": "Most nouns take -s in the plural: cat → cats.",
+      "note": "specific explanation"
+    },
+    "bx-3-english-0068": {
+      "explanation": "red = אדום. blue = כחול, green = ירוק, yellow = צהוב.",
+      "note": "specific explanation"
+    },
+    "bx-3-english-0069": {
+      "explanation": "Monday = יום שני. Sunday = יום ראשון.",
+      "note": "specific explanation"
+    },
+    "bx-3-english-0070": {
+      "explanation": "An apple is a fruit. A chair, a table and a pencil are not food.",
+      "note": "specific explanation"
+    },
+    "bx-3-english-0071": {
+      "explanation": "one, two, three — 1, 2, 3.",
+      "note": "specific explanation"
+    },
+    "bx-3-english-0072": {
+      "explanation": "book = ספר. pen = עט, bag = תיק, desk = שולחן.",
+      "note": "specific explanation"
+    },
+    "bx-3-english-0073": {
+      "explanation": "With I we use the base verb: I like apples.",
+      "note": "specific explanation"
+    },
+    "bx-3-english-0074": {
+      "explanation": "play = לשחק. sleep = לישון, read = לקרוא, eat = לאכול.",
+      "note": "specific explanation"
+    }
+  }
+}

@@ -3411,3 +3411,19 @@ body.theme-pink .app-header {
   color: #1b5e20;
   font-weight: 600;
 }
+
+/* ===== Admin: imported content review ===== */
+.import-help, .import-summary { color: #666; text-align: center; font-size: 0.9rem; margin: 8px 0; }
+.import-filters { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 12px 0; }
+.import-filters select { padding: 8px 10px; border-radius: 10px; border: 1px solid #cbd5e0; background: #fff; font-family: inherit; }
+.import-card { text-align: start; }
+.import-card .quiz-question { font-size: 1.05rem; margin: 10px 0; }
+.import-meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 0.82rem; color: #4a5568; }
+.import-meta code { font-size: 0.75rem; color: #718096; }
+.import-badge { padding: 2px 10px; border-radius: 999px; font-weight: 700; font-size: 0.75rem; }
+.import-badge.draft { background: #fefcbf; color: #975a16; }
+.import-badge.published { background: #c6f6d5; color: #22543d; }
+.import-options { display: grid; gap: 6px; }
+.import-options .quiz-option { cursor: default; }
+.import-note { font-size: 0.8rem; color: #718096; margin-top: 6px; }
+

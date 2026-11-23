@@ -161,7 +161,6 @@
 
         <!-- Grade 6 Dictation -->
         <div id="home-grade6-dictation-card" class="daily-challenge-card" style="display:none;" onclick="navigate('grade6-dictation')">
-          <div class="dc-new-badge">חדש!</div>
           <div class="dc-icon">🎓</div>
           <div class="dc-info">
             <div class="dc-title">הכתבה לכיתה ו׳</div>
@@ -247,7 +246,7 @@
           <div id="quiz-question" class="quiz-question"></div>
           <div id="quiz-options" class="quiz-options"></div>
           <div id="quiz-feedback" class="quiz-feedback hidden"></div>
-          <button id="quiz-next" class="btn-primary hidden" onclick="nextQuestion()">השאלה הבאה →</button>
+          <button id="quiz-next" class="btn-primary hidden" onclick="AutoAdvance.next(nextQuestion)">השאלה הבאה →</button>
         </div>
         <div id="quiz-results" class="quiz-results hidden">
           <div class="results-emoji" id="results-emoji"></div>
@@ -315,7 +314,7 @@
             <div class="feature-name">מתמטיקה מהירה</div>
             <div class="feature-desc">פתור תרגילים בזמן!</div>
           </button>
-          <button class="feature-card" style="background:linear-gradient(135deg,#e0f7fa,#b2ebf2)" onclick="navigate('game-fill-blank')">
+          <button id="game-fill-blank-btn" class="feature-card" style="background:linear-gradient(135deg,#e0f7fa,#b2ebf2)" onclick="navigate('game-fill-blank')">
             <div class="feature-icon">✏️</div>
             <div class="feature-name">השלם את החסר</div>
             <div class="feature-desc">מלא את המילה החסרה</div>
@@ -508,7 +507,7 @@
             <button id="btn-general-dictation" class="feature-card" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb)" onclick="showGeneralDictationMenu()">
               <div class="feature-icon">📖</div>
               <div class="feature-name">הכתבה כללי</div>
-              <div class="feature-desc">100 מילים רנדומליות</div>
+              <div class="feature-desc">10 מילים אקראיות בכל סיבוב</div>
             </button>
             <button id="btn-grade6-dictation" class="feature-card" style="background:linear-gradient(135deg,#ede7f6,#d1c4e9); display:none;" onclick="navigate('grade6-dictation')">
               <div class="feature-icon">🎓</div>
@@ -661,7 +660,7 @@
           <div id="geo-question" class="quiz-question"></div>
           <div id="geo-options" class="quiz-options"></div>
           <div id="geo-feedback" class="quiz-feedback hidden"></div>
-          <button id="geo-next" class="btn-primary hidden" onclick="nextGeoQuestion()">השאלה הבאה →</button>
+          <button id="geo-next" class="btn-primary hidden" onclick="AutoAdvance.next(nextGeoQuestion)">השאלה הבאה →</button>
           <div id="geo-results" class="quiz-results hidden">
             <h2 id="geo-results-title"></h2>
             <p id="geo-results-text"></p>
@@ -687,7 +686,7 @@
           <div id="mul-question" class="quiz-question" style="direction:ltr; text-align:center;"></div>
           <div id="mul-options" class="quiz-options" style="direction:ltr;"></div>
           <div id="mul-feedback" class="quiz-feedback hidden"></div>
-          <button id="mul-next" class="btn-primary hidden" onclick="nextMulQuestion()">השאלה הבאה →</button>
+          <button id="mul-next" class="btn-primary hidden" onclick="AutoAdvance.next(nextMulQuestion)">השאלה הבאה →</button>
           <div id="mul-results" class="quiz-results hidden">
             <h2 id="mul-results-title"></h2>
             <p id="mul-results-text"></p>
@@ -713,7 +712,7 @@
           <div id="grammar-question" class="quiz-question" style="direction:ltr; text-align:left;"></div>
           <div id="grammar-options" class="quiz-options"></div>
           <div id="grammar-feedback" class="quiz-feedback hidden"></div>
-          <button id="grammar-next" class="btn-primary hidden" onclick="nextGrammarQuestion()">השאלה הבאה →</button>
+          <button id="grammar-next" class="btn-primary hidden" onclick="AutoAdvance.next(nextGrammarQuestion)">השאלה הבאה →</button>
           <div id="grammar-results" class="quiz-results hidden">
             <h2 id="grammar-results-title"></h2>
             <p id="grammar-results-text"></p>
@@ -740,7 +739,7 @@
             <div id="reading-question" class="quiz-question" style="direction:ltr; text-align:left;"></div>
             <div id="reading-options" class="quiz-options"></div>
             <div id="reading-feedback" class="quiz-feedback hidden"></div>
-            <button id="reading-next" class="btn-primary hidden" onclick="nextReadingQuestion()">השאלה הבאה →</button>
+            <button id="reading-next" class="btn-primary hidden" onclick="AutoAdvance.next(nextReadingQuestion)">השאלה הבאה →</button>
             <div id="reading-results" class="quiz-results hidden">
               <h2 id="reading-results-title"></h2>
               <p id="reading-results-text"></p>
@@ -766,7 +765,7 @@
           <div id="writing-sentence" class="quiz-question" style="direction:ltr; text-align:left; font-size:1.2rem;"></div>
           <div id="writing-options" class="quiz-options"></div>
           <div id="writing-feedback" class="quiz-feedback hidden"></div>
-          <button id="writing-next" class="btn-primary hidden" onclick="nextWritingQuestion()">השאלה הבאה →</button>
+          <button id="writing-next" class="btn-primary hidden" onclick="AutoAdvance.next(nextWritingQuestion)">השאלה הבאה →</button>
           <div id="writing-results" class="quiz-results hidden">
             <h2 id="writing-results-title"></h2>
             <p id="writing-results-text"></p>
@@ -800,7 +799,7 @@
         <div class="game-container">
           <div class="dictation-header">
             <h2>🏆 הכנה למבחן הגדול - מתמטיקה</h2>
-            <p style="color: #666; margin-bottom: 1rem;">כיתה ה' - 15.3.2026</p>
+            <p style="color: #666; margin-bottom: 1rem;">כיתה ו׳ · תרגול לפי נושאים</p>
           </div>
           <div class="feature-grid">
             <button class="feature-card" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9)" onclick="navigate('math-big-natural')">
@@ -845,7 +844,7 @@
           <div id="math-natural-hint" style="color:#888; font-size:0.9rem; margin-bottom:0.5rem;"></div>
           <div id="math-natural-options" class="quiz-options"></div>
           <div id="math-natural-feedback" class="quiz-feedback hidden"></div>
-          <button id="math-natural-next" class="btn-primary hidden" onclick="nextMathNaturalQuestion()">השאלה הבאה →</button>
+          <button id="math-natural-next" class="btn-primary hidden" onclick="AutoAdvance.next(nextMathNaturalQuestion)">השאלה הבאה →</button>
           <div id="math-natural-results" class="quiz-results hidden">
             <h2 id="math-natural-results-title"></h2>
             <p id="math-natural-results-text"></p>
@@ -872,7 +871,7 @@
           <div id="math-fractions-hint" style="color:#888; font-size:0.9rem; margin-bottom:0.5rem;"></div>
           <div id="math-fractions-options" class="quiz-options"></div>
           <div id="math-fractions-feedback" class="quiz-feedback hidden"></div>
-          <button id="math-fractions-next" class="btn-primary hidden" onclick="nextMathFractionsQuestion()">השאלה הבאה →</button>
+          <button id="math-fractions-next" class="btn-primary hidden" onclick="AutoAdvance.next(nextMathFractionsQuestion)">השאלה הבאה →</button>
           <div id="math-fractions-results" class="quiz-results hidden">
             <h2 id="math-fractions-results-title"></h2>
             <p id="math-fractions-results-text"></p>
@@ -899,7 +898,7 @@
           <div id="math-decimals-hint" style="color:#888; font-size:0.9rem; margin-bottom:0.5rem;"></div>
           <div id="math-decimals-options" class="quiz-options"></div>
           <div id="math-decimals-feedback" class="quiz-feedback hidden"></div>
-          <button id="math-decimals-next" class="btn-primary hidden" onclick="nextMathDecimalsQuestion()">השאלה הבאה →</button>
+          <button id="math-decimals-next" class="btn-primary hidden" onclick="AutoAdvance.next(nextMathDecimalsQuestion)">השאלה הבאה →</button>
           <div id="math-decimals-results" class="quiz-results hidden">
             <h2 id="math-decimals-results-title"></h2>
             <p id="math-decimals-results-text"></p>
@@ -926,7 +925,7 @@
           <div id="math-geometry-hint" style="color:#888; font-size:0.9rem; margin-bottom:0.5rem;"></div>
           <div id="math-geometry-options" class="quiz-options"></div>
           <div id="math-geometry-feedback" class="quiz-feedback hidden"></div>
-          <button id="math-geometry-next" class="btn-primary hidden" onclick="nextMathGeometryQuestion()">השאלה הבאה →</button>
+          <button id="math-geometry-next" class="btn-primary hidden" onclick="AutoAdvance.next(nextMathGeometryQuestion)">השאלה הבאה →</button>
           <div id="math-geometry-results" class="quiz-results hidden">
             <h2 id="math-geometry-results-title"></h2>
             <p id="math-geometry-results-text"></p>
@@ -1177,19 +1176,16 @@
               <div style="font-size:0.88rem; color:#ad1457; margin-top:4px;">Test 3 &nbsp;|&nbsp; ⏰ Time · 🔤 Pronouns · ✏️ Grammar · 📍 Prepositions · 📖 Reading</div>
             </button>
             <button class="feature-card" style="background:linear-gradient(135deg,#fff3e0,#ffcc80); padding:24px 20px; text-align:left; direction:ltr; position:relative;" onclick="navigate('english-test-4')">
-              <div class="dc-new-badge">NEW!</div>
               <div style="font-size:2rem; margin-bottom:6px;">📝</div>
               <div style="font-size:1.1rem; font-weight:800; color:#e65100;">English Test – September 2026</div>
               <div style="font-size:0.88rem; color:#bf360c; margin-top:4px;">Test 4 &nbsp;|&nbsp; ⏰ Time · 🔤 Pronouns · ✏️ Grammar · 📍 Prepositions · 📖 Reading</div>
             </button>
             <button class="feature-card" style="background:linear-gradient(135deg,#f3e5f5,#ce93d8); padding:24px 20px; text-align:left; direction:ltr; position:relative;" onclick="navigate('english-test-5')">
-              <div class="dc-new-badge">NEW!</div>
               <div style="font-size:2rem; margin-bottom:6px;">📝</div>
               <div style="font-size:1.1rem; font-weight:800; color:#4a148c;">English Test – October 2026</div>
               <div style="font-size:0.88rem; color:#6a1b9a; margin-top:4px;">Test 5 &nbsp;|&nbsp; ⏰ Time · 🔤 Pronouns · ✏️ Grammar · 📍 Prepositions · 📖 Reading</div>
             </button>
             <button class="feature-card" style="background:linear-gradient(135deg,#e8f5e9,#80cbc4); padding:24px 20px; text-align:left; direction:ltr; position:relative;" onclick="navigate('english-test-6')">
-              <div class="dc-new-badge">NEW!</div>
               <div style="font-size:2rem; margin-bottom:6px;">📝</div>
               <div style="font-size:1.1rem; font-weight:800; color:#004d40;">English Test – November 2026</div>
               <div style="font-size:0.88rem; color:#00695c; margin-top:4px;">Test 6 &nbsp;|&nbsp; ⏰ Time · 🔤 Pronouns · ✏️ Grammar · 📍 Prepositions · 📖 Reading</div>
@@ -1424,6 +1420,8 @@
   </div>
 
   <script src="version.js"></script>
+  <script src="core/timers.js"></script>
+  <script src="core/feedback.js"></script>
   <script src="data.js"></script>
   <script src="content-imports.js"></script>
   <script src="app.js"></script>

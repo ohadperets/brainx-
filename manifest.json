@@ -1,7 +1,7 @@
 {
-  "name": "BrainX - לימודים לכיתה ה׳",
+  "name": "BrainX - לימודים לכיתות ג׳ ו־ו׳",
   "short_name": "BrainX",
-  "description": "אפליקציית לימודים לכיתה ה׳ - עברית, אנגלית ומתמטיקה",
+  "description": "אפליקציית לימודים לכיתות ג׳ ו־ו׳ - עברית, אנגלית ומתמטיקה",
   "start_url": "/index.html",
   "display": "standalone",
   "orientation": "portrait",

@@ -1,0 +1,22 @@
+{
+  "_note": "Shape of data saved by BrainX before the redesign (v62). The smoke test sets the grade to 2 or 5 to check the legacy-grade migration.",
+  "users": [
+    { "id": "user_legacy_1", "name": "נועה", "avatar": "🦊", "grade": 5, "createdAt": 1735689600000 }
+  ],
+  "progress": {
+    "stars": 137,
+    "streak": 4,
+    "lastActiveDate": "Sun Nov 22 2026",
+    "gamesPlayed": 42,
+    "balloonGames": 5,
+    "memoryGames": 3,
+    "hangmanWins": 2,
+    "mathRaces": 1,
+    "dictationsCompleted": 2,
+    "unlockedAchievements": ["first-lesson"],
+    "dailyChallengeDate": null,
+    "hebrew": { "lessonsRead": [1], "quizScores": [80] },
+    "english": { "lessonsRead": [], "quizScores": [] },
+    "math": { "lessonsRead": [], "quizScores": [70] }
+  }
+}

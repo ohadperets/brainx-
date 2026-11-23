@@ -8,6 +8,8 @@ const ASSETS = [
   '/styles.css',
   '/app.js',
   '/version.js',
+  '/core/timers.js',
+  '/core/feedback.js',
   '/data.js',
   '/content-imports.js',
   '/manifest.json',
@@ -38,27 +40,43 @@ self.addEventListener('activate', event => {
 });
 
 // Fetch
+// - The app's own pages/code/data (same origin: HTML, JS, CSS, JSON): NETWORK FIRST, so a new
+//   release is used on the first open; falls back to the cache when offline.
+// - Everything else (icons, fonts, images): CACHE FIRST.
+function isAppShell(url, request) {
+  if (url.origin !== self.location.origin) return false;
+  if (request.mode === 'navigate') return true;
+  return /\.(html|js|css|json)$/.test(url.pathname) || url.pathname === '/';
+}
+
+function putInCache(request, response) {
+  if (response && response.status === 200 && response.type === 'basic') {
+    const copy = response.clone();
+    caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
+  }
+  return response;
+}
+
 self.addEventListener('fetch', event => {
   // Only handle GET requests with http/https
   if (event.request.method !== 'GET') return;
   if (!event.request.url.startsWith('http')) return;
-  
+  const url = new URL(event.request.url);
+
+  if (isAppShell(url, event.request)) {
+    event.respondWith(
+      // cache: 'no-cache' revalidates with the server (304 if unchanged), bypassing the 1h HTTP cache
+      // (fetch by URL: a 'navigate' request can't be re-issued with options)
+      fetch(url.href, { cache: 'no-cache', credentials: 'same-origin' })
+        .then(res => putInCache(event.request, res))
+        .catch(() => caches.match(event.request).then(cached =>
+          cached || (event.request.mode === 'navigate' ? caches.match('/index.html') : undefined)))
+    );
+    return;
+  }
+
   event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request).then(fetchRes => {
-        // Only cache successful responses
-        if (!fetchRes || fetchRes.status !== 200 || fetchRes.type !== 'basic') {
-          return fetchRes;
-        }
-        return caches.open(CACHE_NAME).then(cache => {
-          cache.put(event.request, fetchRes.clone());
-          return fetchRes;
-        });
-      });
-    }).catch(() => {
-      if (event.request.mode === 'navigate') {
-        return caches.match('/index.html');
-      }
-    })
+    caches.match(event.request).then(cached =>
+      cached || fetch(event.request).then(res => putInCache(event.request, res)))
   );
 });

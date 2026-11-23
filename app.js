@@ -14,11 +14,11 @@ let dailyChallengeState = {};
 let currentUserId = null;
 
 // ===== SOUND EFFECTS =====
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+// audioCtx / ensureAudio() live in core/feedback.js (created on first tap).
 
 function playSound(type) {
   try {
-    if (audioCtx.state === 'suspended') audioCtx.resume();
+    if (!ensureAudio()) return;
     const now = audioCtx.currentTime;
     
     switch(type) {
@@ -158,7 +158,6 @@ function showPointsPopup(points, x, y) {
   popup.style.left = (x || window.innerWidth / 2) + 'px';
   popup.style.top = (y || window.innerHeight / 2) + 'px';
   document.body.appendChild(popup);
-  playSound('points');
   setTimeout(() => popup.classList.add('animate'), 10);
   setTimeout(() => popup.remove(), 1000);
 }
@@ -805,16 +804,26 @@ function goHome() {
   navigate('home');
 }
 
+// Stop everything that belongs to the screen being left (timers, game clocks, speech).
+function stopScreenActivity() {
+  T.clearAll();
+  if (typeof raceState !== 'undefined' && raceState) { raceState.timer = null; raceState.active = false; }
+  if (typeof speedMathState !== 'undefined' && speedMathState) { speedMathState.timer = null; speedMathState.active = false; }
+}
+
 function navigate(screen, subject, skipHistory = false) {
-  if (currentScreen !== screen || (subject !== undefined && subject !== currentSubject)) {
+  stopScreenActivity();
+  const screenChanged = currentScreen !== screen || (subject !== undefined && subject !== currentSubject);
+  if (screenChanged) {
     screenHistory.push({ screen: currentScreen, subject: currentSubject });
   }
 
   currentScreen = screen;
   if (subject !== undefined) currentSubject = subject;
 
-  // Update browser history for back button support
-  if (!skipHistory && !isNavigatingBack) {
+  // Update browser history for back button support (re-opening the same screen, e.g.
+  // "play again", must not add an extra history entry)
+  if (!skipHistory && !isNavigatingBack && (screenChanged || screen === 'home')) {
     const state = { screen, subject: currentSubject };
     if (screen === 'home') {
       history.replaceState(state, '', location.pathname);
@@ -895,12 +904,23 @@ function navigate(screen, subject, skipHistory = false) {
       // Hide Speed Math in non-math subjects
       const speedMathBtn = document.getElementById('game-speed-math-btn');
       if (speedMathBtn) speedMathBtn.style.display = currentSubject === 'math' ? '' : 'none';
-      // Hide Spelling Bee in Hebrew and Math
+      // Games are shown only when the current grade has content for them
+      // (grade 3 has no spelling list, word problems, or fill-blank sources for English/Math).
+      const gd = getData();
+      const has = arr => Array.isArray(arr) && arr.length > 0;
+      // Spelling Bee: English only
       const spellingBtn = document.getElementById('game-spelling-btn');
-      if (spellingBtn) spellingBtn.style.display = (currentSubject === 'hebrew' || currentSubject === 'math') ? 'none' : '';
-      // Hide Word Problems in non-math subjects (math only)
+      if (spellingBtn) spellingBtn.style.display = (currentSubject === 'english' && has(gd.generalDictation)) ? '' : 'none';
+      // Word Problems: math only
       const wpBtn = document.getElementById('game-word-problems-btn');
-      if (wpBtn) wpBtn.style.display = currentSubject === 'math' ? '' : 'none';
+      if (wpBtn) wpBtn.style.display = (currentSubject === 'math' && has(gd.mathWordProblems)) ? '' : 'none';
+      // Fill in the blank: needs a source for the current subject
+      const fillBtn = document.getElementById('game-fill-blank-btn');
+      if (fillBtn) {
+        const fillSource = currentSubject === 'english' ? gd.bigExam?.grammar
+          : currentSubject === 'math' ? gd.mathBigExam?.fractions : gd.hebrew?.quiz;
+        fillBtn.style.display = has(fillSource) ? '' : 'none';
+      }
       break;
 
     case 'game-hangman':
@@ -1015,6 +1035,25 @@ function navigate(screen, subject, skipHistory = false) {
       document.getElementById('screen-dictation-typing').classList.add('active');
       headerTitle.textContent = 'הכתבה';
       startDictation();
+      break;
+
+    // Shows the dictation screen for a session that was already prepared
+    // (test-prep / general dictation) — does not start a new one.
+    case 'dictation-session':
+      document.getElementById('screen-dictation-typing').classList.add('active');
+      headerTitle.textContent = 'הכתבה';
+      break;
+
+    // Word match round already prepared by startGeneralWordMatch()
+    case 'word-match-session':
+      document.getElementById('screen-word-match').classList.add('active');
+      headerTitle.textContent = 'חבר מילים';
+      break;
+
+    // Grade 6 word match: state prepared by startGrade6WordMatch()
+    case 'grade6-word-match':
+      document.getElementById('screen-word-match').classList.add('active');
+      headerTitle.textContent = 'הכתבה לכיתה ו׳ - התאמה';
       break;
 
     case 'grade6-dictation':
@@ -1285,10 +1324,8 @@ window.addEventListener('popstate', (event) => {
     screenHistory = tempHistory;
   } else if (currentScreen !== 'home') {
     navigate('home', undefined, true);
-  } else {
-    // Already at home - push state back to prevent exit
-    history.pushState({ screen: 'home' }, '', location.pathname);
   }
+  // At Home there is nothing to go back to: let the browser/OS handle it (exits the app).
   isNavigatingBack = false;
 });
 
@@ -1325,7 +1362,7 @@ function updateSubjectFeatures() {
       <button class="feature-card big-exam-card" style="grid-column: 1 / -1; background:linear-gradient(135deg,#ffd54f,#ffb300); padding: 32px 16px;" onclick="navigate('math-big-exam')">
         <div class="feature-icon" style="font-size:2.5rem">🏆</div>
         <div class="feature-name" style="font-size:1.3rem; font-weight:800">הכנה למבחן הגדול - מתמטיקה</div>
-        <div class="feature-desc" style="font-size:0.95rem">15.3.2026 - התכונן למבחן!</div>
+        <div class="feature-desc" style="font-size:0.95rem">מספרים, שברים, עשרוניים וגאומטריה</div>
       </button>`;
     }
     if (grade === 3) {
@@ -1338,7 +1375,7 @@ function updateSubjectFeatures() {
     }
   }
 
-  if (currentSubject === 'hebrew') {
+  if (currentSubject === 'hebrew' && (getData().readingComprehension || []).length > 0) {
     html += `
     <button class="feature-card" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9)" onclick="navigate('reading-comp')">
       <div class="feature-icon">📖</div>
@@ -1352,7 +1389,7 @@ function updateSubjectFeatures() {
     <button class="feature-card" style="background:linear-gradient(135deg,#fff3e0,#ffe0b2)" onclick="navigate('dictation')">
       <div class="feature-icon">📝</div>
       <div class="feature-name">הכתבה באנגלית</div>
-      <div class="feature-desc">הכנה למבחן והכתבה כללי</div>
+      <div class="feature-desc">${normalizeGrade(profile?.grade) === 6 ? 'הכנה למבחן והכתבה כללי' : 'הכנה למבחן'}</div>
     </button>`;
 
     const grade = normalizeGrade(profile?.grade);
@@ -1658,7 +1695,7 @@ function selectAnswer(index) {
   const nextBtn = document.getElementById('quiz-next');
   nextBtn.classList.remove('hidden');
   nextBtn.classList.add('btn-timer-fill');
-  setTimeout(() => nextQuestion(), showExplanation ? 4500 : 2000);
+  AutoAdvance.schedule(showExplanation ? 4500 : 2000, nextQuestion, nextBtn);
 
   if (quizState.current === quizState.questions.length - 1) {
     nextBtn.textContent = 'סיום ←';
@@ -2250,7 +2287,7 @@ function startRace() {
 
   generateRaceQuestion();
 
-  raceState.timer = setInterval(() => {
+  raceState.timer = T.every(() => {
     raceState.timeLeft--;
     document.getElementById('race-timer').textContent = raceState.timeLeft;
     if (raceState.timeLeft <= 0) {
@@ -2542,7 +2579,7 @@ function startSpeedMath() {
   
   generateSpeedMathProblem();
   
-  speedMathState.timer = setInterval(() => {
+  speedMathState.timer = T.every(() => {
     speedMathState.timeLeft--;
     document.getElementById('speed-math-timer').textContent = speedMathState.timeLeft;
     if (speedMathState.timeLeft <= 0) endSpeedMath();
@@ -3296,7 +3333,7 @@ function renderDailyChallengeQuestion(container) {
     <div class="quiz-options">${q.options.map((opt, i) =>
       `<button class="quiz-option" onclick="dailyChallengeAnswer(${i})">${opt}</button>`
     ).join('')}</div>
-    <button id="dc-next" class="btn-primary hidden" onclick="nextDailyChallenge()">הבא →</button>`;
+    <button id="dc-next" class="btn-primary hidden" onclick="AutoAdvance.next(nextDailyChallenge)">הבא →</button>`;
 }
 
 function dailyChallengeAnswer(index) {
@@ -3320,7 +3357,7 @@ function dailyChallengeAnswer(index) {
   const nextBtn = document.getElementById('dc-next');
   nextBtn.classList.remove('hidden');
   nextBtn.classList.add('btn-timer-fill');
-  setTimeout(() => nextDailyChallenge(), 2000);
+  AutoAdvance.schedule(2000, nextDailyChallenge, nextBtn);
   if (dailyChallengeState.current === dailyChallengeState.questions.length - 1) {
     nextBtn.textContent = 'סיום ←';
   }
@@ -3390,10 +3427,8 @@ function startTestPrepDictation() {
   if (counter) counter.style.display = '';
 
   // Navigate to dictation typing screen
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-dictation-typing').classList.add('active');
+  navigate('dictation-session');
   document.getElementById('header-title').textContent = 'הכנה למבחן';
-  history.pushState({ screen: 'dictation-test-prep' }, '', '');
 
   renderDictationWord();
 }
@@ -3429,10 +3464,8 @@ function startGeneralDictation() {
   if (counter) counter.style.display = '';
 
   // Navigate to dictation typing screen
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-dictation-typing').classList.add('active');
+  navigate('dictation-session');
   document.getElementById('header-title').textContent = 'הכתבה כללי';
-  history.pushState({ screen: 'dictation-general-typing' }, '', '');
 
   renderDictationWord();
 }
@@ -3676,7 +3709,7 @@ function answerGeo(btn, isCorrect) {
   const geoNext = document.getElementById('geo-next');
   geoNext.classList.remove('hidden');
   geoNext.classList.add('btn-timer-fill');
-  setTimeout(() => nextGeoQuestion(), 2000);
+  AutoAdvance.schedule(2000, nextGeoQuestion, geoNext);
 }
 
 function nextGeoQuestion() {
@@ -3755,7 +3788,7 @@ function answerMul(btn, isCorrect) {
   const mulNext = document.getElementById('mul-next');
   mulNext.classList.remove('hidden');
   mulNext.classList.add('btn-timer-fill');
-  setTimeout(() => nextMulQuestion(), 2000);
+  AutoAdvance.schedule(2000, nextMulQuestion, mulNext);
 }
 
 function nextMulQuestion() {
@@ -3840,7 +3873,7 @@ function answerGrammar(selected) {
   const grammarNext = document.getElementById('grammar-next');
   grammarNext.classList.remove('hidden');
   grammarNext.classList.add('btn-timer-fill');
-  setTimeout(() => nextGrammarQuestion(), 2000);
+  AutoAdvance.schedule(2000, nextGrammarQuestion, grammarNext);
 }
 
 function nextGrammarQuestion() {
@@ -3920,7 +3953,7 @@ function answerReading(selected) {
   const readingNext = document.getElementById('reading-next');
   readingNext.classList.remove('hidden');
   readingNext.classList.add('btn-timer-fill');
-  setTimeout(() => nextReadingQuestion(), 2000);
+  AutoAdvance.schedule(2000, nextReadingQuestion, readingNext);
 }
 
 function nextReadingQuestion() {
@@ -3995,7 +4028,7 @@ function answerWriting(selected) {
   const writingNext = document.getElementById('writing-next');
   writingNext.classList.remove('hidden');
   writingNext.classList.add('btn-timer-fill');
-  setTimeout(() => nextWritingQuestion(), 2000);
+  AutoAdvance.schedule(2000, nextWritingQuestion, writingNext);
 }
 
 function nextWritingQuestion() {
@@ -4185,7 +4218,7 @@ function answerMathNatural(btn, isCorrect) {
   const nextBtn = document.getElementById('math-natural-next');
   nextBtn.classList.remove('hidden');
   nextBtn.classList.add('btn-timer-fill');
-  setTimeout(() => nextMathNaturalQuestion(), 2000);
+  AutoAdvance.schedule(2000, nextMathNaturalQuestion, nextBtn);
 }
 
 function nextMathNaturalQuestion() {
@@ -4269,7 +4302,7 @@ function answerMathFractions(btn, isCorrect) {
   const nextBtn = document.getElementById('math-fractions-next');
   nextBtn.classList.remove('hidden');
   nextBtn.classList.add('btn-timer-fill');
-  setTimeout(() => nextMathFractionsQuestion(), 2000);
+  AutoAdvance.schedule(2000, nextMathFractionsQuestion, nextBtn);
 }
 
 function nextMathFractionsQuestion() {
@@ -4353,7 +4386,7 @@ function answerMathDecimals(btn, isCorrect) {
   const nextBtn = document.getElementById('math-decimals-next');
   nextBtn.classList.remove('hidden');
   nextBtn.classList.add('btn-timer-fill');
-  setTimeout(() => nextMathDecimalsQuestion(), 2000);
+  AutoAdvance.schedule(2000, nextMathDecimalsQuestion, nextBtn);
 }
 
 function nextMathDecimalsQuestion() {
@@ -4437,7 +4470,7 @@ function answerMathGeometry(btn, isCorrect) {
   const nextBtn = document.getElementById('math-geometry-next');
   nextBtn.classList.remove('hidden');
   nextBtn.classList.add('btn-timer-fill');
-  setTimeout(() => nextMathGeometryQuestion(), 2000);
+  AutoAdvance.schedule(2000, nextMathGeometryQuestion, nextBtn);
 }
 
 function nextMathGeometryQuestion() {
@@ -4463,16 +4496,14 @@ function showMathGeometryResults() {
 // ===== WORD MATCHING GAME =====
 let matchState = {};
 
-function startGeneralWordMatch() {
-  // Use words from generalDictation pool
-  const data = getData();
-  const generalWords = data.generalDictation || [];
-  const dictWords = generalWords.map(w => ({ hebrew: w.hebrewHint, english: w.word }));
-  
-  // Shuffle and take 10 random words
+// Prepare a word-match round from {hebrewHint, word} pairs (up to 10, shuffled).
+function setupWordMatch(pairs, restartFnName) {
+  const dictWords = pairs
+    .filter(w => w && w.word && w.hebrewHint)
+    .map(w => ({ hebrew: w.hebrewHint, english: w.word }));
   shuffle(dictWords);
   const words = dictWords.slice(0, 10);
-  
+
   const hebrewWords = words.map(w => ({ text: w.hebrew, pairId: w.english }));
   const englishWords = words.map(w => ({ text: w.english, pairId: w.english }));
   shuffle(englishWords);
@@ -4483,7 +4514,7 @@ function startGeneralWordMatch() {
     selected: null,
     matched: 0,
     total: words.length,
-    restartFnName: 'startGeneralWordMatch'
+    restartFnName
   };
 
   document.getElementById('match-score').textContent = '0';
@@ -4491,17 +4522,29 @@ function startGeneralWordMatch() {
   document.getElementById('match-result').classList.add('hidden');
   document.getElementById('match-lines').innerHTML = '';
   renderMatchWords();
-  // Navigate manually without triggering startWordMatch()
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-word-match').classList.add('active');
-  document.querySelector('.app-header h1').textContent = 'חבר מילים';
+}
+
+// Weekly dictation lists that have English↔Hebrew pairs (the teacher's custom list first).
+function getMergedDictation() {
+  const data = getData();
+  const weeks = (data.dictation || []).map(w => ({ title: w.week || w.title || '', words: w.words || [] }));
+  const custom = getCustomDictation();
+  if (Array.isArray(custom) && custom.length) weeks.unshift({ title: 'הכתבה שבועית', words: custom });
+  return weeks.filter(w => w.words.some(x => x && x.word && x.hebrewHint));
+}
+
+function startGeneralWordMatch() {
+  // Use words from generalDictation pool
+  setupWordMatch(getData().generalDictation || [], 'startGeneralWordMatch');
+  navigate('word-match-session');
 }
 
 function startWordMatch() {
-  // Use words from selected dictation week
+  // Use words from selected dictation week (falls back to the general word pool)
   const data = getMergedDictation();
-  const weekData = data[selectedDictationWeek];
-  const dictWords = weekData.words.map(w => ({ hebrew: w.hebrewHint, english: w.word }));
+  const weekData = data[selectedDictationWeek] || data[0];
+  if (!weekData) { setupWordMatch(getData().generalDictation || [], 'startWordMatch'); return; }
+  const dictWords = weekData.words.filter(w => w && w.word && w.hebrewHint).map(w => ({ hebrew: w.hebrewHint, english: w.word }));
   
   // Take up to 10 words
   shuffle(dictWords);
@@ -5409,10 +5452,7 @@ function startGrade6WordMatch() {
   document.getElementById('match-lines').innerHTML = '';
   renderMatchWords();
 
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-word-match').classList.add('active');
-  document.querySelector('.app-header h1').textContent = 'הכתבה לכיתה ו׳ - התאמה';
-  history.pushState({ screen: 'grade6-word-match' }, '', '');
+  navigate('grade6-word-match');
 }
 
 // ===== FIREBASE CLOUD SYNC =====

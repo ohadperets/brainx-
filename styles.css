@@ -3427,3 +3427,6 @@ body.theme-pink .app-header {
 .import-options .quiz-option { cursor: default; }
 .import-note { font-size: 0.8rem; color: #718096; margin-top: 6px; }
 
+/* ===== Version footer ===== */
+.app-version-footer { text-align: center; font-size: 0.72rem; color: #a0aec0; padding: 16px 0 8px; user-select: text; }
+

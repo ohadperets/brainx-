@@ -114,8 +114,9 @@ node tools/import-content.mjs --publish "pack:<dataset name>"
 node tools/import-content.mjs --unpublish <ids>
 ```
 Publishing only edits `content-imports.js`. The site updates when the change is committed and
-pushed to `main`, which deploys to Firebase. Commit and push only when the user asks. When you
-change `content-imports.js`, bump `CACHE_NAME` in `sw.js` so installed apps fetch the new file.
+pushed to `main`, which deploys to Firebase. Commit and push only when the user asks. For every
+release, bump `APP_VERSION` (and `APP_BUILD_DATE`) in `version.js`. The service-worker cache name
+and the "Op2 production · vNN" footer both come from it.
 
 ## Larger content (reading passages, vocabulary, games)
 The importer handles multiple-choice questions only. Reading passages

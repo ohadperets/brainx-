@@ -6489,3 +6489,10 @@ function renderAdminImportReview() {
     </div>`).join('');
 }
 
+// ===== VERSION FOOTER =====
+(function renderVersionFooter() {
+  const el = document.getElementById('app-version-footer');
+  if (!el || typeof APP_VERSION === 'undefined') return;
+  el.textContent = `${APP_CHANNEL} · v${APP_VERSION} · ${APP_BUILD_DATE}`;
+})();
+

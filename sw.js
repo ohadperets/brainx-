@@ -1,11 +1,13 @@
 // ===== SERVICE WORKER — Offline Support =====
 
-const CACHE_NAME = 'brainx-v61';
+importScripts('/version.js');
+const CACHE_NAME = `brainx-v${APP_VERSION}`;
 const ASSETS = [
   '/',
   '/index.html',
   '/styles.css',
   '/app.js',
+  '/version.js',
   '/data.js',
   '/content-imports.js',
   '/manifest.json',

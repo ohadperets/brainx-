@@ -57,6 +57,7 @@ function finishGame(o = {}) {
 
   let best = null;
   let isRecord = false;
+  let xpResult = null;
   if (typeof currentUserId !== 'undefined' && currentUserId) {
     progress.stars = (progress.stars || 0) + stars;
     progress.lastResult = { gameId: o.gameId || null, stars, pct, at: Date.now() };
@@ -67,10 +68,15 @@ function finishGame(o = {}) {
       best = (getHighScores()[o.gameId] || {}).score ?? null;
       isRecord = saveHighScore(o.gameId, o.score);
     }
+    if (typeof awardRoundXp === 'function') {
+      xpResult = awardRoundXp({ correct, total, pct, stars, daily: !!o.daily });
+      saveProgress(progress);
+    }
   }
 
   lastFinishedGame = o;
-  showResultsCard({ ...o, pct, stars, best, isRecord, correct, total });
+  showResultsCard({ ...o, pct, stars, best, isRecord, correct, total, xp: xpResult });
+  if (xpResult && xpResult.leveledUp) T.after(() => playSound('levelup'), 600 + stars * 260 + 900);
 
   // sounds: one sparkle per star, then a win jingle + confetti for 2–3 stars
   for (let i = 0; i < stars; i++) T.after(() => playSound('star'), 350 + i * 260);
@@ -119,6 +125,7 @@ function showResultsCard(r) {
         <div class="rc-stat"><div class="rc-stat-value">+${r.stars} ⭐</div><div class="rc-stat-label">כוכבים</div></div>
       </div>
       ${bestLine}
+      ${r.xp ? xpBlock(r.xp) : ''}
       <div class="rc-actions">
         ${typeof r.replay === 'function' ? '<button class="results-btn results-btn-primary" data-action="replay">🔄 שחק שוב</button>' : ''}
         <button class="results-btn" data-action="close">📋 לפרטים</button>
@@ -135,6 +142,20 @@ function showResultsCard(r) {
   document.body.appendChild(overlay);
   const primary = overlay.querySelector('[data-action="replay"]') || overlay.querySelector('[data-action="close"]');
   if (primary && primary.focus) T.after(() => primary.focus(), 50);
+}
+
+function xpBlock(x) {
+  const lv = x.info;
+  let html = `<div class="rc-xp">
+      <div class="rc-xp-row"><span class="rc-level">רמה ${lv.level}</span><span class="rc-xp-gain">+${x.gained} XP${x.firstToday ? ' · בונוס יומי' : ''}</span></div>
+      <div class="rc-xp-track"><div class="rc-xp-fill" style="width:${lv.pct}%"></div></div>
+      <div class="rc-xp-next">${lv.into} / ${lv.needed} XP לרמה ${lv.level + 1}</div>
+    </div>`;
+  if (x.leveledUp) {
+    const items = [...x.unlocked.avatars, ...x.unlocked.themes.map(t => `ערכת ${t}`)];
+    html += `<div class="rc-levelup">🎉 עלית לרמה ${lv.level}!${items.length ? `<div class="rc-unlocked">נפתח: ${items.map(escapeText).join(' · ')}</div>` : ''}</div>`;
+  }
+  return html;
 }
 
 function closeResultsCard() {

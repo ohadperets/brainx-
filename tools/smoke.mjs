@@ -106,7 +106,7 @@ function makeContext() {
 }
 
 // ---------- load the app ----------
-const SCRIPTS = ['version.js', 'core/timers.js', 'core/feedback.js', 'core/game-kit.js', 'data.js', 'content-imports.js', 'app.js'];
+const SCRIPTS = ['version.js', 'core/timers.js', 'core/feedback.js', 'core/game-kit.js', 'core/rewards.js', 'data.js', 'content-imports.js', 'app.js'];
 const failures = [];
 
 function load(ctx) {
@@ -228,6 +228,45 @@ function run(grade) {
     const r = exec(`(() => { const a = settings.sound; toggleSound(); const b = loadSettings().sound; toggleSound(); return [a, b, loadSettings().sound]; })()`);
     if (r.join(',') !== 'true,false,true') failures.push(`[g${grade}] mute toggle/persist wrong: ${r}`);
   } catch (e) { failures.push(`[g${grade}] sound settings: ${e.message}`); }
+
+  // ---- R3: levels, XP, migration, registry, generated content ----
+  try {
+    const curve = exec('[1,2,3,4,5,10].map(l => levelStartXp(l)).join(",")');
+    if (curve !== '0,100,300,600,1000,4500') failures.push(`[g${grade}] level curve wrong: ${curve}`);
+    const lv = exec('[levelInfo(0).level, levelInfo(99).level, levelInfo(100).level, levelInfo(1370).level].join(",")');
+    if (lv !== '1,1,2,5') failures.push(`[g${grade}] levelInfo wrong: ${lv}`);
+    // legacy fixture: 137 stars, no xp → 1370 XP (level 5); migrating twice changes nothing
+    const mig = exec(`(() => { const p = migrateProgressSchema({ stars: 137 }); const once = p.xp; migrateProgressSchema(p); return [once, p.xp, p.schema]; })()`);
+    if (mig.join(',') !== '1370,1370,2') failures.push(`[g${grade}] migration wrong: ${mig}`);
+    if (exec('progress.xp') < 1370) failures.push(`[g${grade}] legacy user did not get migrated XP: ${exec('progress.xp')}`);
+    const daily = exec('[xpForRound({correct: 4, total: 5, stars: 2}), xpForRound({correct: 4, total: 5, stars: 2, daily: true})].join(",")');
+    if (daily !== '30,60') failures.push(`[g${grade}] daily XP not doubled: ${daily}`);
+    const xpGain = exec(`(() => { const b = progress.xp; navigate('quiz', 'hebrew'); quizState.score = quizState.questions.length; showQuizResults(); return progress.xp - b; })()`);
+    if (!(xpGain > 0)) failures.push(`[g${grade}] finishing a game gave ${xpGain} XP`);
+    exec(`navigate('home')`);
+  } catch (e) { failures.push(`[g${grade}] rewards: ${e.message}`); }
+
+  try {
+    const missing = exec(`GAME_REGISTRY.filter(g => !${JSON.stringify(routes)}.includes(g.route)).map(g => g.route)`);
+    if (missing.length) failures.push(`[g${grade}] registry routes without a screen: ${missing}`);
+    const counts = exec(`ALL_SUBJECTS.map(s => s + ':' + availableGames(s).length).join(' ')`);
+    for (const s of ['hebrew', 'english', 'math']) {
+      exec(`navigate('home')`);
+      for (const g of exec(`availableGames(${JSON.stringify(s)}).map(g => g.route)`)) {
+        try { exec(`navigate(${JSON.stringify(g)}, ${JSON.stringify(s)})`); }
+        catch (e) { failures.push(`[g${grade}/${s}] available game '${g}' failed to open: ${e.message}`); }
+      }
+    }
+    exec(`navigate('home')`);
+    console.log(`grade ${grade}: games per subject — ${counts}`);
+  } catch (e) { failures.push(`[g${grade}] registry: ${e.message}`); }
+
+  try {
+    const bad = exec(`(() => { let bad = 0; for (let i = 0; i < 500; i++) for (const s of ALL_SUBJECTS) for (const st of generateTrueFalseFromQuiz(s)) { if (typeof st.isTrue !== 'boolean' || !st.statement) bad++; } return bad; })()`);
+    if (bad) failures.push(`[g${grade}] ${bad} malformed generated true/false statements`);
+    const fb = exec(`ALL_SUBJECTS.map(s => getFillBlankSource(s).filter(q => !(q.options && q.options[q.answer] !== undefined)).length).join(',')`);
+    if (fb !== '0,0,0') failures.push(`[g${grade}] fill-blank items whose answer is not among the options: ${fb}`);
+  } catch (e) { failures.push(`[g${grade}] generators: ${e.message}`); }
 
   // auto-advance: Next must advance exactly once even with a pending timer
   try {

@@ -14,16 +14,18 @@ const APP_DATA = {
   ],
 
   // ========== AVATARS ==========
-  avatars: ['😎','🦊','🐱','🐶','🦁','🐼','🦄','🌟','🚀','⚡','👑','💎'],
+  // unlock levels live in core/rewards.js (AVATAR_UNLOCKS)
+  avatars: ['😎','🦊','🐱','🐶','🦁','🐼','🦄','🌟','🐯','🐸','🚀','⚡','🦉','🐙','👑','🦖','💎','🏆'],
 
   // ========== THEMES ==========
   themes: [
-    { id: 'default', name: 'ברירת מחדל', color: '#667eea', class: '' },
-    { id: 'ocean', name: 'אוקיינוס', color: '#0ea5e9', class: 'theme-ocean' },
-    { id: 'forest', name: 'יער', color: '#22c55e', class: 'theme-forest' },
-    { id: 'sunset', name: 'שקיעה', color: '#f97316', class: 'theme-sunset' },
-    { id: 'pink', name: 'ורוד', color: '#ec4899', class: 'theme-pink' },
-    { id: 'dark', name: 'כהה', color: '#2d3748', class: 'theme-dark' }
+    { id: 'default', name: 'ברירת מחדל', color: '#4F5BD5', class: '' },
+    { id: 'ocean', name: 'אוקיינוס', color: '#0B7BB5', class: 'theme-ocean' },
+    { id: 'forest', name: 'יער', color: '#2F855A', class: 'theme-forest' },
+    { id: 'sunset', name: 'שקיעה', color: '#C2410C', class: 'theme-sunset' },
+    { id: 'pink', name: 'ורוד', color: '#BE185D', class: 'theme-pink' },
+    { id: 'dark', name: 'כהה', color: '#171B22', class: 'theme-dark' },
+    { id: 'space', name: 'חלל', color: '#6D28D9', class: 'theme-space' }
   ],
 
   // ========== ACHIEVEMENTS ==========

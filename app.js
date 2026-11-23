@@ -355,6 +355,10 @@ function getDefaultProgress() {
     unlockedAchievements: [],
     dailyChallengeDate: null,
     dailyChallengeScore: null,
+    xp: 0,
+    schema: 2,
+    lastXpDate: null,
+    lastPlayed: null,
     hebrew: { quizBest: 0, quizAttempts: 0, flashcardsCompleted: 0, lessonsRead: [] },
     english: { quizBest: 0, quizAttempts: 0, flashcardsCompleted: 0, lessonsRead: [] },
     math: { quizBest: 0, quizAttempts: 0, flashcardsCompleted: 0, lessonsRead: [] }
@@ -366,7 +370,8 @@ function loadProgressForUser(userId) {
   try {
     const data = localStorage.getItem('brainx-progress-' + userId);
     if (data) {
-      const p = JSON.parse(data);
+      // migrate before merging with defaults (defaults already carry the new schema number)
+      const p = migrateProgressSchema(JSON.parse(data));
       const def = getDefaultProgress();
       return { ...def, ...p,
         hebrew: { ...def.hebrew, ...p.hebrew },
@@ -584,9 +589,14 @@ function showProfileSetup(newUser = false) {
   });
 
   const grid = document.getElementById('avatar-grid');
-  grid.innerHTML = APP_DATA.avatars.map((a, i) =>
-    `<button class="avatar-option ${i === 0 ? 'selected' : ''}" onclick="selectAvatar(this, '${a}')" data-avatar="${a}">${a}</button>`
-  ).join('');
+  // Avatars unlock with levels (a new user starts at level 1)
+  const level = newUser ? 1 : currentLevel();
+  grid.innerHTML = APP_DATA.avatars.map((a, i) => {
+    const open = newUser ? (AVATAR_UNLOCKS[a] || 1) <= 1 : isAvatarUnlocked(a, level);
+    return open
+      ? `<button class="avatar-option ${i === 0 ? 'selected' : ''}" onclick="selectAvatar(this, '${a}')" data-avatar="${a}">${a}</button>`
+      : `<button class="avatar-option locked" disabled aria-label="נפתח ברמה ${AVATAR_UNLOCKS[a]}" title="נפתח ברמה ${AVATAR_UNLOCKS[a]}"><span class="avatar-locked-emoji">${a}</span><span class="lock-badge">🔒${AVATAR_UNLOCKS[a]}</span></button>`;
+  }).join('');
 }
 
 let selectedAvatar = '😎';
@@ -671,13 +681,16 @@ function applyTheme(themeId) {
 function renderThemeGrid() {
   const grid = document.getElementById('theme-grid');
   if (!grid) return;
-  grid.innerHTML = APP_DATA.themes.map(t => `
+  const level = currentLevel();
+  grid.innerHTML = APP_DATA.themes.map(t => isThemeUnlocked(t.id, level) ? `
     <button class="theme-option ${settings.theme === t.id ? 'selected' : ''}"
             onclick="applyTheme('${t.id}'); renderThemeGrid();"
             style="background: ${t.color}; color: white;">
       ${t.name}${settings.theme === t.id ? ' ✓' : ''}
-    </button>
-  `).join('');
+    </button>` : `
+    <button class="theme-option locked" disabled style="background: ${t.color}; color: white;" title="נפתח ברמה ${THEME_UNLOCKS[t.id]}">
+      🔒 ${t.name} · רמה ${THEME_UNLOCKS[t.id]}
+    </button>`).join('');
 }
 
 // ===== TEXT-TO-SPEECH (for dictation) =====
@@ -770,6 +783,21 @@ function navigate(screen, subject, skipHistory = false) {
       updateHomeBadges();
       updateHomeGrade6DictationCard();
       updateUIWithProfile();
+      updateHomeHub();
+      break;
+
+    case 'all-games':
+      document.getElementById('screen-all-games').classList.add('active');
+      headerTitle.textContent = 'כל המשחקים';
+      document.getElementById('nav-games').classList.add('active');
+      renderAllGames();
+      break;
+
+    case 'trophies':
+      document.getElementById('screen-trophies').classList.add('active');
+      headerTitle.textContent = 'הישגים ורמות';
+      document.getElementById('nav-trophies').classList.add('active');
+      renderTrophies();
       break;
 
     case 'subject':
@@ -828,11 +856,7 @@ function navigate(screen, subject, skipHistory = false) {
       if (wpBtn) wpBtn.style.display = (currentSubject === 'math' && has(gd.mathWordProblems)) ? '' : 'none';
       // Fill in the blank: needs a source for the current subject
       const fillBtn = document.getElementById('game-fill-blank-btn');
-      if (fillBtn) {
-        const fillSource = currentSubject === 'english' ? gd.bigExam?.grammar
-          : currentSubject === 'math' ? gd.mathBigExam?.fractions : gd.hebrew?.quiz;
-        fillBtn.style.display = has(fillSource) ? '' : 'none';
-      }
+      if (fillBtn) fillBtn.style.display = has(getFillBlankSource(currentSubject)) ? '' : 'none';
       break;
 
     case 'game-hangman':
@@ -1207,6 +1231,7 @@ function navigate(screen, subject, skipHistory = false) {
   }
 
   document.getElementById('main-content').scrollTop = 0;
+  if (typeof findGame === 'function' && findGame(screen)) rememberLastGame(screen, currentSubject);
 }
 
 function goBack() {
@@ -2545,32 +2570,7 @@ function endSpeedMath() {
 let fillBlankState = { questions: [], current: 0, score: 0 };
 
 function startFillBlank() {
-  const data = getData();
-  let questions = [];
-  
-  if (currentSubject === 'english') {
-    // Use grammar questions from big exam prep
-    questions = (data.bigExam?.grammar || []).map(q => ({
-      sentence: q.question,
-      options: q.options,
-      answer: q.options.indexOf(q.answer)
-    }));
-  } else if (currentSubject === 'math') {
-    // Create math fill-in-blank from fractions
-    questions = shuffle([...(data.mathBigExam?.fractions || [])]).slice(0, 10).map(q => ({
-      sentence: q.question,
-      options: q.options,
-      answer: q.correct
-    }));
-  } else {
-    // Hebrew - use quiz questions
-    questions = shuffle([...(data.hebrew?.quiz || [])]).slice(0, 10).map(q => ({
-      sentence: q.question,
-      options: q.options,
-      answer: q.correct
-    }));
-  }
-  
+  const questions = shuffle([...getFillBlankSource(currentSubject)]);
   shuffle(questions);
   fillBlankState = { questions: questions.slice(0, 10), current: 0, score: 0 };
   document.getElementById('fill-blank-result').classList.add('hidden');
@@ -2646,7 +2646,10 @@ let trueFalseState = { questions: [], current: 0, score: 0 };
 function startTrueFalse() {
   let questions = [];
   
-  if (currentSubject === 'math') {
+  if (normalizeGrade(profile?.grade) === 3) {
+    // the curated statements below are grade-6 level; grade 3 uses its own quiz content
+    questions = generateTrueFalseFromQuiz(currentSubject);
+  } else if (currentSubject === 'math') {
     questions = generateMathTrueFalse();
   } else if (currentSubject === 'english') {
     questions = generateEnglishTrueFalse();
@@ -3228,7 +3231,7 @@ function nextDailyChallenge() {
     progress.dailyChallengeDate = new Date().toDateString();
     progress.dailyChallengeScore = percent;
     saveProgress(progress);
-    finishGame({ title: 'אתגר יומי', correct: score, total, summary: 'חזרו מחר לאתגר חדש!' });
+    finishGame({ title: 'אתגר יומי', correct: score, total, daily: true, summary: 'XP כפול! חזרו מחר לאתגר חדש' });
 
     const container = document.getElementById('daily-challenge-container');
     container.innerHTML = `
@@ -6392,3 +6395,189 @@ function renderAdminImportReview() {
   el.textContent = `${APP_CHANNEL} · v${APP_VERSION} · ${APP_BUILD_DATE}`;
 })();
 
+
+// ===== GAME REGISTRY =====
+// One list of every game: route, title, icon, which subjects it belongs to, and whether
+// the current grade has content for it. Used by the "all games" screen and "continue".
+const ALL_SUBJECTS = ['hebrew', 'english', 'math'];
+const SUBJECT_META = {
+  hebrew: { name: 'עברית', icon: '📖' },
+  english: { name: 'אנגלית', icon: '🔤' },
+  math: { name: 'מתמטיקה', icon: '🔢' },
+};
+const hasItems = arr => Array.isArray(arr) && arr.length > 0;
+
+const GAME_REGISTRY = [
+  { route: 'quiz', title: 'חידון', icon: '❓', tone: 'blue', subjects: ALL_SUBJECTS, has: (d, s) => s === 'math' || hasItems(d[s]?.quiz) },
+  { route: 'balloon-pop', title: 'פיצוץ בלונים', icon: '🎈', tone: 'rose', subjects: ALL_SUBJECTS, has: (d, s) => hasItems(d[s]?.flashcards) },
+  { route: 'game-hangman', title: 'תלייה', icon: '🎯', tone: 'orange', subjects: ALL_SUBJECTS, has: (d, s) => hasItems(d.hangman?.[s]) },
+  { route: 'game-memory', title: 'זיכרון', icon: '🧠', tone: 'green', subjects: ALL_SUBJECTS, has: (d, s) => hasItems(d.memory?.[s]) },
+  { route: 'game-race', title: 'מרוץ ידע', icon: '🏎️', tone: 'blue', subjects: ALL_SUBJECTS, has: (d, s) => s === 'math' || hasItems(d[s]?.quiz) },
+  { route: 'game-fill-blank', title: 'השלם את החסר', icon: '✏️', tone: 'teal', subjects: ALL_SUBJECTS, has: (d, s) => hasItems(getFillBlankSource(s)) },
+  { route: 'game-true-false', title: 'נכון או לא', icon: '✅', tone: 'green', subjects: ALL_SUBJECTS, has: () => true },
+  { route: 'game-scramble', title: 'ערבוב מילים', icon: '🔀', tone: 'amber', subjects: ['hebrew'], has: d => hasItems(d.hangman?.hebrew) },
+  { route: 'reading-comp', title: 'הבנת הנקרא', icon: '📖', tone: 'green', subjects: ['hebrew'], has: d => hasItems(d.readingComprehension) },
+  { route: 'game-spelling', title: 'איות', icon: '🐝', tone: 'amber', subjects: ['english'], has: d => hasItems(d.generalDictation) },
+  { route: 'dictation', title: 'הכתבה באנגלית', icon: '📝', tone: 'orange', subjects: ['english'], has: () => true },
+  { route: 'game-speed-math', title: 'מתמטיקה מהירה', icon: '⚡', tone: 'pink', subjects: ['math'], has: () => true },
+  { route: 'game-word-problems', title: 'בעיות מילוליות', icon: '🧩', tone: 'blue', subjects: ['math'], has: d => hasItems(d.mathWordProblems) },
+  { route: 'geometry-quiz', title: 'גאומטריה', icon: '📐', tone: 'green', subjects: ['math'], has: d => hasItems(d.math?.geometryQuiz) },
+  { route: 'multiplication-quiz', title: 'לוח הכפל', icon: '✖️', tone: 'amber', subjects: ['math'], has: d => hasItems(d.math?.multiplicationQuiz) },
+];
+
+function findGame(route) { return GAME_REGISTRY.find(g => g.route === route) || null; }
+
+function availableGames(subject) {
+  const d = getData();
+  return GAME_REGISTRY.filter(g => g.subjects.includes(subject) && g.has(d, subject));
+}
+
+// Remember the last game so Home can offer "continue"
+function rememberLastGame(route, subject) {
+  const g = findGame(route);
+  if (!g || !currentUserId) return;
+  progress.lastPlayed = { route, subject, title: g.title, icon: g.icon, at: Date.now() };
+  saveProgress(progress);
+}
+
+function continueLastGame() {
+  const last = progress.lastPlayed;
+  if (last && findGame(last.route)) navigate(last.route, last.subject);
+}
+
+// ===== HOME HUB =====
+function updateHomeHub() {
+  const info = levelInfo(progress.xp);
+  const set = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
+  set('home-level', `רמה ${info.level}`);
+  set('home-xp-text', `${info.into} / ${info.needed} XP`);
+  set('home-stars', progress.stars || 0);
+  const fill = document.getElementById('home-xp-fill');
+  if (fill) fill.style.width = info.pct + '%';
+
+  const doneToday = progress.dailyChallengeDate === new Date().toDateString();
+  const daily = document.getElementById('home-daily-card');
+  if (daily) daily.classList.toggle('is-done', doneToday);
+  set('home-daily-sub', doneToday
+    ? `✅ הושלם היום (${progress.dailyChallengeScore ?? 0}%) · חזרו מחר`
+    : '5 שאלות מכל המקצועות · XP כפול');
+
+  const last = progress.lastPlayed;
+  const cont = document.getElementById('home-continue-card');
+  if (cont) {
+    const ok = last && findGame(last.route) && (findGame(last.route).has(getData(), last.subject));
+    cont.classList.toggle('hidden', !ok);
+    if (ok) {
+      set('home-continue-icon', last.icon || '▶️');
+      set('home-continue-sub', `${last.title} · ${SUBJECT_META[last.subject]?.name || ''}`);
+    }
+  }
+}
+
+// ===== ALL GAMES SCREEN =====
+function renderAllGames() {
+  const el = document.getElementById('all-games-list');
+  if (!el) return;
+  el.innerHTML = ALL_SUBJECTS.map(subject => {
+    const games = availableGames(subject);
+    if (!games.length) return '';
+    return `<h3 class="section-title">${SUBJECT_META[subject].icon} ${SUBJECT_META[subject].name}</h3>
+      <div class="feature-grid">${games.map(g => `
+        <button class="feature-card" data-tone="${g.tone}" onclick="navigate('${g.route}', '${subject}')">
+          <div class="feature-icon">${g.icon}</div>
+          <div class="feature-name">${g.title}</div>
+        </button>`).join('')}
+      </div>`;
+  }).join('');
+}
+
+// ===== TROPHIES SCREEN =====
+// Level, achievements, and a real leaderboard of the profiles on this device.
+function renderTrophies() {
+  const info = levelInfo(progress.xp);
+  const lv = document.getElementById('trophies-level');
+  if (lv) {
+    const nextUnlock = (() => {
+      for (let l = info.level + 1; l <= info.level + 20; l++) {
+        const u = unlocksAtLevel(l);
+        const items = [...u.avatars, ...u.themes.map(t => `ערכת ${t}`)];
+        if (items.length) return `ברמה ${l} נפתח: ${items.join(' · ')}`;
+      }
+      return '';
+    })();
+    lv.innerHTML = `
+      <div class="trophy-level-badge">${info.level}</div>
+      <div class="trophy-level-info">
+        <div class="trophy-level-title">רמה ${info.level}</div>
+        <div class="home-xp-track"><div class="home-xp-fill" style="width:${info.pct}%"></div></div>
+        <div class="trophy-level-sub">${info.into} / ${info.needed} XP · ⭐ ${progress.stars || 0} כוכבים · 🔥 ${progress.streak || 0} ימים</div>
+        ${nextUnlock ? `<div class="trophy-next">${nextUnlock}</div>` : ''}
+      </div>`;
+  }
+
+  const ach = document.getElementById('trophies-achievements');
+  if (ach) {
+    const unlocked = progress.unlockedAchievements || [];
+    const count = APP_DATA.achievements.filter(a => unlocked.includes(a.id)).length;
+    ach.innerHTML = `<div class="trophy-count">${count} מתוך ${APP_DATA.achievements.length} הישגים</div>
+      <div class="badges-grid">${APP_DATA.achievements.map(a => {
+        const has = unlocked.includes(a.id);
+        return `<div class="badge-item ${has ? '' : 'locked'}" title="${a.name}: ${a.desc}">
+          <span>${has ? a.icon : '🔒'}</span><small>${a.name}</small></div>`;
+      }).join('')}</div>`;
+  }
+
+  const lb = document.getElementById('trophies-leaderboard');
+  if (lb) {
+    const players = getAllUsers().map(u => {
+      const p = loadProgressForUser(u.id);
+      return { id: u.id, name: u.name, avatar: u.avatar, xp: p.xp || 0, level: levelInfo(p.xp).level, stars: p.stars || 0 };
+    }).sort((a, b) => b.xp - a.xp);
+    lb.innerHTML = players.length < 2
+      ? '<p class="trophy-empty">כשעוד ילדים ישחקו במכשיר הזה, הם יופיעו כאן 👫</p>'
+      : players.map((p, i) => `
+        <div class="leaderboard-row ${p.id === currentUserId ? 'me' : ''}">
+          <span class="lb-rank">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1)}</span>
+          <span class="lb-avatar">${p.avatar}</span>
+          <span class="lb-name">${escapeText(p.name)}${p.id === currentUserId ? ' (אני)' : ''}</span>
+          <span class="lb-stars">רמה ${p.level} · ${p.xp} XP</span>
+        </div>`).join('');
+  }
+}
+
+// ===== GENERATED CONTENT (fills gaps, e.g. grade 3) =====
+// Fill-in-the-blank source per subject: curated sets first, then generated/quiz fallbacks.
+function getFillBlankSource(subject) {
+  const data = getData();
+  const asBlank = q => ({ sentence: q.question, options: q.options, answer: q.correct });
+  if (subject === 'english') {
+    if (hasItems(data.bigExam?.grammar)) {
+      return data.bigExam.grammar.map(q => ({ sentence: q.question, options: q.options, answer: q.options.indexOf(q.answer) }));
+    }
+    return (data.english?.quiz || []).map(asBlank);
+  }
+  if (subject === 'math') {
+    if (hasItems(data.mathBigExam?.fractions)) return data.mathBigExam.fractions.map(asBlank);
+    return generateMathQuestions(normalizeGrade(profile?.grade), 10).map(asBlank);
+  }
+  return (data.hebrew?.quiz || []).map(asBlank);
+}
+
+// True/false statements built from the grade's own quiz questions:
+// each question is shown with either its correct answer or one of its distractors.
+function generateTrueFalseFromQuiz(subject) {
+  const data = getData();
+  const items = subject === 'math'
+    ? generateMathQuestions(normalizeGrade(profile?.grade), 12)
+    : (data[subject]?.quiz || []);
+  return shuffle([...items]).slice(0, 12).map(q => {
+    const truthful = Math.random() < 0.5;
+    const wrongIdx = q.options.map((_, i) => i).filter(i => i !== q.correct);
+    const shown = truthful || !wrongIdx.length ? q.options[q.correct] : q.options[wrongIdx[Math.floor(Math.random() * wrongIdx.length)]];
+    const isTrue = shown === q.options[q.correct];
+    const statement = /=\s*\?\s*$/.test(q.question)
+      ? q.question.replace(/\?\s*$/, shown)
+      : `${q.question}\nתשובה: ${shown}`;
+    return { statement, isTrue };
+  });
+}

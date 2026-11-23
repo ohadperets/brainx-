@@ -60,6 +60,7 @@
 body.theme-ocean  { --brand: #0B7BB5; --brand-strong: #08608E; --brand-soft: #E3F2FA; --primary: var(--brand); --primary-dark: var(--brand-strong); }
 body.theme-forest { --brand: #2F855A; --brand-strong: #276749; --brand-soft: #E6F4EC; --primary: var(--brand); --primary-dark: var(--brand-strong); }
 body.theme-sunset { --brand: #C2410C; --brand-strong: #9A3412; --brand-soft: #FDECE3; --primary: var(--brand); --primary-dark: var(--brand-strong); }
+body.theme-space  { --brand: #6D28D9; --brand-strong: #5B21B6; --brand-soft: #F0E9FD; --bg: #F5F3FA; --primary: var(--brand); --primary-dark: var(--brand-strong); }
 body.theme-pink   { --brand: #BE185D; --brand-strong: #9D174D; --brand-soft: #FCE7F1; --primary: var(--brand); --primary-dark: var(--brand-strong); }
 
 /* ---------- dark theme ---------- */
@@ -369,3 +370,65 @@ body.theme-dark .feature-card { --tone-soft: #232936; --tone-soft: color-mix(in 
 /* settings rows sit inside one grouped card */
 .settings-group .setting-row { background: none !important; border: 0 !important; box-shadow: none !important; border-radius: 0 !important; margin: 0 !important; padding: 0 !important; }
 .settings-group .setting-row + .setting-row { border-top: 1px solid var(--border) !important; }
+
+/* ---------- home hub ---------- */
+button.welcome-banner { display: block; width: 100%; text-align: start; font: inherit; cursor: pointer; }
+.home-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+.stars-chip { background: var(--brand-soft); color: var(--brand); font-weight: 700; border-radius: var(--r-pill); padding: 2px 10px; font-size: 0.85rem; }
+.streak-badge { padding: 2px 10px; font-size: 0.85rem; }
+.home-level { margin-top: 14px; }
+.home-level-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+.home-level-badge { font-weight: 800; color: var(--brand); }
+.home-level-xp { font-size: 0.8rem; color: var(--text-3); direction: ltr; }
+.home-xp-track { height: 8px; background: var(--surface-2); border-radius: var(--r-pill); overflow: hidden; }
+.home-xp-fill { height: 100%; background: var(--brand); border-radius: var(--r-pill); transition: width var(--dur-3) var(--ease); }
+
+.home-card {
+  display: flex; align-items: center; gap: 14px; width: 100%;
+  background: var(--surface); color: var(--text);
+  border: 1px solid var(--border); border-radius: var(--r-xl); box-shadow: var(--e1);
+  padding: 14px 16px; margin-bottom: 12px; font: inherit; text-align: start; cursor: pointer;
+  transition: transform var(--dur-1) var(--ease);
+}
+.home-card:active { transform: scale(0.985); }
+.home-card-icon { width: 48px; height: 48px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: var(--r-md); font-size: 1.5rem; background: var(--brand-soft); }
+.home-card-daily { border-inline-start: 4px solid var(--warning); }
+.home-card-daily .home-card-icon { background: var(--warning-soft); }
+.home-card-daily.is-done { border-inline-start-color: var(--success); }
+.home-card-daily.is-done .home-card-icon { background: var(--success-soft); }
+.home-card-continue { border-inline-start: 4px solid var(--brand); }
+.home-card-text { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.home-card-title { font-weight: 700; }
+.home-card-sub { font-size: 0.85rem; color: var(--text-2); }
+.home-card-arrow { color: var(--text-3); }
+
+/* ---------- trophies ---------- */
+.trophy-level-card { display: flex; gap: 14px; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-xl); box-shadow: var(--e1); padding: 16px; }
+.trophy-level-badge { width: 64px; height: 64px; flex-shrink: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 800; color: var(--on-brand); background: var(--brand); box-shadow: 0 0 0 6px var(--brand-soft); }
+.trophy-level-info { flex: 1; min-width: 0; }
+.trophy-level-title { font-weight: 800; font-size: 1.15rem; margin-bottom: 6px; }
+.trophy-level-sub { font-size: 0.82rem; color: var(--text-2); margin-top: 6px; }
+.trophy-next { font-size: 0.85rem; color: var(--brand); font-weight: 600; margin-top: 6px; }
+.trophy-count { color: var(--text-2); font-size: 0.9rem; margin-bottom: 8px; }
+.trophy-empty { color: var(--text-2); text-align: center; padding: 16px; background: var(--surface); border: 1px dashed var(--border-strong); border-radius: var(--r-lg); }
+.leaderboard-row { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-md); padding: 10px 12px; margin-bottom: 8px; }
+.leaderboard-row.me { border-color: var(--brand); background: var(--brand-soft); }
+.lb-name { flex: 1; font-weight: 600; }
+.lb-stars { color: var(--text-2); font-size: 0.85rem; }
+
+/* ---------- results card: XP ---------- */
+.rc-xp { background: var(--surface-2); border-radius: var(--r-md); padding: 10px 12px; margin-bottom: 12px; text-align: start; }
+.rc-xp-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+.rc-level { font-weight: 800; color: var(--brand); }
+.rc-xp-gain { font-weight: 700; color: var(--success); font-size: 0.9rem; }
+.rc-xp-track { height: 8px; background: var(--surface); border-radius: var(--r-pill); overflow: hidden; }
+.rc-xp-fill { height: 100%; background: var(--brand); border-radius: var(--r-pill); }
+.rc-xp-next { font-size: 0.78rem; color: var(--text-3); margin-top: 4px; }
+.rc-levelup { background: var(--brand); color: var(--on-brand); border-radius: var(--r-md); padding: 10px 12px; margin-bottom: 12px; font-weight: 800; animation: v2-pop 600ms var(--ease) 2; }
+.rc-unlocked { font-weight: 500; font-size: 0.9rem; margin-top: 4px; }
+
+/* ---------- locked avatars / themes ---------- */
+.avatar-option.locked { position: relative; opacity: 0.55; cursor: not-allowed; }
+.avatar-option.locked .avatar-locked-emoji { filter: grayscale(1); }
+.avatar-option.locked .lock-badge { position: absolute; bottom: -4px; inset-inline-end: -4px; font-size: 0.65rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-pill); padding: 0 4px; }
+.theme-option.locked { opacity: 0.5; cursor: not-allowed; }

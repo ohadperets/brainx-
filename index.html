@@ -154,15 +154,42 @@
       <!-- Home Screen -->
       <section id="screen-home" class="screen active">
         <!-- Profile Banner -->
-        <div class="welcome-banner compact" onclick="navigate('profile')">
+        <button class="welcome-banner compact" onclick="navigate('trophies')" aria-label="הרמה וההישגים שלי">
           <div class="welcome-row">
             <div class="welcome-avatar" id="home-avatar">🌟</div>
             <div class="welcome-info">
               <h2 id="home-greeting">שלום!</h2>
-              <div class="streak-badge" id="streak-badge">🔥 <span id="streak-count">0</span> ימים ברצף</div>
+              <div class="home-chips">
+                <span class="streak-badge" id="streak-badge">🔥 <span id="streak-count">0</span> ימים ברצף</span>
+                <span class="stars-chip">⭐ <span id="home-stars">0</span></span>
+              </div>
             </div>
           </div>
-        </div>
+          <div class="home-level">
+            <div class="home-level-row"><span class="home-level-badge" id="home-level">רמה 1</span><span class="home-level-xp" id="home-xp-text">0 / 100 XP</span></div>
+            <div class="home-xp-track"><div class="home-xp-fill" id="home-xp-fill" style="width:0%"></div></div>
+          </div>
+        </button>
+
+        <!-- Daily challenge -->
+        <button id="home-daily-card" class="home-card home-card-daily" onclick="navigate('daily-challenge')">
+          <span class="home-card-icon">🎯</span>
+          <span class="home-card-text">
+            <span class="home-card-title">אתגר יומי</span>
+            <span class="home-card-sub" id="home-daily-sub">5 שאלות מכל המקצועות · XP כפול</span>
+          </span>
+          <span class="home-card-arrow">←</span>
+        </button>
+
+        <!-- Continue last game -->
+        <button id="home-continue-card" class="home-card home-card-continue hidden" onclick="continueLastGame()">
+          <span class="home-card-icon" id="home-continue-icon">▶️</span>
+          <span class="home-card-text">
+            <span class="home-card-title">להמשיך לשחק</span>
+            <span class="home-card-sub" id="home-continue-sub"></span>
+          </span>
+          <span class="home-card-arrow">←</span>
+        </button>
 
         <!-- Grade 6 Dictation -->
         <div id="home-grade6-dictation-card" class="daily-challenge-card" style="display:none;" onclick="navigate('grade6-dictation')">
@@ -175,6 +202,7 @@
         </div>
 
         <!-- Subjects -->
+        <h3 class="section-title">מקצועות</h3>
         <div class="subjects-grid">
           <button class="subject-card hebrew" onclick="navigate('subject', 'hebrew')">
             <div class="subject-icon">📖</div>
@@ -982,6 +1010,20 @@
         <div class="achievements-container" id="achievements-container"></div>
       </section>
 
+      <!-- All games (every subject, built from GAME_REGISTRY) -->
+      <section id="screen-all-games" class="screen">
+        <div id="all-games-list"></div>
+      </section>
+
+      <!-- Trophies: level, achievements, device leaderboard -->
+      <section id="screen-trophies" class="screen">
+        <div class="trophy-level-card" id="trophies-level"></div>
+        <h3 class="section-title">🏆 הישגים</h3>
+        <div id="trophies-achievements"></div>
+        <h3 class="section-title">👫 לוח המשפחה</h3>
+        <div id="trophies-leaderboard" class="leaderboard"></div>
+      </section>
+
       <!-- Profile Screen -->
       <section id="screen-profile" class="screen">
         <div class="profile-container">
@@ -1415,22 +1457,18 @@
     </main>
 
     <!-- Bottom Navigation -->
-    <nav class="bottom-nav">
+    <nav class="bottom-nav" aria-label="ניווט ראשי">
       <button class="nav-item active" onclick="navigate('home')" id="nav-home">
         <span class="nav-icon">🏠</span>
         <span class="nav-label">בית</span>
       </button>
-      <button class="nav-item" onclick="navigate('subject', 'hebrew')" id="nav-hebrew">
-        <span class="nav-icon">📖</span>
-        <span class="nav-label">עברית</span>
+      <button class="nav-item" onclick="navigate('all-games')" id="nav-games">
+        <span class="nav-icon">🎮</span>
+        <span class="nav-label">משחקים</span>
       </button>
-      <button class="nav-item" onclick="navigate('subject', 'english')" id="nav-english">
-        <span class="nav-icon">🔤</span>
-        <span class="nav-label">אנגלית</span>
-      </button>
-      <button class="nav-item" onclick="navigate('subject', 'math')" id="nav-math">
-        <span class="nav-icon">🔢</span>
-        <span class="nav-label">מתמטיקה</span>
+      <button class="nav-item" onclick="navigate('trophies')" id="nav-trophies">
+        <span class="nav-icon">🏆</span>
+        <span class="nav-label">הישגים</span>
       </button>
       <button class="nav-item" onclick="navigate('profile')" id="nav-profile">
         <span class="nav-icon" id="nav-profile-icon">👤</span>
@@ -1443,6 +1481,7 @@
   <script src="core/timers.js"></script>
   <script src="core/feedback.js"></script>
   <script src="core/game-kit.js"></script>
+  <script src="core/rewards.js"></script>
   <script src="data.js"></script>
   <script src="content-imports.js"></script>
   <script src="app.js"></script>

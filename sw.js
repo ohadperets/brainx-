@@ -12,6 +12,7 @@ const ASSETS = [
   '/core/timers.js',
   '/core/feedback.js',
   '/core/game-kit.js',
+  '/core/rewards.js',
   '/data.js',
   '/content-imports.js',
   '/manifest.json',

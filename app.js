@@ -661,8 +661,9 @@ function applyTheme(themeId) {
   if (theme && theme.class) {
     document.body.classList.add(theme.class);
   }
+  // the browser/status bar matches the (white or dark) header, not the accent colour
   const meta = document.getElementById('meta-theme');
-  if (meta && theme) meta.content = theme.color;
+  if (meta) meta.content = themeId === 'dark' ? '#171B22' : '#FFFFFF';
   settings.theme = themeId;
   saveSettings(settings);
 }
@@ -1264,13 +1265,13 @@ function updateSubjectFeatures() {
     const grade = normalizeGrade(profile?.grade);
     if (grade === 6) {
       html += `
-      <button class="feature-card" style="background:linear-gradient(135deg,#e8f5e9,#a5d6a7)" onclick="navigate('geometry-quiz')">
+      <button class="feature-card" onclick="navigate('geometry-quiz')" data-tone="green">
         <div class="feature-icon">📐</div>
         <div class="feature-name">גאומטריה</div>
         <div class="feature-desc">צורות, זוויות ומרובעים</div>
       </button>`;
       html += `
-      <button class="feature-card big-exam-card" style="grid-column: 1 / -1; background:linear-gradient(135deg,#ffd54f,#ffb300); padding: 32px 16px;" onclick="navigate('math-big-exam')">
+      <button class="feature-card big-exam-card" style="grid-column: 1 / -1; padding: 32px 16px" onclick="navigate('math-big-exam')" data-tone="amber">
         <div class="feature-icon" style="font-size:2.5rem">🏆</div>
         <div class="feature-name" style="font-size:1.3rem; font-weight:800">הכנה למבחן הגדול - מתמטיקה</div>
         <div class="feature-desc" style="font-size:0.95rem">מספרים, שברים, עשרוניים וגאומטריה</div>
@@ -1278,7 +1279,7 @@ function updateSubjectFeatures() {
     }
     if (grade === 3) {
       html += `
-      <button class="feature-card" style="background:linear-gradient(135deg,#fff9c4,#fff176)" onclick="navigate('multiplication-quiz')">
+      <button class="feature-card" onclick="navigate('multiplication-quiz')" data-tone="amber">
         <div class="feature-icon">✖️</div>
         <div class="feature-name">לוח הכפל וחילוק</div>
         <div class="feature-desc">תרגול לוח הכפל 1-12 וחילוק</div>
@@ -1288,7 +1289,7 @@ function updateSubjectFeatures() {
 
   if (currentSubject === 'hebrew' && (getData().readingComprehension || []).length > 0) {
     html += `
-    <button class="feature-card" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9)" onclick="navigate('reading-comp')">
+    <button class="feature-card" onclick="navigate('reading-comp')" data-tone="green">
       <div class="feature-icon">📖</div>
       <div class="feature-name">הבנת הנקרא</div>
       <div class="feature-desc">קרא וענה על שאלות</div>
@@ -1297,7 +1298,7 @@ function updateSubjectFeatures() {
 
   if (currentSubject === 'english') {
     html += `
-    <button class="feature-card" style="background:linear-gradient(135deg,#fff3e0,#ffe0b2)" onclick="navigate('dictation')">
+    <button class="feature-card" onclick="navigate('dictation')" data-tone="orange">
       <div class="feature-icon">📝</div>
       <div class="feature-name">הכתבה באנגלית</div>
       <div class="feature-desc">${normalizeGrade(profile?.grade) === 6 ? 'הכנה למבחן והכתבה כללי' : 'הכנה למבחן'}</div>
@@ -1306,7 +1307,7 @@ function updateSubjectFeatures() {
     const grade = normalizeGrade(profile?.grade);
     if (grade === 6) {
       html += `
-      <button class="feature-card" style="background:linear-gradient(135deg,#ede7f6,#d1c4e9)" onclick="navigate('grade6-dictation')">
+      <button class="feature-card" onclick="navigate('grade6-dictation')" data-tone="purple">
         <div class="feature-icon">🎓</div>
         <div class="feature-name">הכתבה לכיתה ו׳</div>
         <div class="feature-desc">מילות השבוע - שמיעה, השלמה והתאמה</div>
@@ -1314,13 +1315,13 @@ function updateSubjectFeatures() {
     }
     if (grade === 6) {
       html += `
-      <button class="feature-card" style="grid-column: 1 / -1; background:linear-gradient(135deg,#e3f2fd,#90caf9); padding: 28px 16px;" onclick="navigate('et-all-tests')">
+      <button class="feature-card" style="grid-column: 1 / -1; padding: 28px 16px" onclick="navigate('et-all-tests')" data-tone="blue">
         <div class="feature-icon" style="font-size:2.5rem">📋</div>
         <div class="feature-name" style="font-size:1.2rem; font-weight:800; color:#0d47a1">English Tests – 2026</div>
         <div class="feature-desc" style="font-size:0.88rem; color:#1565c0">6 Tests &bull; ⏰ Time &bull; 🔤 Pronouns &bull; ✏️ Grammar &bull; 📍 Prepositions &bull; 📖 Reading</div>
       </button>`;
       html += `
-      <button class="feature-card big-exam-card" style="grid-column: 1 / -1; background:linear-gradient(135deg,#ffd54f,#ffb300); padding: 32px 16px;" onclick="navigate('big-exam')">
+      <button class="feature-card big-exam-card" style="grid-column: 1 / -1; padding: 32px 16px" onclick="navigate('big-exam')" data-tone="amber">
         <div class="feature-icon" style="font-size:2.5rem">🏆</div>
         <div class="feature-name" style="font-size:1.3rem; font-weight:800">הכנה למבחן הגדול</div>
         <div class="feature-desc" style="font-size:0.95rem">התכונן למבחן באנגלית</div>
@@ -2970,7 +2971,7 @@ function renderReadingCompPassages() {
   const passages = data.readingComprehension || [];
   const grid = document.getElementById('reading-comp-passages');
   grid.innerHTML = passages.map((p, i) => `
-    <button class="feature-card rc-passage-card" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9)" onclick="startReadingPassage(${i})">
+    <button class="feature-card rc-passage-card" onclick="startReadingPassage(${i})" data-tone="green">
       <div class="feature-icon">${p.icon}</div>
       <div class="feature-name">${p.title}</div>
       <div class="feature-desc">${p.questions.length} שאלות</div>

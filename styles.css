@@ -3453,7 +3453,7 @@ body.theme-pink .app-header {
 .rc-emoji { font-size: 3rem; line-height: 1.2; margin-top: 4px; }
 .rc-title { font-size: 1.5rem; font-weight: 800; margin: 4px 0 2px; }
 .rc-summary { font-size: 0.95rem; color: var(--text-light, #718096); margin-bottom: 4px; }
-.rc-stars { display: flex; justify-content: center; gap: 10px; margin: 12px 0 16px; direction: ltr; }
+.rc-stars { display: flex; justify-content: center; gap: 10px; margin: 12px 0 16px; }
 .rc-star { font-size: 2.6rem; line-height: 1; color: #e2e8f0; transform: scale(0.6); opacity: 0.6; }
 .rc-star.on { color: #f6b93b; animation: rc-star-in 420ms cubic-bezier(.2, .8, .2, 1.4) forwards; opacity: 0; }
 .rc-stats { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; }

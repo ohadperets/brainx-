@@ -2,11 +2,11 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#667eea" id="meta-theme">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#FFFFFF" id="meta-theme">
   <meta name="description" content="BrainX - אפליקציית לימודים אינטראקטיבית לילדים. עברית, אנגלית ומתמטיקה בכיף!">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   
   <!-- Open Graph / WhatsApp Preview -->
   <meta property="og:type" content="website">
@@ -26,9 +26,13 @@
   
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icons/icon-192.svg">
-  <link rel="apple-touch-icon" href="icons/icon-192.svg">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <title>BrainX</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap" crossorigin>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="theme.css">
   
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZN8BW56CVN"></script>
@@ -289,53 +293,53 @@
             <div class="feature-name">פיצוץ בלונים</div>
             <div class="feature-desc">לחץ על הבלון הנכון!</div>
           </button>
-          <button class="feature-card" style="background:linear-gradient(135deg,#fce4ec,#f8bbd0)" onclick="navigate('game-hangman')">
+          <button class="feature-card" onclick="navigate('game-hangman')" data-tone="rose">
             <div class="feature-icon">🎯</div>
             <div class="feature-name">תלייה</div>
             <div class="feature-desc">נחש את המילה</div>
           </button>
-          <button class="feature-card" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9)" onclick="navigate('game-memory')">
+          <button class="feature-card" onclick="navigate('game-memory')" data-tone="green">
             <div class="feature-icon">🧠</div>
             <div class="feature-name">זיכרון</div>
             <div class="feature-desc">מצא זוגות</div>
           </button>
-          <button class="feature-card" id="game-race-btn" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb)" onclick="navigate('game-race')">
+          <button class="feature-card" id="game-race-btn" onclick="navigate('game-race')" data-tone="blue">
             <div class="feature-icon" id="game-race-icon">🏎️</div>
             <div class="feature-name" id="game-race-name">מרוץ ידע</div>
             <div class="feature-desc">ענה מהר!</div>
           </button>
           <!-- New Games -->
-          <button id="game-scramble-btn" class="feature-card" style="background:linear-gradient(135deg,#fff3e0,#ffe0b2)" onclick="navigate('game-scramble')">
+          <button id="game-scramble-btn" class="feature-card" onclick="navigate('game-scramble')" data-tone="orange">
             <div class="feature-icon">🔀</div>
             <div class="feature-name">ערבוב מילים</div>
             <div class="feature-desc">סדר את האותיות!</div>
           </button>
-          <button id="game-speed-math-btn" class="feature-card" style="background:linear-gradient(135deg,#f3e5f5,#e1bee7)" onclick="navigate('game-speed-math')">
+          <button id="game-speed-math-btn" class="feature-card" onclick="navigate('game-speed-math')" data-tone="pink">
             <div class="feature-icon">⚡</div>
             <div class="feature-name">מתמטיקה מהירה</div>
             <div class="feature-desc">פתור תרגילים בזמן!</div>
           </button>
-          <button id="game-fill-blank-btn" class="feature-card" style="background:linear-gradient(135deg,#e0f7fa,#b2ebf2)" onclick="navigate('game-fill-blank')">
+          <button id="game-fill-blank-btn" class="feature-card" onclick="navigate('game-fill-blank')" data-tone="teal">
             <div class="feature-icon">✏️</div>
             <div class="feature-name">השלם את החסר</div>
             <div class="feature-desc">מלא את המילה החסרה</div>
           </button>
-          <button class="feature-card" style="background:linear-gradient(135deg,#fce4ec,#f8bbd0)" onclick="navigate('game-true-false')">
+          <button class="feature-card" onclick="navigate('game-true-false')" data-tone="rose">
             <div class="feature-icon">✅</div>
             <div class="feature-name">נכון או לא</div>
             <div class="feature-desc">האם המשפט נכון?</div>
           </button>
-          <button class="feature-card" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9); display:none;" onclick="navigate('game-match-drag')">
+          <button class="feature-card" style="display:none" onclick="navigate('game-match-drag')" data-tone="green">
             <div class="feature-icon">🔗</div>
             <div class="feature-name">התאמה</div>
             <div class="feature-desc">חבר זוגות מתאימים</div>
           </button>
-          <button id="game-spelling-btn" class="feature-card" style="background:linear-gradient(135deg,#fff8e1,#ffecb3)" onclick="navigate('game-spelling')">
+          <button id="game-spelling-btn" class="feature-card" onclick="navigate('game-spelling')" data-tone="amber">
             <div class="feature-icon">🐝</div>
             <div class="feature-name">איות</div>
             <div class="feature-desc">שמע וכתוב!</div>
           </button>
-          <button id="game-word-problems-btn" class="feature-card" style="background:linear-gradient(135deg,#e8eaf6,#c5cae9)" onclick="navigate('game-word-problems')">
+          <button id="game-word-problems-btn" class="feature-card" onclick="navigate('game-word-problems')" data-tone="blue">
             <div class="feature-icon">🧩</div>
             <div class="feature-name">בעיות חשבון</div>
             <div class="feature-desc">פתור בעיות מילוליות!</div>
@@ -500,17 +504,17 @@
             <p style="color: #666; margin-bottom: 1rem;">בחר סוג הכתבה:</p>
           </div>
           <div class="feature-grid">
-            <button class="feature-card" style="background:linear-gradient(135deg,#fce4ec,#f8bbd9)" onclick="startTestPrepDictation()">
+            <button class="feature-card" onclick="startTestPrepDictation()" data-tone="rose">
               <div class="feature-icon">📚</div>
               <div class="feature-name">הכתבה שבועית</div>
               <div class="feature-desc">מילים להכתבה השבועית</div>
             </button>
-            <button id="btn-general-dictation" class="feature-card" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb)" onclick="showGeneralDictationMenu()">
+            <button id="btn-general-dictation" class="feature-card" onclick="showGeneralDictationMenu()" data-tone="blue">
               <div class="feature-icon">📖</div>
               <div class="feature-name">הכתבה כללי</div>
               <div class="feature-desc">10 מילים אקראיות בכל סיבוב</div>
             </button>
-            <button id="btn-grade6-dictation" class="feature-card" style="background:linear-gradient(135deg,#ede7f6,#d1c4e9); display:none;" onclick="navigate('grade6-dictation')">
+            <button id="btn-grade6-dictation" class="feature-card" style="display:none" onclick="navigate('grade6-dictation')" data-tone="purple">
               <div class="feature-icon">🎓</div>
               <div class="feature-name">הכתבה לכיתה ו׳</div>
               <div class="feature-desc">מילות השבוע - שמיעה, השלמה והתאמה</div>
@@ -527,17 +531,17 @@
             <p style="color: #666; margin-bottom: 1rem;">בחר משחק לתרגול מילות השבוע:</p>
           </div>
           <div class="feature-grid">
-            <button class="feature-card" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb)" onclick="navigate('grade6-dict-write')">
+            <button class="feature-card" onclick="navigate('grade6-dict-write')" data-tone="blue">
               <div class="feature-icon">🎧</div>
               <div class="feature-name">הכתבה - שמיעה</div>
               <div class="feature-desc">שמע או קרא רמז בעברית וכתוב</div>
             </button>
-            <button class="feature-card" style="background:linear-gradient(135deg,#e0f7fa,#b2ebf2)" onclick="navigate('grade6-dict-complete')">
+            <button class="feature-card" onclick="navigate('grade6-dict-complete')" data-tone="teal">
               <div class="feature-icon">✏️</div>
               <div class="feature-name">השלם את המילה</div>
               <div class="feature-desc">השלם את האותיות החסרות</div>
             </button>
-            <button class="feature-card" style="background:linear-gradient(135deg,#fff3e0,#ffe0b2)" onclick="startGrade6WordMatch()">
+            <button class="feature-card" onclick="startGrade6WordMatch()" data-tone="orange">
               <div class="feature-icon">🔗</div>
               <div class="feature-name">התאמה למשמעות</div>
               <div class="feature-desc">חבר מילה באנגלית לפירוש בעברית</div>
@@ -599,12 +603,12 @@
             <p style="color: #666; margin-bottom: 1rem;">10 מילים אקראיות בכל סיבוב</p>
           </div>
           <div class="feature-grid">
-            <button class="feature-card" style="background:linear-gradient(135deg,#e0f2fe,#bae6fd)" onclick="startGeneralWordMatch()">
+            <button class="feature-card" onclick="startGeneralWordMatch()" data-tone="blue">
               <div class="feature-icon">🔗</div>
               <div class="feature-name">חבר מילים</div>
               <div class="feature-desc">חבר עברית לאנגלית</div>
             </button>
-            <button class="feature-card" style="background:linear-gradient(135deg,#fff3e0,#ffe0b2)" onclick="startGeneralDictation()">
+            <button class="feature-card" onclick="startGeneralDictation()" data-tone="orange">
               <div class="feature-icon">⌨️</div>
               <div class="feature-name">הכתבה</div>
               <div class="feature-desc">כתוב את המילים</div>
@@ -621,22 +625,22 @@
             <p style="color: #666; margin-bottom: 1rem;">Unit 3 - Present Progressive</p>
           </div>
           <div class="feature-grid">
-            <button class="feature-card" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9)" onclick="navigate('big-exam-grammar')">
+            <button class="feature-card" onclick="navigate('big-exam-grammar')" data-tone="green">
               <div class="feature-icon">📐</div>
               <div class="feature-name">Grammar</div>
               <div class="feature-desc">Present Progressive</div>
             </button>
-            <button class="feature-card" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb)" onclick="navigate('big-exam-reading')">
+            <button class="feature-card" onclick="navigate('big-exam-reading')" data-tone="blue">
               <div class="feature-icon">📖</div>
               <div class="feature-name">Reading</div>
               <div class="feature-desc">Unseen + שאלות</div>
             </button>
-            <button class="feature-card" style="background:linear-gradient(135deg,#fff3e0,#ffe0b2)" onclick="navigate('big-exam-writing')">
+            <button class="feature-card" onclick="navigate('big-exam-writing')" data-tone="orange">
               <div class="feature-icon">✏️</div>
               <div class="feature-name">Writing</div>
               <div class="feature-desc">a/an + משפטים</div>
             </button>
-            <button class="feature-card" style="background:linear-gradient(135deg,#fce4ec,#f8bbd0)" onclick="navigate('big-exam-vocab')">
+            <button class="feature-card" onclick="navigate('big-exam-vocab')" data-tone="rose">
               <div class="feature-icon">📚</div>
               <div class="feature-name">Vocabulary</div>
               <div class="feature-desc">אוצר מילים Unit 3</div>
@@ -803,22 +807,22 @@
             <p style="color: #666; margin-bottom: 1rem;">כיתה ו׳ · תרגול לפי נושאים</p>
           </div>
           <div class="feature-grid">
-            <button class="feature-card" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9)" onclick="navigate('math-big-natural')">
+            <button class="feature-card" onclick="navigate('math-big-natural')" data-tone="green">
               <div class="feature-icon">🔢</div>
               <div class="feature-name">מספרים טבעיים</div>
               <div class="feature-desc">סדר פעולות, משוואות, בעיות</div>
             </button>
-            <button class="feature-card" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb)" onclick="navigate('math-big-fractions')">
+            <button class="feature-card" onclick="navigate('math-big-fractions')" data-tone="blue">
               <div class="feature-icon">🥧</div>
               <div class="feature-name">שברים פשוטים</div>
               <div class="feature-desc">חיבור, חיסור, השוואה</div>
             </button>
-            <button class="feature-card" style="background:linear-gradient(135deg,#fff3e0,#ffe0b2)" onclick="navigate('math-big-decimals')">
+            <button class="feature-card" onclick="navigate('math-big-decimals')" data-tone="orange">
               <div class="feature-icon">🔸</div>
               <div class="feature-name">מספרים עשרוניים</div>
               <div class="feature-desc">עשיריות, מאיות, חישובים</div>
             </button>
-            <button class="feature-card" style="background:linear-gradient(135deg,#fce4ec,#f8bbd0)" onclick="navigate('math-big-geometry')">
+            <button class="feature-card" onclick="navigate('math-big-geometry')" data-tone="rose">
               <div class="feature-icon">📐</div>
               <div class="feature-name">גאומטריה</div>
               <div class="feature-desc">שטח, היקף, מרובעים</div>
@@ -1176,32 +1180,32 @@
             <p id="et-all-tests-subtitle" style="color:#666; margin-bottom:1rem; direction:ltr; text-align:center;">Grade 6 &nbsp;|&nbsp; Choose a test to practise</p>
           </div>
           <div style="display:flex; flex-direction:column; gap:14px;">
-            <button class="feature-card" style="background:linear-gradient(135deg,#e3f2fd,#90caf9); padding:24px 20px; text-align:left; direction:ltr;" onclick="navigate('english-test-0626')">
+            <button class="feature-card" style="padding:24px 20px; text-align:left; direction:ltr" onclick="navigate('english-test-0626')" data-tone="blue">
               <div style="font-size:2rem; margin-bottom:6px;">📝</div>
               <div style="font-size:1.1rem; font-weight:800; color:#0d47a1;">English Test – June 2026</div>
               <div style="font-size:0.88rem; color:#1565c0; margin-top:4px;">Test 1 &nbsp;|&nbsp; ⏰ Time · 🔤 Pronouns · ✏️ Grammar · 📍 Prepositions · 📖 Reading</div>
             </button>
-            <button class="feature-card" style="background:linear-gradient(135deg,#e8f5e9,#a5d6a7); padding:24px 20px; text-align:left; direction:ltr;" onclick="navigate('english-test-2')">
+            <button class="feature-card" style="padding:24px 20px; text-align:left; direction:ltr" onclick="navigate('english-test-2')" data-tone="green">
               <div style="font-size:2rem; margin-bottom:6px;">📝</div>
               <div style="font-size:1.1rem; font-weight:800; color:#1b5e20;">English Test – July 2026</div>
               <div style="font-size:0.88rem; color:#2e7d32; margin-top:4px;">Test 2 &nbsp;|&nbsp; ⏰ Time · 🔤 Pronouns · ✏️ Grammar · 📍 Prepositions · 📖 Reading</div>
             </button>
-            <button class="feature-card" style="background:linear-gradient(135deg,#fce4ec,#f48fb1); padding:24px 20px; text-align:left; direction:ltr;" onclick="navigate('english-test-3')">
+            <button class="feature-card" style="padding:24px 20px; text-align:left; direction:ltr" onclick="navigate('english-test-3')" data-tone="rose">
               <div style="font-size:2rem; margin-bottom:6px;">📝</div>
               <div style="font-size:1.1rem; font-weight:800; color:#880e4f;">English Test – August 2026</div>
               <div style="font-size:0.88rem; color:#ad1457; margin-top:4px;">Test 3 &nbsp;|&nbsp; ⏰ Time · 🔤 Pronouns · ✏️ Grammar · 📍 Prepositions · 📖 Reading</div>
             </button>
-            <button class="feature-card" style="background:linear-gradient(135deg,#fff3e0,#ffcc80); padding:24px 20px; text-align:left; direction:ltr; position:relative;" onclick="navigate('english-test-4')">
+            <button class="feature-card" style="padding:24px 20px; text-align:left; direction:ltr; position:relative" onclick="navigate('english-test-4')" data-tone="orange">
               <div style="font-size:2rem; margin-bottom:6px;">📝</div>
               <div style="font-size:1.1rem; font-weight:800; color:#e65100;">English Test – September 2026</div>
               <div style="font-size:0.88rem; color:#bf360c; margin-top:4px;">Test 4 &nbsp;|&nbsp; ⏰ Time · 🔤 Pronouns · ✏️ Grammar · 📍 Prepositions · 📖 Reading</div>
             </button>
-            <button class="feature-card" style="background:linear-gradient(135deg,#f3e5f5,#ce93d8); padding:24px 20px; text-align:left; direction:ltr; position:relative;" onclick="navigate('english-test-5')">
+            <button class="feature-card" style="padding:24px 20px; text-align:left; direction:ltr; position:relative" onclick="navigate('english-test-5')" data-tone="pink">
               <div style="font-size:2rem; margin-bottom:6px;">📝</div>
               <div style="font-size:1.1rem; font-weight:800; color:#4a148c;">English Test – October 2026</div>
               <div style="font-size:0.88rem; color:#6a1b9a; margin-top:4px;">Test 5 &nbsp;|&nbsp; ⏰ Time · 🔤 Pronouns · ✏️ Grammar · 📍 Prepositions · 📖 Reading</div>
             </button>
-            <button class="feature-card" style="background:linear-gradient(135deg,#e8f5e9,#80cbc4); padding:24px 20px; text-align:left; direction:ltr; position:relative;" onclick="navigate('english-test-6')">
+            <button class="feature-card" style="padding:24px 20px; text-align:left; direction:ltr; position:relative" onclick="navigate('english-test-6')" data-tone="green">
               <div style="font-size:2rem; margin-bottom:6px;">📝</div>
               <div style="font-size:1.1rem; font-weight:800; color:#004d40;">English Test – November 2026</div>
               <div style="font-size:0.88rem; color:#00695c; margin-top:4px;">Test 6 &nbsp;|&nbsp; ⏰ Time · 🔤 Pronouns · ✏️ Grammar · 📍 Prepositions · 📖 Reading</div>

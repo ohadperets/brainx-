@@ -6,6 +6,7 @@ const ASSETS = [
   '/',
   '/index.html',
   '/styles.css',
+  '/theme.css',
   '/app.js',
   '/version.js',
   '/core/timers.js',
@@ -15,7 +16,9 @@ const ASSETS = [
   '/content-imports.js',
   '/manifest.json',
   '/icons/icon-192.svg',
-  '/icons/icon-512.svg'
+  '/icons/icon-512.svg',
+  '/icons/icon-192.png',
+  '/icons/apple-touch-icon.png'
 ];
 
 // Install
@@ -50,8 +53,15 @@ function isAppShell(url, request) {
   return /\.(html|js|css|json)$/.test(url.pathname) || url.pathname === '/';
 }
 
+// Google Fonts (CSS + font files) are cross-origin; cache them so the font works offline.
+function isFont(url) {
+  return url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com';
+}
+
 function putInCache(request, response) {
-  if (response && response.status === 200 && response.type === 'basic') {
+  const cacheable = response && response.status === 200 &&
+    (response.type === 'basic' || (response.type === 'cors' && isFont(new URL(request.url))));
+  if (cacheable) {
     const copy = response.clone();
     caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
   }

@@ -95,7 +95,7 @@ function showResultsCard(r) {
   const t = RESULT_TITLES[r.stars];
   const starsHtml = [0, 1, 2].map(i =>
     `<span class="rc-star ${i < r.stars ? 'on' : ''}" style="animation-delay:${350 + i * 260}ms">★</span>`).join('');
-  const accuracy = r.total ? `${r.correct} מתוך ${r.total} · ${r.pct}%` : `${r.pct}%`;
+  const accuracyLabel = r.total ? `דיוק · ${r.correct}/${r.total}` : 'דיוק';
   let bestLine = '';
   if (r.isRecord) bestLine = '<div class="rc-best rc-best-new">🏆 שיא אישי חדש!</div>';
   else if (r.best != null) bestLine = `<div class="rc-best">השיא שלך: ${escapeText(r.best)}</div>`;
@@ -114,7 +114,7 @@ function showResultsCard(r) {
       ${r.summary ? `<div class="rc-summary">${escapeText(r.summary)}</div>` : ''}
       <div class="rc-stars" aria-label="${r.stars} מתוך 3 כוכבים">${starsHtml}</div>
       <div class="rc-stats">
-        <div class="rc-stat"><div class="rc-stat-value" dir="ltr">${escapeText(accuracy)}</div><div class="rc-stat-label">דיוק</div></div>
+        <div class="rc-stat"><div class="rc-stat-value" dir="ltr">${r.pct}%</div><div class="rc-stat-label" dir="rtl"><bdi>${escapeText(accuracyLabel)}</bdi></div></div>
         ${r.score != null ? `<div class="rc-stat"><div class="rc-stat-value">${escapeText(r.score)}</div><div class="rc-stat-label">${escapeText(r.scoreLabel || 'ניקוד')}</div></div>` : ''}
         <div class="rc-stat"><div class="rc-stat-value">+${r.stars} ⭐</div><div class="rc-stat-label">כוכבים</div></div>
       </div>

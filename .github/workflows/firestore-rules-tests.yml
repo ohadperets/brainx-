@@ -23,10 +23,22 @@ jobs:
           distribution: temurin
           java-version: 21
       - name: Install test tools
-        run: npm install --no-audit --no-fund
+        run: |
+          if ! npm ci --no-audit --no-fund > npm-install.log 2>&1; then
+            echo "::error title=npm ci failed::$(grep -E 'npm (error|ERR)' npm-install.log | tail -8 | tr '\n' ' ')"
+            tail -60 npm-install.log
+            exit 1
+          fi
       - name: Smoke test
         run: node tools/smoke.mjs
       - name: Rules tests (${{ matrix.rules }})
         env:
           RULES_FILE: ${{ matrix.rules }}
-        run: npx firebase emulators:exec --only firestore --project demo-brainx "node --test tests/"
+        run: |
+          if ! npx firebase emulators:exec --only firestore --project demo-brainx "node --test --test-reporter=spec tests/" > rules-test.log 2>&1; then
+            # surface failing test names as annotations (readable without opening the log)
+            grep -E '✖|not ok|Error|FAILED' rules-test.log | head -20 | while IFS= read -r line; do echo "::error title=rules test::$line"; done
+            tail -120 rules-test.log
+            exit 1
+          fi
+          tail -60 rules-test.log

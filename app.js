@@ -3081,7 +3081,7 @@ function endReadingComp() {
 
   progress.gamesPlayed = (progress.gamesPlayed || 0) + 1;
   saveProgress(progress);
-  finishGame({ gameId: 'reading-comp-' + s.passage.id, title: 'הבנת הנקרא', correct: Math.round(s.score / 10), total: s.passage.questions.length, score: s.score, scoreLabel: 'נקודות', replay: () => startReadingPassage(getData().readingComprehension.indexOf(s.passage)) });
+  finishGame({ gameId: 'reading-comp-' + Math.max(0, getData().readingComprehension.indexOf(s.passage)), title: 'הבנת הנקרא', correct: Math.round(s.score / 10), total: s.passage.questions.length, score: s.score, scoreLabel: 'נקודות', replay: () => startReadingPassage(getData().readingComprehension.indexOf(s.passage)) });
 }
 
 // ===== WORD PROBLEMS GAME (בעיות מילוליות) =====

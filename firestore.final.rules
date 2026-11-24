@@ -1,0 +1,108 @@
+rules_version = '2';
+
+// BrainX Firestore rules — v2 FINAL (publish ~2 weeks after app v71, once old app versions are gone).
+// Generated from firestore.rules by removing its TRANSITION-ONLY blocks.
+//
+// Who is who:
+//   child's device  = Firebase Anonymous Auth user (created silently by the app)
+//   admin           = Google sign-in AND a document admins/{uid} created by hand in the console
+//
+// Guarantees:
+//   - A device can read/write/delete ONLY its own profiles (devices/{its uid}/profiles/*).
+//   - No real names in the cloud: profiles hold a generated nickname ("tag").
+//   - Nobody but the admin can read children's data; nobody can change another device's data.
+//   - Public records: validated shape, tied to the writer's uid, can only go up, no deletes.
+//   - Everything not listed here is closed.
+// Legacy collections users/progress: admin read-only, no writes (cleaned up with tools/migrate-legacy.mjs).
+//
+// Tests: tests/firestore-rules.test.mjs (Firebase Emulator, runs in CI).
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- helpers ----------
+    function signedIn() { return request.auth != null; }
+    function isAdmin() {
+      return signedIn()
+        && request.auth.token.firebase.sign_in_provider == 'google.com'
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    function isStr(v, max) { return v is string && v.size() > 0 && v.size() <= max; }
+    function isCount(v) { return v is int && v >= 0 && v <= 10000000; }
+
+    // ---------- admin allowlist (managed only in the Firebase console) ----------
+    match /admins/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;   // lets the app check "am I admin?"
+      allow write: if false;
+    }
+
+    // ---------- private: one subtree per anonymous device ----------
+    match /devices/{uid}/profiles/{profileId} {
+      function validProfile(d) {
+        return d.keys().hasOnly(['tag', 'avatar', 'grade', 'stars', 'streak', 'xp', 'gamesPlayed',
+                                 'achievements', 'quizAttempts', 'schema', 'updatedAt'])
+          && isStr(d.tag, 24)
+          && isStr(d.avatar, 16)
+          && d.grade in [3, 6]
+          && isCount(d.stars) && isCount(d.streak) && isCount(d.xp) && isCount(d.gamesPlayed)
+          && d.achievements is list && d.achievements.size() <= 200
+          && d.quizAttempts is map
+          && d.quizAttempts.keys().hasOnly(['hebrew', 'english', 'math'])
+          && isCount(d.quizAttempts.hebrew) && isCount(d.quizAttempts.english) && isCount(d.quizAttempts.math)
+          && d.schema == 2
+          && d.updatedAt == request.time;
+      }
+      function isOwner() { return signedIn() && request.auth.uid == uid; }
+
+      allow read: if isOwner() || isAdmin();
+      allow create, update: if isOwner() && profileId.matches('^[A-Za-z0-9_-]{1,64}$') && validProfile(request.resource.data);
+      allow delete: if isOwner();
+    }
+
+    // admin dashboard: collection-group query over every device's profiles
+    match /{path=**}/profiles/{profileId} {
+      allow read: if isAdmin();
+    }
+
+    // ---------- public high scores ----------
+    match /records/{recordId} {
+      allow read: if true;
+
+      // v2 shape: written by a signed-in device; grade must match the _g3/_g6 suffix
+      function validRecordV2(d) {
+        return recordId.matches('^[a-z0-9-]{1,60}_g[36]$')
+          && d.keys().hasOnly(['score', 'tag', 'avatar', 'ownerUid', 'grade', 'date'])
+          && d.score is int && d.score >= -1000 && d.score <= 100000
+          && isStr(d.tag, 24)
+          && isStr(d.avatar, 16)
+          && d.ownerUid == request.auth.uid
+          && ((recordId.matches('^.*_g3$') && d.grade == 3) || (recordId.matches('^.*_g6$') && d.grade == 6))
+          && d.date == request.time;
+      }
+      function higherThanExisting() {
+        return resource == null || request.resource.data.score > resource.data.score;
+      }
+
+      allow create, update: if signedIn() && validRecordV2(request.resource.data) && higherThanExisting();
+
+      allow delete: if false;
+    }
+
+    // ---------- legacy collections (pre-v71) ----------
+    // Reads: admin only (they contain names). Deletes: never from the app
+    // (cleanup is done with tools/migrate-legacy.mjs using admin credentials).
+    match /users/{docId} {
+      allow read: if isAdmin();
+      allow delete: if false;
+    }
+    match /progress/{docId} {
+      allow read: if isAdmin();
+      allow delete: if false;
+    }
+
+    // ---------- everything else is closed ----------
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

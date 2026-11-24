@@ -1,87 +1,142 @@
 rules_version = '2';
 
-// BrainX Firestore rules — step 1 (works with the current app, no login needed).
-// - Only the three collections the app uses are allowed; everything else is closed.
-// - Writes must have the exact shape the app sends (no junk fields, sane sizes).
-// - Records can only go UP (nobody can overwrite a record with a lower score) and can't be deleted.
-// - Nothing can be deleted from the browser.
-// Still open in step 1: anyone can READ users/progress (the admin dashboard reads them from the
-// browser). Step 2 (admin "Sign in with Google") closes that.
+// BrainX Firestore rules — v2 TRANSITION (publish together with app v71).
+// Final state: firestore.final.rules (publish ~2 weeks later, when old app versions are gone).
+// Previous version (step 1) is in git history.
 //
-// Apply: Firebase console → Firestore Database → Rules → paste this file → Publish.
+// Who is who:
+//   child's device  = Firebase Anonymous Auth user (created silently by the app)
+//   admin           = Google sign-in AND a document admins/{uid} created by hand in the console
+//
+// Guarantees:
+//   - A device can read/write/delete ONLY its own profiles (devices/{its uid}/profiles/*).
+//   - No real names in the cloud: profiles hold a generated nickname ("tag").
+//   - Nobody but the admin can read children's data; nobody can change another device's data.
+//   - Public records: validated shape, tied to the writer's uid, can only go up, no deletes.
+//   - Everything not listed here is closed.
+// Blocks marked TRANSITION ONLY are removed in firestore.final.rules.
+//
+// Tests: tests/firestore-rules.test.mjs (Firebase Emulator, runs in CI).
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function isStr(v, max) { return v is string && v.size() <= max; }
+    // ---------- helpers ----------
+    function signedIn() { return request.auth != null; }
+    function isAdmin() {
+      return signedIn()
+        && request.auth.token.firebase.sign_in_provider == 'google.com'
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    function isStr(v, max) { return v is string && v.size() > 0 && v.size() <= max; }
     function isCount(v) { return v is int && v >= 0 && v <= 10000000; }
 
-    // ---- global high scores: records/{gameId} or records/{gameId}_g3 / _g6 ----
+    // ---------- admin allowlist (managed only in the Firebase console) ----------
+    match /admins/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;   // lets the app check "am I admin?"
+      allow write: if false;
+    }
+
+    // ---------- private: one subtree per anonymous device ----------
+    match /devices/{uid}/profiles/{profileId} {
+      function validProfile(d) {
+        return d.keys().hasOnly(['tag', 'avatar', 'grade', 'stars', 'streak', 'xp', 'gamesPlayed',
+                                 'achievements', 'quizAttempts', 'schema', 'updatedAt'])
+          && isStr(d.tag, 24)
+          && isStr(d.avatar, 16)
+          && d.grade in [3, 6]
+          && isCount(d.stars) && isCount(d.streak) && isCount(d.xp) && isCount(d.gamesPlayed)
+          && d.achievements is list && d.achievements.size() <= 200
+          && d.quizAttempts is map
+          && d.quizAttempts.keys().hasOnly(['hebrew', 'english', 'math'])
+          && isCount(d.quizAttempts.hebrew) && isCount(d.quizAttempts.english) && isCount(d.quizAttempts.math)
+          && d.schema == 2
+          && d.updatedAt == request.time;
+      }
+      function isOwner() { return signedIn() && request.auth.uid == uid; }
+
+      allow read: if isOwner() || isAdmin();
+      allow create, update: if isOwner() && profileId.matches('^[A-Za-z0-9_-]{1,64}$') && validProfile(request.resource.data);
+      allow delete: if isOwner();
+    }
+
+    // admin dashboard: collection-group query over every device's profiles
+    match /{path=**}/profiles/{profileId} {
+      allow read: if isAdmin();
+    }
+
+    // ---------- public high scores ----------
     match /records/{recordId} {
       allow read: if true;
 
-      function validRecord() {
-        let d = request.resource.data;
+      // v2 shape: written by a signed-in device; grade must match the _g3/_g6 suffix
+      function validRecordV2(d) {
+        return recordId.matches('^[a-z0-9-]{1,60}_g[36]$')
+          && d.keys().hasOnly(['score', 'tag', 'avatar', 'ownerUid', 'grade', 'date'])
+          && d.score is int && d.score >= -1000 && d.score <= 100000
+          && isStr(d.tag, 24)
+          && isStr(d.avatar, 16)
+          && d.ownerUid == request.auth.uid
+          && ((recordId.matches('^.*_g3$') && d.grade == 3) || (recordId.matches('^.*_g6$') && d.grade == 6))
+          && d.date == request.time;
+      }
+      function higherThanExisting() {
+        return resource == null || request.resource.data.score > resource.data.score;
+      }
+
+      allow create, update: if signedIn() && validRecordV2(request.resource.data) && higherThanExisting();
+
+      // TRANSITION ONLY: app versions before v71 write records without sign-in.
+      // Validated, only higher scores; userName limited to an initial (v70 sends "נ.").
+      function validRecordLegacy(d) {
         return recordId.matches('^[a-z0-9-]{1,60}(_g[36])?$')
           && d.keys().hasOnly(['score', 'userName', 'userAvatar', 'userId', 'date', 'grade'])
-          // memory scores are 100 − moves, which can dip below 0
           && d.score is number && d.score >= -1000 && d.score <= 100000
-          && isStr(d.userName, 40)
+          && isStr(d.userName, 2)
           && isStr(d.userAvatar, 16)
           && isStr(d.userId, 80)
           && d.date == request.time
           && (!('grade' in d) || d.grade in [3, 6]);
       }
+      allow create, update: if !signedIn() && validRecordLegacy(request.resource.data) && higherThanExisting();
 
-      allow create: if validRecord();
-      allow update: if validRecord() && request.resource.data.score > resource.data.score;
       allow delete: if false;
     }
 
-    // ---- one document per child per device: users/{deviceId}_{userId} ----
+    // ---------- legacy collections (pre-v71) ----------
+    // Reads: admin only (they contain names). Deletes: never from the app
+    // (cleanup is done with tools/migrate-legacy.mjs using admin credentials).
     match /users/{docId} {
-      allow read: if true;   // admin dashboard (closed in step 2)
-
-      function validUser(d) {
-        return isStr(d.name, 40)
-          && isStr(d.avatar, 16)
-          && d.grade in [2, 3, 5, 6]
-          && isStr(d.userId, 80)
-          && isStr(d.deviceId, 80);
-      }
+      allow read: if isAdmin();
+      allow delete: if false;
+      // TRANSITION ONLY: old app versions still sync here (write-only for them).
       allow create: if docId.size() <= 170
         && request.resource.data.keys().hasOnly(['userId', 'name', 'avatar', 'grade', 'deviceId', 'lastSeen', 'createdAt'])
-        && validUser(request.resource.data);
+        && isStr(request.resource.data.name, 40)
+        && isStr(request.resource.data.avatar, 16)
+        && request.resource.data.grade in [2, 3, 5, 6];
       allow update: if request.resource.data.diff(resource.data).affectedKeys()
           .hasOnly(['userId', 'name', 'avatar', 'grade', 'deviceId', 'lastSeen', 'createdAt'])
-        && validUser(request.resource.data);
-      allow delete: if false;
+        && isStr(request.resource.data.name, 40)
+        && request.resource.data.grade in [2, 3, 5, 6];
     }
-
-    // ---- progress summary per child per device: progress/{deviceId}_{userId} ----
     match /progress/{docId} {
-      allow read: if true;   // admin dashboard (closed in step 2)
-
-      function validProgress(d) {
-        return isStr(d.userId, 80)
-          && isStr(d.userName, 40)
-          && isStr(d.deviceId, 80)
-          && isCount(d.stars)
-          && isCount(d.streak)
-          && isCount(d.gamesPlayed)
-          && d.achievements is list && d.achievements.size() <= 200
-          && d.quizAttempts is map;
-      }
+      allow read: if isAdmin();
+      allow delete: if false;
+      // TRANSITION ONLY
       allow create: if docId.size() <= 170
         && request.resource.data.keys().hasOnly(['userId', 'userName', 'deviceId', 'stars', 'streak', 'achievements', 'gamesPlayed', 'quizAttempts', 'lastUpdated'])
-        && validProgress(request.resource.data);
+        && isCount(request.resource.data.stars)
+        && isCount(request.resource.data.streak)
+        && isCount(request.resource.data.gamesPlayed);
       allow update: if request.resource.data.diff(resource.data).affectedKeys()
           .hasOnly(['userId', 'userName', 'deviceId', 'stars', 'streak', 'achievements', 'gamesPlayed', 'quizAttempts', 'lastUpdated'])
-        && validProgress(request.resource.data);
-      allow delete: if false;
+        && isCount(request.resource.data.stars)
+        && isCount(request.resource.data.streak)
+        && isCount(request.resource.data.gamesPlayed);
     }
 
-    // everything else is closed
+    // ---------- everything else is closed ----------
     match /{document=**} {
       allow read, write: if false;
     }

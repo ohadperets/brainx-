@@ -71,7 +71,7 @@ let globalRecordsCache = {};
 // Records saved before grades were separated (records/{gameId}) were set by the older
 // grade, so grade 6 falls back to them until a grade-6 record is saved.
 function recordDocId(gameId) {
-  return `${gameId}_g${normalizeGrade(profile?.grade)}`;
+  return BrainXCloud.recordDocId(gameId, normalizeGrade(profile?.grade));
 }
 
 async function loadGlobalRecord(gameId, forceRefresh = false) {
@@ -92,27 +92,25 @@ async function loadGlobalRecord(gameId, forceRefresh = false) {
 }
 
 async function checkAndSaveGlobalRecord(gameId, score) {
-  if (!window.firebaseReady || !window.firebaseDB) return false;
+  if (!window.firebaseReady || !window.firebaseDB || !window.firebaseUid) return false;
   if (!currentUserId) return false;
-  const prof = loadProfile();
+  const user = ensurePublicTag(getUserById(currentUserId));
+  if (!user) return false;
   try {
     // Always fetch fresh from Firestore to avoid stale cache
     const current = await loadGlobalRecord(gameId, true);
     if (current && current.score >= score) return false;
 
-    const recordData = {
-      score,
-      // privacy: records are visible to every player, so only the first initial is stored
-      userName: publicName(prof?.name),
-      userAvatar: prof?.avatar || '😎',
-      userId: currentUserId,
-      date: window.firebaseServerTimestamp()
-    };
-    const docId = recordDocId(gameId);
-    const docRef = window.firebaseDoc(window.firebaseDB, 'records', docId);
-    await window.firebaseSetDoc(docRef, { ...recordData, grade: normalizeGrade(profile?.grade) });
+    const grade = normalizeGrade(profile?.grade);
+    const docId = BrainXCloud.recordDocId(gameId, grade);
+    // privacy: only the generated nickname + avatar are public — never the child's name
+    const recordData = BrainXCloud.buildRecordDoc({
+      score, tag: user.publicTag, avatar: user.avatar, uid: window.firebaseUid, grade,
+      serverTimestamp: window.firebaseServerTimestamp,
+    });
+    await window.firebaseSetDoc(window.firebaseDoc(window.firebaseDB, 'records', docId), recordData);
     globalRecordsCache[docId] = { ...recordData, date: new Date() };
-    showGlobalRecordBanner(prof?.name || 'תלמיד');   // shown only on this device
+    showGlobalRecordBanner(profile?.name || user.publicTag);   // shown only on this device
     return true;
   } catch (e) { console.error('Save global record error:', e); }
   return false;
@@ -145,7 +143,7 @@ async function displayGameRecord(gameId, screenId) {
   const record = await loadGlobalRecord(gameId, true);
   if (record) {
     recordBar.innerHTML = `<span class="record-trophy">🏆</span>
-      <span class="record-holder">${escapeText(record.userAvatar || '😎')} ${escapeText(publicName(record.userName))}</span>
+      <span class="record-holder">${escapeText(record.avatar || record.userAvatar || '😎')} ${escapeText(BrainXCloud.displayName(record))}</span>
       <span class="record-divider">|</span>
       <span class="record-score">שיא: ${escapeText(record.score)}</span>`;
   } else {
@@ -260,6 +258,7 @@ function updateUser(userId, updates) {
 }
 
 function deleteUser(userId) {
+  deleteProfileFromCloud(userId);
   let users = getAllUsers();
   users = users.filter(u => u.id !== userId);
   saveAllUsers(users);
@@ -4862,28 +4861,38 @@ function launchConfetti() {
 }
 
 // ===== ADMIN SYSTEM =====
-const ADMIN_CREDENTIALS = { username: 'ohadp', password: 'Op0544756518' };
+// Admin = Google account listed in Firestore admins/{uid} (created by hand in the Firebase
+// console). The check that matters is enforced by Firestore rules, not by this flag.
 let isAdminLoggedIn = false;
 
-function adminLogin() {
-  const username = document.getElementById('admin-username').value.trim();
-  const password = document.getElementById('admin-password').value;
+async function adminLogin() {
   const errorEl = document.getElementById('admin-login-error');
-  
-  if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
-    isAdminLoggedIn = true;
-    errorEl.classList.add('hidden');
-    document.getElementById('admin-username').value = '';
-    document.getElementById('admin-password').value = '';
-    navigate('admin-dashboard');
-  } else {
-    errorEl.textContent = '❌ שם משתמש או סיסמה שגויים';
-    errorEl.classList.remove('hidden');
+  const btn = document.getElementById('admin-google-btn');
+  const fail = (msg) => { errorEl.textContent = msg; errorEl.classList.remove('hidden'); };
+  errorEl.classList.add('hidden');
+  if (!window.brainxAdmin) {
+    fail(window.brainxCloudDisabled ? 'כניסת מנהל זמינה רק באתר הרשמי (brainxiq.com).' : 'החיבור לשרת עדיין לא מוכן. נסו שוב בעוד רגע.');
+    return;
+  }
+  if (btn) btn.disabled = true;
+  try {
+    const res = await window.brainxAdmin.signIn();
+    if (res.ok) {
+      isAdminLoggedIn = true;
+      navigate('admin-dashboard');
+    } else {
+      fail(`החשבון הזה אינו מורשה. מזהה לרשימת המנהלים: ${res.uid}`);
+    }
+  } catch (e) {
+    fail('ההתחברות בוטלה או נכשלה.');
+  } finally {
+    if (btn) btn.disabled = false;
   }
 }
 
 function adminLogout() {
   isAdminLoggedIn = false;
+  if (window.brainxAdmin) window.brainxAdmin.signOut().catch(() => {});
   navigate('home');
 }
 
@@ -5353,65 +5362,47 @@ function getDeviceId() {
   return deviceId;
 }
 
-async function syncUserToCloud(userData) {
-  console.log('🔄 syncUserToCloud called, firebaseReady:', window.firebaseReady, 'firebaseDB:', !!window.firebaseDB);
-  if (!window.firebaseReady || !window.firebaseDB) {
-    console.log('⚠️ Firebase not ready, skipping sync');
-    return;
+// Each profile keeps a generated public nickname ("שועל 37"); the real name never leaves the device.
+function ensurePublicTag(user) {
+  if (!user) return null;
+  if (!user.publicTag) {
+    user.publicTag = BrainXCloud.makeTag(user.avatar);
+    updateUser(user.id, { publicTag: user.publicTag });
   }
-  
+  return user;
+}
+
+// Private cloud copy of a profile's progress summary (no name), readable only by this
+// device's anonymous account and the admin. Debounced: progress saves happen often.
+const cloudSyncTimers = {};
+function scheduleProfileSync(userId, delay = 2500) {
+  if (!userId) return;
+  clearTimeout(cloudSyncTimers[userId]);
+  cloudSyncTimers[userId] = setTimeout(() => syncProfileToCloud(userId), delay);
+}
+
+async function syncProfileToCloud(userId) {
+  if (!window.firebaseReady || !window.firebaseDB || !window.firebaseUid || !userId) return;
+  const user = ensurePublicTag(getUserById(userId));
+  if (!user) return;
   try {
-    const deviceId = getDeviceId();
-    console.log('📤 Syncing user:', userData.name, 'deviceId:', deviceId);
-    const docRef = window.firebaseDoc(window.firebaseDB, 'users', deviceId + '_' + userData.id);
-    
-    await window.firebaseSetDoc(docRef, {
-      userId: userData.id,
-      name: userData.name,
-      avatar: userData.avatar,
-      grade: normalizeGrade(userData.grade),
-      deviceId: deviceId,
-      lastSeen: window.firebaseServerTimestamp(),
-      createdAt: userData.createdAt || new Date().toISOString()
-    }, { merge: true });
-    
-    console.log('✅ User synced to cloud:', userData.name);
+    const p = userId === currentUserId ? progress : loadProgressForUser(userId);
+    const ref = window.firebaseDoc(window.firebaseDB, 'devices', window.firebaseUid, 'profiles', userId);
+    await window.firebaseSetDoc(ref, BrainXCloud.buildProfileDoc({
+      user, progress: p, serverTimestamp: window.firebaseServerTimestamp,
+    }));
   } catch (error) {
-    console.error('❌ Cloud sync error:', error);
+    console.error('Cloud sync error:', error);
   }
 }
 
-async function syncProgressToCloud(userId, progressData) {
-  console.log('🔄 syncProgressToCloud called');
-  if (!window.firebaseReady || !window.firebaseDB) {
-    console.log('⚠️ Firebase not ready, skipping progress sync');
-    return;
-  }
-  
+// Deleting a profile on the device also deletes its private cloud copy.
+async function deleteProfileFromCloud(userId) {
+  if (!window.firebaseReady || !window.firebaseDB || !window.firebaseUid || !userId) return;
   try {
-    const deviceId = getDeviceId();
-    const userName = profile?.name || 'Unknown';
-    const docRef = window.firebaseDoc(window.firebaseDB, 'progress', deviceId + '_' + userId);
-    
-    await window.firebaseSetDoc(docRef, {
-      userId: userId,
-      userName: userName,
-      deviceId: deviceId,
-      stars: progressData.stars || 0,
-      streak: progressData.streak || 0,
-      achievements: progressData.unlockedAchievements || [],
-      gamesPlayed: progressData.gamesPlayed || 0,
-      quizAttempts: {
-        hebrew: progressData.hebrew?.quizAttempts || 0,
-        english: progressData.english?.quizAttempts || 0,
-        math: progressData.math?.quizAttempts || 0
-      },
-      lastUpdated: window.firebaseServerTimestamp()
-    }, { merge: true });
-    
-    console.log('✅ Progress synced to cloud');
+    await window.firebaseDeleteDoc(window.firebaseDoc(window.firebaseDB, 'devices', window.firebaseUid, 'profiles', userId));
   } catch (error) {
-    console.error('❌ Progress sync error:', error);
+    console.error('Cloud delete error:', error);
   }
 }
 
@@ -5419,33 +5410,18 @@ async function syncProgressToCloud(userId, progressData) {
 const originalSaveProgress = saveProgress;
 saveProgress = function(p) {
   originalSaveProgress(p);
-  // Sync to cloud in background (don't wait)
-  if (currentUserId) {
-    syncProgressToCloud(currentUserId, p);
-  }
+  if (currentUserId) scheduleProfileSync(currentUserId);
 };
 
 const originalSaveProfileData = saveProfileData;
 saveProfileData = function(prof) {
   originalSaveProfileData(prof);
-  // Sync to cloud in background
-  if (currentUserId && prof) {
-    syncUserToCloud({ id: currentUserId, ...prof });
-  }
+  if (currentUserId && prof) scheduleProfileSync(currentUserId, 500);
 };
 
 // Sync on app load when Firebase is ready
 window.addEventListener('firebaseReady', () => {
-  console.log('🔥 Firebase connected - cloud sync enabled');
-  console.log('Current user ID:', currentUserId);
-  console.log('Profile:', profile);
-  // Sync current user if exists
-  if (currentUserId && profile) {
-    syncUserToCloud({ id: currentUserId, ...profile });
-    syncProgressToCloud(currentUserId, progress);
-  } else {
-    console.log('⚠️ No user logged in yet, will sync when user is selected');
-  }
+  if (currentUserId) scheduleProfileSync(currentUserId, 500);
 });
 
 // Admin Analytics Dashboard
@@ -5453,8 +5429,9 @@ async function loadAnalytics() {
   const tableEl = document.getElementById('analytics-table');
   const updateEl = document.getElementById('analytics-last-update');
   
-  if (!window.firebaseReady || !window.firebaseDB) {
-    tableEl.innerHTML = '<div style="text-align: center; padding: 30px; color: #e74c3c;">Firebase לא מחובר. נסה לרענן את הדף.</div>';
+  const adminDb = window.brainxAdmin && window.brainxAdmin.isSignedIn() ? window.brainxAdmin.db : null;
+  if (!adminDb) {
+    tableEl.innerHTML = '<div style="text-align: center; padding: 30px; color: #e74c3c;">יש להתחבר כמנהל עם Google.</div>';
     return;
   }
   
@@ -5462,7 +5439,10 @@ async function loadAnalytics() {
   
   try {
     // Get users
-    const usersSnapshot = await window.firebaseGetDocs(window.firebaseCollection(window.firebaseDB, 'users'));
+    // v2: private profiles of every device (nickname only) — readable only with admin rights
+    const profilesSnapshot = await window.firebaseGetDocs(window.firebaseCollectionGroup(adminDb, 'profiles'));
+    // legacy (pre-v71) collections, still read during the transition
+    const usersSnapshot = await window.firebaseGetDocs(window.firebaseCollection(adminDb, 'users'));
     const users = {};
     usersSnapshot.forEach(doc => {
       const data = doc.data();
@@ -5470,7 +5450,7 @@ async function loadAnalytics() {
     });
     
     // Get progress
-    const progressSnapshot = await window.firebaseGetDocs(window.firebaseCollection(window.firebaseDB, 'progress'));
+    const progressSnapshot = await window.firebaseGetDocs(window.firebaseCollection(adminDb, 'progress'));
     const progressList = [];
     let totalStars = 0;
     let totalGames = 0;
@@ -5478,7 +5458,7 @@ async function loadAnalytics() {
     
     progressSnapshot.forEach(doc => {
       const data = doc.data();
-      progressList.push(data);
+      progressList.push({ ...data, userName: `${data.userName || ''} (גרסה ישנה)` });
       totalStars += data.stars || 0;
       totalGames += data.gamesPlayed || 0;
       totalQuizzes += (data.quizAttempts?.hebrew || 0) + 
@@ -5486,6 +5466,15 @@ async function loadAnalytics() {
                      (data.quizAttempts?.math || 0);
     });
     
+    profilesSnapshot.forEach(doc => {
+      const d = doc.data();
+      progressList.push({ userId: doc.id, userName: d.tag, avatar: d.avatar, stars: d.stars, streak: d.streak,
+                          gamesPlayed: d.gamesPlayed, quizAttempts: d.quizAttempts, achievements: d.achievements });
+      totalStars += d.stars || 0;
+      totalGames += d.gamesPlayed || 0;
+      totalQuizzes += (d.quizAttempts?.hebrew || 0) + (d.quizAttempts?.english || 0) + (d.quizAttempts?.math || 0);
+    });
+
     // Update stats - use progressList.length as primary (reflects actual activity)
     document.getElementById('stat-users').textContent = progressList.length || Object.keys(users).length;
     document.getElementById('stat-stars').textContent = totalStars;
@@ -5522,7 +5511,7 @@ async function loadAnalytics() {
       html += `
         <tr style="border-bottom: 1px solid #eee;">
           <td style="padding: 10px; text-align: right;">
-            ${medal} <span style="font-size: 1.2rem;">${escapeText(user.avatar || '👤')}</span>
+            ${medal} <span style="font-size: 1.2rem;">${escapeText(p.avatar || user.avatar || '👤')}</span>
             ${escapeText(p.userName || user.name || 'לא ידוע')}
           </td>
           <td style="padding: 10px; text-align: center;"><span style="background: #ffd700; padding: 2px 8px; border-radius: 10px;">${Number(p.stars) || 0}</span></td>
@@ -6614,14 +6603,6 @@ function generateTrueFalseFromQuiz(subject) {
       : `${q.question}\nתשובה: ${shown}`;
     return { statement, isTrue };
   });
-}
-
-// ===== PRIVACY HELPERS =====
-// Names shown to other players are reduced to the first letter ("נועה" → "נ.").
-// Older records that still hold a full name are masked the same way when displayed.
-function publicName(name) {
-  const first = String(name || '').trim().charAt(0);
-  return first ? `${first}.` : 'אנונימי';
 }
 
 // ===== PARENT GATE =====

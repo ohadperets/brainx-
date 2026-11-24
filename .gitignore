@@ -1,2 +1,8 @@
 node_modules/
 .DS_Store
+# never commit credentials or exports of children's data
+*-firebase-adminsdk-*.json
+service-account*.json
+*legacy*backup*.json
+firebase-debug.log
+firestore-debug.log

@@ -1,5 +1,16 @@
 {
   "dependencies": {
     "firebase-admin": "^13.6.1"
+  },
+  "private": true,
+  "scripts": {
+    "smoke": "node tools/smoke.mjs",
+    "test:rules": "firebase emulators:exec --only firestore --project demo-brainx \"node --test tests/\"",
+    "test:rules:final": "firebase emulators:exec --only firestore --project demo-brainx \"RULES_FILE=firestore.final.rules node --test tests/\""
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "6.0.0",
+    "firebase": "13.4.0",
+    "firebase-tools": "15.37.0"
   }
 }

@@ -472,3 +472,7 @@ button.daily-challenge-card { width: 100%; font: inherit; text-align: start; }
 .gate-question { font-size: 1.8rem; font-weight: 800; margin: 8px 0 12px; }
 .gate-input { width: 100%; text-align: center; font-size: 1.3rem; margin-bottom: 8px; }
 .gate-error { color: var(--danger); font-weight: 600; margin-bottom: 8px; }
+
+/* profile name hint + admin sign-in */
+.name-hint { color: var(--text-3); font-weight: 400; font-size: 0.8rem; }
+.admin-help { color: var(--text-2); text-align: center; margin-bottom: 12px; }

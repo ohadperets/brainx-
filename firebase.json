@@ -7,7 +7,13 @@
       "**/node_modules/**",
       "tools/**",
       "content/**",
-      "firestore.rules"
+      "firestore.rules",
+      "tests/**",
+      "package.json",
+      "package-lock.json",
+      "firestore.final.rules",
+      "GOOGLE_PLAY_READINESS.md",
+      "*.md"
     ],
     "rewrites": [
       {
@@ -51,5 +57,14 @@
   },
   "firestore": {
     "rules": "firestore.rules"
+  },
+  "emulators": {
+    "firestore": {
+      "port": 8080
+    },
+    "ui": {
+      "enabled": false
+    },
+    "singleProjectMode": true
   }
 }

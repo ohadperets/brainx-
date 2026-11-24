@@ -36,42 +36,77 @@
   
   <!-- No analytics/tracking: BrainX is a children's app (Google Play Families policy). -->
 
-  <!-- Firebase SDK -->
+  <!-- Firebase: anonymous sign-in for devices, Google sign-in for the admin (separate app instance).
+       Cloud features run only on production hosts (core/cloud.js → BrainXCloud.isProductionHost),
+       so staging previews / GitHub Pages / localhost can never touch production children's data. -->
   <script type="module">
-    try {
-      const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js");
-      const { getFirestore, doc, setDoc, getDoc, collection, getDocs, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
-      
-      const firebaseConfig = {
-        apiKey: "AIzaSyASqhMNCsgNlFRNcBMJ92P-s17WLwK0dhY",
-        authDomain: "brainx-a65b8.firebaseapp.com",
-        projectId: "brainx-a65b8",
-        storageBucket: "brainx-a65b8.firebasestorage.app",
-        messagingSenderId: "611913012672",
-        appId: "1:611913012672:web:684d7aabc7769f46fc6425",
-        measurementId: "G-Y4RQ277T4D"
-      };
-      
+    const FIREBASE_VERSION = '10.8.0';
+    const firebaseConfig = {
+      apiKey: "AIzaSyASqhMNCsgNlFRNcBMJ92P-s17WLwK0dhY",
+      authDomain: "brainx-a65b8.firebaseapp.com",
+      projectId: "brainx-a65b8",
+      storageBucket: "brainx-a65b8.firebasestorage.app",
+      messagingSenderId: "611913012672",
+      appId: "1:611913012672:web:684d7aabc7769f46fc6425"
+    };
+
+    async function initFirebase() {
+      // core/cloud.js is a classic script that runs before this (deferred) module
+      const prodHost = window.BrainXCloud && BrainXCloud.isProductionHost(location.hostname);
+      if (!prodHost) {
+        console.info('BrainX: cloud features are off on this host (' + location.hostname + ')');
+        window.firebaseReady = false;
+        window.brainxCloudDisabled = true;
+        return;
+      }
+      const base = `https://www.gstatic.com/firebasejs/${FIREBASE_VERSION}`;
+      const { initializeApp } = await import(`${base}/firebase-app.js`);
+      const fs = await import(`${base}/firebase-firestore.js`);
+      const au = await import(`${base}/firebase-auth.js`);
+
+      // --- child devices: silent anonymous account ---
       const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
-      
-      // Make Firestore available globally
-      window.firebaseDB = db;
-      window.firebaseDoc = doc;
-      window.firebaseSetDoc = setDoc;
-      window.firebaseGetDoc = getDoc;
-      window.firebaseCollection = collection;
-      window.firebaseGetDocs = getDocs;
-      window.firebaseServerTimestamp = serverTimestamp;
-      window.firebaseReady = true;
-      
-      console.log('✅ Firebase initialized successfully');
-      
-      // Dispatch event when Firebase is ready
-      window.dispatchEvent(new Event('firebaseReady'));
-    } catch (error) {
-      console.error('❌ Firebase init error:', error);
+      const db = fs.getFirestore(app);
+      const auth = au.getAuth(app);
+      Object.assign(window, {
+        firebaseDB: db,
+        firebaseDoc: fs.doc, firebaseSetDoc: fs.setDoc, firebaseGetDoc: fs.getDoc, firebaseDeleteDoc: fs.deleteDoc,
+        firebaseCollection: fs.collection, firebaseCollectionGroup: fs.collectionGroup, firebaseGetDocs: fs.getDocs,
+        firebaseServerTimestamp: fs.serverTimestamp,
+      });
+      au.onAuthStateChanged(auth, (user) => {
+        if (!user) return;
+        window.firebaseUid = user.uid;
+        if (!window.firebaseReady) {
+          window.firebaseReady = true;
+          window.dispatchEvent(new Event('firebaseReady'));
+        }
+      });
+      if (!auth.currentUser) await au.signInAnonymously(auth);
+
+      // --- admin: Google sign-in on a SEPARATE app instance, so the device's anonymous
+      //     session (and the children's sync) is never replaced by the admin account ---
+      const adminApp = initializeApp(firebaseConfig, 'admin');
+      const adminAuth = au.getAuth(adminApp);
+      const adminDb = fs.getFirestore(adminApp);
+      window.brainxAdmin = {
+        async signIn() {
+          const cred = await au.signInWithPopup(adminAuth, new au.GoogleAuthProvider());
+          const allow = await fs.getDoc(fs.doc(adminDb, 'admins', cred.user.uid));
+          if (!allow.exists()) {
+            const uid = cred.user.uid;
+            await au.signOut(adminAuth);
+            return { ok: false, uid };
+          }
+          return { ok: true, email: cred.user.email };
+        },
+        async signOut() { await au.signOut(adminAuth); },
+        db: adminDb,
+        isSignedIn: () => !!adminAuth.currentUser,
+      };
     }
+
+    initFirebase().catch((error) => console.error('Firebase init error:', error));
   </script>
 </head>
 <body>
@@ -100,8 +135,8 @@
           <span class="grade-label">כיתה ו׳</span>
         </button>
       </div>
-      <p>איך קוראים לך?</p>
-      <input type="text" id="profile-name-input" class="text-input" placeholder="השם שלך..." maxlength="20">
+      <p>איך לקרוא לך? <small class="name-hint">(שם פרטי או כינוי · נשמר רק במכשיר הזה)</small></p>
+      <input type="text" id="profile-name-input" class="text-input" placeholder="שם או כינוי..." maxlength="20">
       <p>בחר אווטאר:</p>
       <div class="avatar-grid" id="avatar-grid"></div>
       <button class="btn-primary" onclick="saveProfile()">!בואו נתחיל 🚀</button>
@@ -1155,9 +1190,8 @@
           <div class="admin-logo">🔐</div>
           <h2>כניסת מנהל</h2>
           <div class="admin-form">
-            <input type="text" id="admin-username" class="text-input" placeholder="שם משתמש" autocomplete="off">
-            <input type="password" id="admin-password" class="text-input" placeholder="סיסמה" autocomplete="off">
-            <button class="btn-primary" onclick="adminLogin()">כניסה</button>
+            <p class="admin-help">כניסה למנהלים בלבד, עם חשבון Google מורשה.</p>
+            <button class="btn-primary" id="admin-google-btn" onclick="adminLogin()">התחברות עם Google</button>
             <div id="admin-login-error" class="admin-error hidden"></div>
           </div>
         </div>
@@ -1546,6 +1580,7 @@
   <script src="core/feedback.js"></script>
   <script src="core/game-kit.js"></script>
   <script src="core/rewards.js"></script>
+  <script src="core/cloud.js"></script>
   <script src="data.js"></script>
   <script src="content-imports.js"></script>
   <script src="app.js"></script>

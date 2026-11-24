@@ -106,7 +106,7 @@ function makeContext() {
 }
 
 // ---------- load the app ----------
-const SCRIPTS = ['version.js', 'core/timers.js', 'core/feedback.js', 'core/game-kit.js', 'core/rewards.js', 'data.js', 'content-imports.js', 'app.js', 'core/games-extra.js'];
+const SCRIPTS = ['version.js', 'core/timers.js', 'core/feedback.js', 'core/game-kit.js', 'core/rewards.js', 'core/cloud.js', 'data.js', 'content-imports.js', 'app.js', 'core/games-extra.js'];
 const failures = [];
 
 function load(ctx) {
@@ -309,8 +309,15 @@ function run(grade) {
 
   // ---- privacy ----
   try {
-    const pn = exec(`[publicName('נועה'), publicName(''), publicName(' Dan ')].join('|')`);
-    if (pn !== 'נ.|אנונימי|D.') failures.push(`[g${grade}] publicName wrong: ${pn}`);
+    const pn = exec(`[BrainXCloud.displayName({ tag: 'שועל 37', userName: 'נועה' }), BrainXCloud.displayName({ userName: 'נועה' }), BrainXCloud.displayName({})].join('|')`);
+    if (pn !== 'שועל 37|נ.|אנונימי') failures.push(`[g${grade}] displayName wrong: ${pn}`);
+    // the cloud copy of a profile never contains the child's name
+    const doc = exec(`(() => { const u = ensurePublicTag(getUserById(currentUserId)); return BrainXCloud.buildProfileDoc({ user: u, progress, serverTimestamp: () => 'TS' }); })()`);
+    if ('name' in doc || JSON.stringify(doc).includes(exec('profile.name'))) failures.push(`[g${grade}] profile cloud doc leaks the name`);
+    if (!/^\S+ \d{2}$/.test(doc.tag)) failures.push(`[g${grade}] generated tag looks wrong: ${doc.tag}`);
+    if (exec('getUserById(currentUserId).publicTag') !== doc.tag) failures.push(`[g${grade}] tag not persisted on the profile`);
+    // admin sign-in without Firebase (non-production host) fails gracefully
+    exec(`adminLogin()`);
     exec(`openParentGate('privacy'); navigate('home'); document.getElementById('parent-gate')?.remove()`);
   } catch (e) { failures.push(`[g${grade}] privacy helpers: ${e.message}`); }
 
@@ -337,7 +344,8 @@ run(6);
 const indexHtml = read('index.html');
 if (/googletagmanager|gtag\(/.test(indexHtml)) failures.push('analytics script is back in index.html');
 if (/wa\.me|972544756518/.test(indexHtml + appSrc)) failures.push('personal phone number / WhatsApp link is back');
-if (/password:\s*'[^']+'/.test(appSrc)) console.log('⚠️  hardcoded admin password still present in app.js (step 2: Firebase Auth)');
+if (/ADMIN_CREDENTIALS|password:\s*'[^']+'/.test(appSrc)) failures.push('hardcoded admin credentials are back in app.js');
+if (/admin-password|admin-username/.test(indexHtml)) failures.push('password login form is back in index.html');
 
 if (failures.length) {
   console.log(`\n❌ ${failures.length} problem(s):`);

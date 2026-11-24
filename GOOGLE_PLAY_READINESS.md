@@ -18,7 +18,7 @@ Status legend: ✅ done · 🟡 done in code, waiting for approval/deploy · ⏳
 | B5 | Contact email not configured (`CONTACT_EMAIL` in `app.js` is empty) | ⏳ | M9 |
 | B6 | GitHub Pages publishes a second, unmanaged copy of the app | ⏳ | M6 |
 | B7 | Android packaging (Trusted Web Activity) not created yet | ⏳ | Section 7 |
-| B8 | Emulator rules tests must pass in CI on the release commit | 🟡 | CI run on `security-hardening` |
+| B8 | Emulator rules tests must pass in CI on the release commit | ✅ green on `security-hardening` (fe79f7b), both rule files | re-check on the merge commit |
 
 ---
 
@@ -40,7 +40,7 @@ Status legend: ✅ done · 🟡 done in code, waiting for approval/deploy · ⏳
 | Admin authorization enforced server-side (Google provider + `admins/{uid}`) | 🟡 v71 | Separate Firebase app instance, so the device's anonymous session is untouched |
 | Profile deletion also deletes the cloud copy | 🟡 v71 | `deleteProfileFromCloud` |
 | Staging/GitHub Pages/localhost cannot touch production data | 🟡 v71 | Cloud is enabled only on `BrainXCloud.PRODUCTION_HOSTS` |
-| Firestore emulator tests incl. negative authorization (both rule files) | 🟡 v71 | `tests/firestore-rules.test.mjs`, CI `firestore-rules-tests.yml` |
+| Firestore emulator tests incl. negative authorization (both rule files) | ✅ CI green | `tests/firestore-rules.test.mjs` (27 tests), CI `firestore-rules-tests.yml` runs on every push |
 | Legacy cleanup script (dry-run by default) | 🟡 v71 | `tools/migrate-legacy.mjs` |
 | Zero extra cost | ✅ | Spark plan: Firestore + Anonymous/Google Auth + Hosting preview channels + GitHub Actions are free at this scale |
 
@@ -92,7 +92,9 @@ migration; only the cloud copies change. Every phase is reversible until phase 4
 | Clearing app data creates a new anonymous account; the old private copy is orphaned until deleted on request. | Low | Documented in the privacy policy; optional cleanup of profiles not updated for 12 months via the admin script. |
 | Progress backup/restore across devices | Low | Future release (e.g. a parent-gated export/import code). |
 | Some older screens are not fully restyled (dark theme) | Low | UI backlog |
-| `actions/checkout@v4` Node 20 deprecation warning in CI | Low | Bump actions when v5 is stable |
+| `actions/checkout@v4` / `setup-java@v4` deprecation warnings in CI | Low | Bump to v5 |
+| Admin Google sign-in uses a popup; inside the Android app (TWA) popups may be blocked | Low | Admin signs in from a regular browser at brainxiq.com (admin isn't needed inside the app) |
+| Cloud sync is debounced (2.5 s); progress made right before the app is closed may reach the cloud on the next open | Low | Local progress is unaffected; acceptable |
 
 ---
 

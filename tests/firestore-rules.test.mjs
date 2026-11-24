@@ -212,7 +212,9 @@ describe('public records', () => {
     await assertFails(setDoc(doc(db, 'records/new-game_g6'), recordDoc('kid-a', { grade: 3 })));             // suffix mismatch
     await assertFails(setDoc(doc(db, 'records/new-game'), recordDoc('kid-a')));                             // v2 needs _gN
     await assertFails(setDoc(doc(db, 'records/new-game_g3'), recordDoc('kid-a', { userName: 'נועה' })));   // name field
-    await assertFails(setDoc(doc(db, 'records/new-game_g3'), recordDoc('kid-a', { score: '99' })));
+    // bypass the app's builder (it coerces scores to integers) to test the rule itself
+    await assertFails(setDoc(doc(db, 'records/new-game_g3'), { ...recordDoc('kid-a'), score: '99' }));
+    await assertFails(setDoc(doc(db, 'records/new-game_g3'), { ...recordDoc('kid-a'), score: 12.5 }));
     await assertFails(setDoc(doc(db, 'records/new-game_g3'), recordDoc('kid-a', { score: 9999999 })));
     await assertFails(setDoc(doc(db, 'records/New_Game_g3'), recordDoc('kid-a')));                          // id format
     await assertFails(setDoc(doc(db, 'records/new-game_g3'), { ...recordDoc('kid-a'), date: Timestamp.fromDate(new Date('2020-01-01')) }));

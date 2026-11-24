@@ -34,15 +34,8 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="theme.css">
   
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZN8BW56CVN"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-ZN8BW56CVN');
-  </script>
-  
+  <!-- No analytics/tracking: BrainX is a children's app (Google Play Families policy). -->
+
   <!-- Firebase SDK -->
   <script type="module">
     try {
@@ -1151,7 +1144,8 @@
           <button class="btn-danger" onclick="resetProgress()" style="margin-top:16px">🗑️ אפס את כל ההתקדמות</button>
           <h3 class="section-title" style="margin-top:30px">🔐 ניהול</h3>
           <button class="btn-secondary" onclick="navigate('admin-login')">🛠️ כניסת מנהל</button>
-          <a href="https://wa.me/972544756518" target="_blank" style="display: block; margin-top: 30px; color: #667eea; font-size: 13px; text-decoration: none;">💬 צור קשר</a>
+          <button class="btn-secondary" id="btn-contact" onclick="openParentGate('contact')" style="margin-top: 30px">💬 צור קשר (להורים)</button>
+          <button class="btn-secondary" onclick="openParentGate('privacy')" style="margin-top: 10px">🔒 מדיניות פרטיות</button>
         </div>
       </section>
 

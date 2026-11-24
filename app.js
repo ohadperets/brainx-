@@ -102,7 +102,8 @@ async function checkAndSaveGlobalRecord(gameId, score) {
 
     const recordData = {
       score,
-      userName: prof?.name || 'תלמיד',
+      // privacy: records are visible to every player, so only the first initial is stored
+      userName: publicName(prof?.name),
       userAvatar: prof?.avatar || '😎',
       userId: currentUserId,
       date: window.firebaseServerTimestamp()
@@ -111,7 +112,7 @@ async function checkAndSaveGlobalRecord(gameId, score) {
     const docRef = window.firebaseDoc(window.firebaseDB, 'records', docId);
     await window.firebaseSetDoc(docRef, { ...recordData, grade: normalizeGrade(profile?.grade) });
     globalRecordsCache[docId] = { ...recordData, date: new Date() };
-    showGlobalRecordBanner(prof?.name || 'תלמיד');
+    showGlobalRecordBanner(prof?.name || 'תלמיד');   // shown only on this device
     return true;
   } catch (e) { console.error('Save global record error:', e); }
   return false;
@@ -144,7 +145,7 @@ async function displayGameRecord(gameId, screenId) {
   const record = await loadGlobalRecord(gameId, true);
   if (record) {
     recordBar.innerHTML = `<span class="record-trophy">🏆</span>
-      <span class="record-holder">${escapeText(record.userAvatar || '😎')} ${escapeText(record.userName || 'אנונימי')}</span>
+      <span class="record-holder">${escapeText(record.userAvatar || '😎')} ${escapeText(publicName(record.userName))}</span>
       <span class="record-divider">|</span>
       <span class="record-score">שיא: ${escapeText(record.score)}</span>`;
   } else {
@@ -6614,3 +6615,65 @@ function generateTrueFalseFromQuiz(subject) {
     return { statement, isTrue };
   });
 }
+
+// ===== PRIVACY HELPERS =====
+// Names shown to other players are reduced to the first letter ("נועה" → "נ.").
+// Older records that still hold a full name are masked the same way when displayed.
+function publicName(name) {
+  const first = String(name || '').trim().charAt(0);
+  return first ? `${first}.` : 'אנונימי';
+}
+
+// ===== PARENT GATE =====
+// Anything that leaves the app (email) or is meant for parents sits behind a small
+// arithmetic check, as Google Play's Families policy expects for children's apps.
+const CONTACT_EMAIL = '';   // set to the app's contact address; the contact button hides while empty
+
+function openParentGate(action) {
+  const a = 6 + Math.floor(Math.random() * 4);
+  const b = 6 + Math.floor(Math.random() * 4);
+  const answer = String(a * b);
+  const overlay = document.createElement('div');
+  overlay.className = 'results-overlay';
+  overlay.id = 'parent-gate';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.innerHTML = `
+    <div class="results-card">
+      <div class="rc-emoji">👪</div>
+      <h2 class="rc-title">להורים בלבד</h2>
+      <p class="rc-summary">כדי להמשיך, ענו על השאלה:</p>
+      <div class="gate-question" dir="ltr">${a} × ${b} = ?</div>
+      <input type="number" inputmode="numeric" class="text-input gate-input" id="gate-input" aria-label="התשובה">
+      <div class="gate-error hidden" id="gate-error">תשובה לא נכונה</div>
+      <div class="rc-actions">
+        <button class="results-btn results-btn-primary" data-gate="ok">המשך</button>
+        <button class="results-btn" data-gate="cancel" style="grid-column: 1 / -1">ביטול</button>
+      </div>
+    </div>`;
+  const close = () => overlay.remove();
+  const submit = () => {
+    if (document.getElementById('gate-input').value.trim() !== answer) {
+      document.getElementById('gate-error').classList.remove('hidden');
+      return;
+    }
+    close();
+    if (action === 'contact' && CONTACT_EMAIL) window.location.href = `mailto:${CONTACT_EMAIL}?subject=BrainX`;
+    if (action === 'privacy') window.open('privacy.html', '_blank', 'noopener');
+  };
+  overlay.addEventListener('click', e => {
+    const k = e.target.closest && e.target.closest('[data-gate]')?.dataset.gate;
+    if (k === 'ok') submit();
+    if (k === 'cancel') close();
+  });
+  overlay.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); if (e.key === 'Escape') close(); });
+  document.body.appendChild(overlay);
+  T.after(() => document.getElementById('gate-input')?.focus(), 50);
+}
+
+// hide the contact button until a contact email is configured
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('btn-contact');
+  if (btn && !CONTACT_EMAIL) btn.style.display = 'none';
+});
+

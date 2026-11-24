@@ -307,6 +307,13 @@ function run(grade) {
     if (/confirmDeleteUser\('[^']*',/.test(html)) failures.push(`[g${grade}] user name still passed inside an inline handler`);
   } catch (e) { failures.push(`[g${grade}] escaping: ${e.message}`); }
 
+  // ---- privacy ----
+  try {
+    const pn = exec(`[publicName('נועה'), publicName(''), publicName(' Dan ')].join('|')`);
+    if (pn !== 'נ.|אנונימי|D.') failures.push(`[g${grade}] publicName wrong: ${pn}`);
+    exec(`openParentGate('privacy'); navigate('home'); document.getElementById('parent-gate')?.remove()`);
+  } catch (e) { failures.push(`[g${grade}] privacy helpers: ${e.message}`); }
+
   // auto-advance: Next must advance exactly once even with a pending timer
   try {
     const r = exec(`(() => { let n = 0; AutoAdvance.schedule(2000, () => n++); AutoAdvance.next(); AutoAdvance.next(); return [n, T.pending()]; })()`);
@@ -325,6 +332,12 @@ function run(grade) {
 
 run(3);
 run(6);
+
+// static privacy checks
+const indexHtml = read('index.html');
+if (/googletagmanager|gtag\(/.test(indexHtml)) failures.push('analytics script is back in index.html');
+if (/wa\.me|972544756518/.test(indexHtml + appSrc)) failures.push('personal phone number / WhatsApp link is back');
+if (/password:\s*'[^']+'/.test(appSrc)) console.log('⚠️  hardcoded admin password still present in app.js (step 2: Firebase Auth)');
 
 if (failures.length) {
   console.log(`\n❌ ${failures.length} problem(s):`);

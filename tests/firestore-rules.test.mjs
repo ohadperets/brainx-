@@ -2,8 +2,8 @@
 //
 // Run (needs Java 11+ and Node 24.12+):
 //   npm install
-//   npx firebase emulators:exec --only firestore --project demo-brainx "node --test tests/"
-//   RULES_FILE=firestore.final.rules npx firebase emulators:exec --only firestore --project demo-brainx "node --test tests/"
+//   npx firebase emulators:exec --only firestore --project demo-brainx "node --test tests/*.test.mjs"
+//   RULES_FILE=firestore.final.rules npx firebase emulators:exec --only firestore --project demo-brainx "node --test tests/*.test.mjs"
 // CI: .github/workflows/firestore-rules-tests.yml runs both rule files on every push.
 //
 // The documents written here are built with core/cloud.js — the same code the app uses —

@@ -35,7 +35,7 @@ jobs:
         env:
           RULES_FILE: ${{ matrix.rules }}
         run: |
-          if ! npx firebase emulators:exec --only firestore --project demo-brainx "node --test --test-reporter=spec tests/" > rules-test.log 2>&1; then
+          if ! npx firebase emulators:exec --only firestore --project demo-brainx "node --test --test-reporter=spec tests/*.test.mjs" > rules-test.log 2>&1; then
             # surface failing test names as annotations (readable without opening the log)
             grep -E '✖|not ok|Error|FAILED' rules-test.log | head -20 | while IFS= read -r line; do echo "::error title=rules test::$line"; done
             tail -120 rules-test.log

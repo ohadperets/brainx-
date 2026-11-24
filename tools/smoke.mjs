@@ -294,6 +294,19 @@ function run(grade) {
     if (exec('T.pending()')) failures.push(`[g${grade}] timers left after the new games`);
   } catch (e) { failures.push(`[g${grade}] new games: ${e.message}`); }
 
+  // ---- security: names are escaped wherever they reach the page ----
+  try {
+    const html = exec(`(() => {
+      const evil = "<img src=x onerror=alert(1)>ג'ורג'";
+      const users = getAllUsers(); users.push({ id: 'user_evil', name: evil, avatar: '😎', grade: ${grade}, createdAt: 1 }); saveAllUsers(users);
+      showUserSelectScreen();
+      const out = document.getElementById('user-list').innerHTML;
+      saveAllUsers(getAllUsers().filter(u => u.id !== 'user_evil'));
+      return out; })()`);
+    if (/<img/i.test(html)) failures.push(`[g${grade}] user list renders raw HTML from a name`);
+    if (/confirmDeleteUser\('[^']*',/.test(html)) failures.push(`[g${grade}] user name still passed inside an inline handler`);
+  } catch (e) { failures.push(`[g${grade}] escaping: ${e.message}`); }
+
   // auto-advance: Next must advance exactly once even with a pending timer
   try {
     const r = exec(`(() => { let n = 0; AutoAdvance.schedule(2000, () => n++); AutoAdvance.next(); AutoAdvance.next(); return [n, T.pending()]; })()`);

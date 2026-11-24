@@ -120,7 +120,7 @@ async function checkAndSaveGlobalRecord(gameId, score) {
 function showGlobalRecordBanner(name) {
   const banner = document.createElement('div');
   banner.className = 'global-record-banner';
-  banner.innerHTML = `🌟🏆 ${name} שבר/ה את השיא! 🏆🌟`;
+  banner.textContent = `🌟🏆 ${name} שבר/ה את השיא! 🏆🌟`;
   document.body.appendChild(banner);
   setTimeout(() => banner.classList.add('show'), 10);
   setTimeout(() => {
@@ -144,9 +144,9 @@ async function displayGameRecord(gameId, screenId) {
   const record = await loadGlobalRecord(gameId, true);
   if (record) {
     recordBar.innerHTML = `<span class="record-trophy">🏆</span>
-      <span class="record-holder">${record.userAvatar || '😎'} ${record.userName || 'אנונימי'}</span>
+      <span class="record-holder">${escapeText(record.userAvatar || '😎')} ${escapeText(record.userName || 'אנונימי')}</span>
       <span class="record-divider">|</span>
-      <span class="record-score">שיא: ${record.score}</span>`;
+      <span class="record-score">שיא: ${escapeText(record.score)}</span>`;
   } else {
     recordBar.innerHTML = `<span class="record-trophy">🏆</span>
       <span class="record-holder">אין שיא עדיין — תהיה הראשון!</span>`;
@@ -289,11 +289,11 @@ function showUserSelectScreen() {
         <div class="user-item" role="button" tabindex="0" onclick="selectUser('${user.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectUser('${user.id}')}">
           <div class="user-item-avatar">${user.avatar}</div>
           <div class="user-item-info">
-            <div class="user-item-name">${user.name}</div>
+            <div class="user-item-name">${escapeText(user.name)}</div>
             <div class="user-item-stats">⭐ ${userProgress.stars} כוכבים | 🔥 ${userProgress.streak} ימים</div>
             <span class="user-item-grade">${gradeText}</span>
           </div>
-          <button class="user-item-delete" onclick="event.stopPropagation(); confirmDeleteUser('${user.id}', '${user.name}')" title="מחק משתמש">🗑️</button>
+          <button class="user-item-delete" onclick="event.stopPropagation(); confirmDeleteUser('${user.id}')" title="מחק משתמש">🗑️</button>
         </div>
       `;
     }).join('');
@@ -333,7 +333,8 @@ function showUserSwitch() {
   showUserSelectScreen();
 }
 
-function confirmDeleteUser(userId, userName) {
+function confirmDeleteUser(userId) {
+  const userName = getUserById(userId)?.name || '';
   if (confirm(`האם למחוק את המשתמש "${userName}"? כל ההתקדמות תימחק!`)) {
     deleteUser(userId);
     showUserSelectScreen(); // Refresh the list
@@ -5520,14 +5521,14 @@ async function loadAnalytics() {
       html += `
         <tr style="border-bottom: 1px solid #eee;">
           <td style="padding: 10px; text-align: right;">
-            ${medal} <span style="font-size: 1.2rem;">${user.avatar || '👤'}</span>
-            ${p.userName || user.name || 'לא ידוע'}
+            ${medal} <span style="font-size: 1.2rem;">${escapeText(user.avatar || '👤')}</span>
+            ${escapeText(p.userName || user.name || 'לא ידוע')}
           </td>
-          <td style="padding: 10px; text-align: center;"><span style="background: #ffd700; padding: 2px 8px; border-radius: 10px;">${p.stars || 0}</span></td>
-          <td style="padding: 10px; text-align: center;"><span style="background: #ff6b6b; color: white; padding: 2px 8px; border-radius: 10px;">${p.streak || 0}</span></td>
-          <td style="padding: 10px; text-align: center;">${p.gamesPlayed || 0}</td>
-          <td style="padding: 10px; text-align: center; font-size: 0.75rem;">עב:${quizHeb} אנ:${quizEng} מת:${quizMath}</td>
-          <td style="padding: 10px; text-align: center;">${(p.achievements || []).length}</td>
+          <td style="padding: 10px; text-align: center;"><span style="background: #ffd700; padding: 2px 8px; border-radius: 10px;">${Number(p.stars) || 0}</span></td>
+          <td style="padding: 10px; text-align: center;"><span style="background: #ff6b6b; color: white; padding: 2px 8px; border-radius: 10px;">${Number(p.streak) || 0}</span></td>
+          <td style="padding: 10px; text-align: center;">${Number(p.gamesPlayed) || 0}</td>
+          <td style="padding: 10px; text-align: center; font-size: 0.75rem;">עב:${Number(quizHeb) || 0} אנ:${Number(quizEng) || 0} מת:${Number(quizMath) || 0}</td>
+          <td style="padding: 10px; text-align: center;">${Array.isArray(p.achievements) ? p.achievements.length : 0}</td>
         </tr>
       `;
     });

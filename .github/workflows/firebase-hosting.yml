@@ -1,5 +1,6 @@
 name: Deploy to Firebase Hosting
 
+# Production: every push to main goes live at brainxiq.com — only after the smoke test passes.
 on:
   push:
     branches:
@@ -11,7 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
+      - name: Smoke test (blocks the deploy if the app is broken)
+        run: node tools/smoke.mjs
+
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:

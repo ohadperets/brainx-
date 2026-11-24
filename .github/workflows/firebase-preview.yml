@@ -1,0 +1,42 @@
+name: Deploy staging preview
+
+# Staging: push to the "staging" branch → a private preview link (Firebase preview channel),
+# never the live site. Also builds a preview for every pull request.
+# The link is shown in the run's "Deploy to preview channel" step (and on the PR).
+on:
+  push:
+    branches:
+      - staging
+  pull_request:
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Smoke test
+        run: node tools/smoke.mjs
+
+      - name: Deploy to preview channel (staging branch)
+        if: github.event_name == 'push'
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: brainx-a65b8
+          channelId: staging
+          expires: 30d
+
+      - name: Deploy to preview channel (pull request)
+        if: github.event_name == 'pull_request'
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: brainx-a65b8
+          expires: 7d

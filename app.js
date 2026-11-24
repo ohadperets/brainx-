@@ -533,7 +533,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const dailyTipEl = document.getElementById('daily-tip');
   if (dailyTipEl) dailyTipEl.textContent = tips[Math.floor(Math.random() * tips.length)];
 
-  if ('serviceWorker' in navigator) {
+  // The Android app bundles its files; the offline service worker is for the website only.
+  if ('serviceWorker' in navigator && !BrainXCloud.isNativeApp()) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
 });
@@ -695,7 +696,26 @@ function renderThemeGrid() {
 }
 
 // ===== TEXT-TO-SPEECH (for dictation) =====
+// Android app: the WebView has no speechSynthesis, so speech goes through the native
+// text-to-speech plugin (@capacitor-community/text-to-speech). Website: Web Speech API.
+function nativeTts() {
+  return (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.TextToSpeech) || null;
+}
+
+function stopSpeech() {
+  const tts = nativeTts();
+  if (tts) { tts.stop().catch(() => {}); return; }
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+}
+
 function speak(text, lang, rate = 0.9) {
+  const tts = nativeTts();
+  if (tts) {
+    tts.stop().catch(() => {})
+      .finally(() => tts.speak({ text: String(text), lang: lang || 'en-US', rate, pitch: 1.0, volume: 1.0, category: 'playback' })
+        .catch(e => console.warn('TTS error:', e)));
+    return;
+  }
   if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
   
@@ -1263,7 +1283,7 @@ function navigate(screen, subject, skipHistory = false) {
 }
 
 function goBack() {
-  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  stopSpeech();
   if (raceState.timer) { clearInterval(raceState.timer); raceState.timer = null; }
 
   // Use browser history for back navigation
@@ -1277,7 +1297,7 @@ function goBack() {
 
 // Handle browser back button
 window.addEventListener('popstate', (event) => {
-  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  stopSpeech();
   if (raceState.timer) { clearInterval(raceState.timer); raceState.timer = null; }
   
   if (screenHistory.length > 0) {
@@ -4871,7 +4891,9 @@ async function adminLogin() {
   const fail = (msg) => { errorEl.textContent = msg; errorEl.classList.remove('hidden'); };
   errorEl.classList.add('hidden');
   if (!window.brainxAdmin) {
-    fail(window.brainxCloudDisabled ? 'כניסת מנהל זמינה רק באתר הרשמי (brainxiq.com).' : 'החיבור לשרת עדיין לא מוכן. נסו שוב בעוד רגע.');
+    fail(window.brainxCloudDisabled || window.brainxAdminInApp || BrainXCloud.isNativeApp()
+      ? 'כניסת מנהל זמינה רק באתר (brainxiq.com), לא באפליקציה.'
+      : 'החיבור לשרת עדיין לא מוכן. נסו שוב בעוד רגע.');
     return;
   }
   if (btn) btn.disabled = true;
@@ -6640,7 +6662,11 @@ function openParentGate(action) {
     }
     close();
     if (action === 'contact' && CONTACT_EMAIL) window.location.href = `mailto:${CONTACT_EMAIL}?subject=BrainX`;
-    if (action === 'privacy') window.open('privacy.html', '_blank', 'noopener');
+    if (action === 'privacy') {
+      // in the Android app, external links open in the phone's browser
+      if (BrainXCloud.isNativeApp()) window.location.href = 'https://brainxiq.com/privacy.html';
+      else window.open('privacy.html', '_blank', 'noopener');
+    }
   };
   overlay.addEventListener('click', e => {
     const k = e.target.closest && e.target.closest('[data-gate]')?.dataset.gate;

@@ -1,16 +1,23 @@
 {
   "dependencies": {
-    "firebase-admin": "^13.6.1"
+    "firebase-admin": "^13.6.1",
+    "@capacitor/android": "8.6.2",
+    "@capacitor/core": "8.6.2",
+    "@capacitor-community/text-to-speech": "8.0.2"
   },
   "private": true,
   "scripts": {
     "smoke": "node tools/smoke.mjs",
     "test:rules": "firebase emulators:exec --only firestore --project demo-brainx \"node --test tests/*.test.mjs\"",
-    "test:rules:final": "firebase emulators:exec --only firestore --project demo-brainx \"RULES_FILE=firestore.final.rules node --test tests/*.test.mjs\""
+    "test:rules:final": "firebase emulators:exec --only firestore --project demo-brainx \"RULES_FILE=firestore.final.rules node --test tests/*.test.mjs\"",
+    "android:apk": "bash scripts/build-android.sh apk",
+    "android:aab": "bash scripts/build-android.sh aab",
+    "build:web": "node tools/build-web.mjs"
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "6.0.0",
     "firebase": "13.4.0",
-    "firebase-tools": "15.37.0"
+    "firebase-tools": "15.37.0",
+    "@capacitor/cli": "8.6.2"
   }
 }

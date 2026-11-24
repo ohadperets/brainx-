@@ -476,3 +476,12 @@ button.daily-challenge-card { width: 100%; font: inherit; text-align: start; }
 /* profile name hint + admin sign-in */
 .name-hint { color: var(--text-3); font-weight: 400; font-size: 0.8rem; }
 .admin-help { color: var(--text-2); text-align: center; margin-bottom: 12px; }
+
+/* ---------- safe areas (Android edge-to-edge in the app; notches on phones) ----------
+   Capacitor's SystemBars plugin injects --safe-area-inset-*; browsers provide env(). */
+:root {
+  --sai-top: max(env(safe-area-inset-top, 0px), var(--safe-area-inset-top, 0px));
+  --sai-bottom: max(env(safe-area-inset-bottom, 0px), var(--safe-area-inset-bottom, 0px));
+}
+.app-header { height: calc(var(--header-height) + var(--sai-top)); padding-top: var(--sai-top); }
+.bottom-nav { height: calc(var(--nav-height) + var(--sai-bottom)); padding-bottom: var(--sai-bottom); }

@@ -6,3 +6,9 @@ service-account*.json
 *legacy*backup*.json
 firebase-debug.log
 firestore-debug.log
+# Android build (Capacitor): bundled web copy, outputs, signing
+www/
+dist/
+*.jks
+*.keystore
+keystore.properties

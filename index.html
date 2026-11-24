@@ -52,7 +52,7 @@
 
     async function initFirebase() {
       // core/cloud.js is a classic script that runs before this (deferred) module
-      const prodHost = window.BrainXCloud && BrainXCloud.isProductionHost(location.hostname);
+      const prodHost = window.BrainXCloud && BrainXCloud.cloudAllowed(location.hostname);
       if (!prodHost) {
         console.info('BrainX: cloud features are off on this host (' + location.hostname + ')');
         window.firebaseReady = false;
@@ -83,6 +83,10 @@
         }
       });
       if (!auth.currentUser) await au.signInAnonymously(auth);
+
+      // --- admin: not available inside the Android app (Google's sign-in popup does not run
+      //     in a WebView); the admin signs in on the website instead ---
+      if (BrainXCloud.isNativeApp()) { window.brainxAdminInApp = true; return; }
 
       // --- admin: Google sign-in on a SEPARATE app instance, so the device's anonymous
       //     session (and the children's sync) is never replaced by the admin account ---

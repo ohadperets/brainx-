@@ -13,7 +13,13 @@
       "package-lock.json",
       "firestore.final.rules",
       "GOOGLE_PLAY_READINESS.md",
-      "*.md"
+      "*.md",
+      "android/**",
+      "assets/**",
+      "scripts/**",
+      "www/**",
+      "dist/**",
+      "capacitor.config.json"
     ],
     "rewrites": [
       {

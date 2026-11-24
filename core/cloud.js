@@ -19,6 +19,18 @@ const BrainXCloud = (() => {
     return PRODUCTION_HOSTS.includes(String(hostname || '').toLowerCase());
   }
 
+  // The Android app (Capacitor) serves the bundled files from https://localhost.
+  // Only a real native app counts — a plain localhost browser tab does not.
+  function isNativeApp(win = (typeof window !== 'undefined' ? window : null)) {
+    try { return !!(win && win.Capacitor && win.Capacitor.isNativePlatform && win.Capacitor.isNativePlatform()); }
+    catch (e) { return false; }
+  }
+
+  // Cloud features (production database) run on the production website and in the store app.
+  function cloudAllowed(hostname, win) {
+    return isProductionHost(hostname) || isNativeApp(win);
+  }
+
   // Generated public nickname: animal/thing from the avatar + a number, e.g. "שועל 37".
   const AVATAR_WORDS = {
     '😎': 'מגניב', '🦊': 'שועל', '🐱': 'חתול', '🐶': 'כלב', '🦁': 'אריה', '🐼': 'פנדה',
@@ -79,7 +91,7 @@ const BrainXCloud = (() => {
     return first ? `${first}.` : 'אנונימי';
   }
 
-  return { PRODUCTION_HOSTS, isProductionHost, makeTag, buildProfileDoc, recordDocId, buildRecordDoc, displayName, AVATAR_WORDS };
+  return { PRODUCTION_HOSTS, isProductionHost, isNativeApp, cloudAllowed, makeTag, buildProfileDoc, recordDocId, buildRecordDoc, displayName, AVATAR_WORDS };
 })();
 
 if (typeof module !== 'undefined' && module.exports) module.exports = BrainXCloud;

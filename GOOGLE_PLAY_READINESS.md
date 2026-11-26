@@ -124,7 +124,18 @@ migration; only the cloud copies change. Every phase is reversible until phase 4
 
 ---
 
-## 7. Android packaging (not started)
-Plan: Trusted Web Activity built with Bubblewrap (free), package name e.g. `com.brainxiq.app`,
-Digital Asset Links file at `https://brainxiq.com/.well-known/assetlinks.json`, maskable icons already present.
-Requires a Google Play developer account (one-time USD 25 — the only cost, already planned for publishing).
+## 7. Android app (Capacitor 8) — branch `android-app`
+| Item | Status |
+|---|---|
+| Capacitor 8.6.2 project `com.brainxiq.app`, one codebase (`tools/build-web.mjs` → `www/`) | ✅ |
+| targetSdk / compileSdk 36 (Android 16), minSdk 24 | ✅ meets Play's 2026 target-API rule |
+| Permissions: INTERNET, VIBRATE; `AD_ID` explicitly removed; no ads/analytics SDKs | ✅ Families |
+| Edge-to-edge (Android 15+) safe areas | ✅ |
+| Text-to-speech via native plugin (WebView has no speechSynthesis) | ✅ |
+| Cloud features in the app (anonymous auth, private sync, records); admin website-only | ✅ |
+| Icons + splash (BrainX brand) | ✅ |
+| Cloud build: GitHub Actions → debug APK + private Firebase preview download link (7 days) | 🟡 first run in progress |
+| Local build `npm run android:apk / android:aab` (outside Drive, `~/.brainx-build`) | 🟡 blocked on the corporate network (Gradle download from GitHub); works off that network |
+| Release AAB signing (upload key outside repo) | ⏳ owner creates the key (ANDROID.md) |
+| Play listing: Families declarations, Data safety (section 6), screenshots, content rating questionnaire | ⏳ |
+| App storage is separate from browser storage (website progress doesn't carry into the app) | ℹ️ documented |

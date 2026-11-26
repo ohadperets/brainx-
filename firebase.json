@@ -19,7 +19,9 @@
       "scripts/**",
       "www/**",
       "dist/**",
-      "capacitor.config.json"
+      "capacitor.config.json",
+      "apk-site/**",
+      "ANDROID.md"
     ],
     "rewrites": [
       {

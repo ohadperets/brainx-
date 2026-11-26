@@ -1,0 +1,76 @@
+name: Android build
+
+# Builds the BrainX Android app (Capacitor) in the cloud — no local Gradle download needed.
+# - push to the "android-app" branch, or run manually (Actions → Android build → Run workflow)
+# - output: debug APK as a build artifact AND on a private Firebase preview link (expires in 7 days)
+# - never touches the live website (preview channel "android-test", separate download page)
+on:
+  push:
+    branches: [android-app]
+  workflow_dispatch:
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Install packages
+        run: npm ci --no-audit --no-fund
+
+      - name: Smoke test
+        run: node tools/smoke.mjs
+
+      - name: Bundle web files and sync Capacitor
+        run: |
+          node tools/build-web.mjs
+          npx cap sync android
+
+      - name: Build debug APK
+        run: |
+          VERSION=$(sed -nE "s/.*APP_VERSION = '([0-9]+)'.*/\1/p" version.js)
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          cd android
+          ./gradlew --no-daemon -PbrainxVersionCode="$VERSION" -PbrainxVersionName="$VERSION" assembleDebug
+          ls -la app/build/outputs/apk/debug/
+
+      - name: Keep the APK as a build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: brainx-v${{ env.VERSION }}-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 14
+
+      - name: Prepare download page
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk apk-site/public/brainx-debug.apk
+          sed -i "s/__VERSION__/v${VERSION}/; s/__DATE__/$(date -u +%Y-%m-%d)/" apk-site/public/index.html
+
+      - name: Publish to a private preview link (expires in 7 days)
+        id: preview
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: brainx-a65b8
+          entryPoint: ./apk-site
+          channelId: android-test
+          expires: 7d
+
+      - name: Show the download link
+        run: |
+          echo "::notice title=APK download page::${{ steps.preview.outputs.details_url }}"
+          echo "### 📱 BrainX v${VERSION} test APK" >> "$GITHUB_STEP_SUMMARY"
+          echo "Download page (open on the Android phone): ${{ steps.preview.outputs.details_url }}" >> "$GITHUB_STEP_SUMMARY"

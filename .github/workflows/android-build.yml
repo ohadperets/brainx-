@@ -68,14 +68,22 @@ jobs:
 
       - name: Publish to a private preview link (expires in 7 days)
         id: preview
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          projectId: brainx-a65b8
-          entryPoint: ./apk-site
-          channelId: android-test
-          expires: 7d
+        env:
+          SA_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          echo "$SA_JSON" > "$RUNNER_TEMP/sa.json"
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
+          cd apk-site
+          if ! npx --no-install firebase hosting:channel:deploy android-test --expires 7d \
+               --project brainx-a65b8 --json --non-interactive > ../deploy.json 2> ../deploy.err; then
+            grep -hE "Error|error|denied|permission" ../deploy.err ../deploy.json | head -15 | while IFS= read -r line; do
+              echo "::error title=firebase::$line"
+            done
+            cat ../deploy.err ../deploy.json; rm -f "$RUNNER_TEMP/sa.json"; exit 1
+          fi
+          rm -f "$RUNNER_TEMP/sa.json"
+          URL=$(node -e "const r=require('../deploy.json'); const s=Object.values(r.result||{})[0]||{}; console.log(s.url||'')")
+          echo "details_url=$URL" >> "$GITHUB_OUTPUT"
 
       - name: Show the download link
         run: |

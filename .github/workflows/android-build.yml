@@ -43,7 +43,15 @@ jobs:
           VERSION=$(sed -nE "s/.*APP_VERSION = '([0-9]+)'.*/\1/p" version.js)
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           cd android
-          ./gradlew --no-daemon -PbrainxVersionCode="$VERSION" -PbrainxVersionName="$VERSION" assembleDebug
+          if ! ./gradlew --no-daemon -PbrainxVersionCode="$VERSION" -PbrainxVersionName="$VERSION" assembleDebug > ../gradle-build.log 2>&1; then
+            # surface Gradle's error summary as annotations (readable without opening the log)
+            grep -A12 -E "What went wrong|error:|FAILURE" ../gradle-build.log | head -30 | while IFS= read -r line; do
+              [ -n "$line" ] && echo "::error title=gradle::$line"
+            done
+            tail -80 ../gradle-build.log
+            exit 1
+          fi
+          tail -15 ../gradle-build.log
           ls -la app/build/outputs/apk/debug/
 
       - name: Keep the APK as a build artifact
